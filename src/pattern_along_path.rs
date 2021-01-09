@@ -104,8 +104,8 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
         PatternCopies::Repeated => {
             // we divide the total arc-length by our pattern's width and then floor it to the nearest integer
             // and this gives us the total amount of whole copies that could fit along this path
-            let copies = (total_arclen/pattern_width) as usize;
-            let left_over = total_arclen/pattern_width - copies as f64;
+            let copies = (total_arclen/total_width) as usize;
+            let left_over = total_arclen/total_width - copies as f64;
 
 
             let mut stretch_len = 0.;
