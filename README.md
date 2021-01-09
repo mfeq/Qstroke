@@ -1,6 +1,8 @@
 # QStroke
 A set of utilities for stroking paths in font glyphs written in rust.
 
+Disclaimer: This repo has absolutely nothing to do with QAnon. It is a part of the MFEQ editor project.
+
 QStroke takes unified font object files and applies path stroking algorithms to them. Currently only pattern along path is provided.
 
 ## Pattern Along Path
