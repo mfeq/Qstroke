@@ -16,3 +16,6 @@ This was generated with the following command:
 ```
 cargo run -- --pattern simple.glif --path Q_.glif --out output.glif --sx 0.3 --sy 0.1 --stretch true --subdivide 2 --mode repeated
 ```
+
+(c) 2021 Matthew Blanchard
+(c) 2021 MFEQ authors
