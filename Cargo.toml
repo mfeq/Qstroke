@@ -1,7 +1,7 @@
 [package]
-name = "QStroke"
+name = "Qstroke"
 version = "0.0.0"
-authors = ["Matthew Blanchard <matthewrblanchard@gmail.com>"]
+authors = ["Matthew Blanchard <matthewrblanchard@gmail.com>", "MFEQ authors"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,10 +13,10 @@ clap = "2.33.3"
 # parses .glif files 
 glifparser = { git = "https://github.com/mfeq/glifparser" }
 
-# we make use of skulpin path ops and provide utilities to convert between skulpin and the math library
-skulpin = { version = "0.10.0", default-features = false, features = ["skia_complete"] }
-
 # For reading and writing glifs
 xmltree = "0.10.1"
 log = "0.4.11"
 xmlwriter = "0.1.0"
+
+# For Skia pathops
+skia-safe = "0"

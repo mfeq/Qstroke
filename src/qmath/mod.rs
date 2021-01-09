@@ -1,7 +1,6 @@
 use glifparser::{ WhichHandle, Contour};
 use glifparser::{Outline, Handle, PointType};
-use skulpin::skia_safe as skia;
-use skia::{path, Path};
+use skia_safe::{self as skia, path, Path};
 
 // stub PointData out here, really not sure how I should be handnling this because we need a concrete
 // type to construct our own glif
@@ -37,7 +36,7 @@ impl Vector {
         return (self.x as f32, self.y as f32);
     }
 
-    pub fn from_skia_point(p: &skulpin::skia_safe::Point) -> Self
+    pub fn from_skia_point(p: &skia_safe::Point) -> Self
     {
         return Vector {x: p.x as f64, y: p.y as f64 }
     }
