@@ -72,7 +72,7 @@ impl Vector {
         Vector {x: self.x + v1.x, y: self.y + v1.y}
     }
 
-    pub fn subtract(self, v1: Vector) -> Self
+    pub fn sub(self, v1: Vector) -> Self
     {
         Vector {x: self.x - v1.x, y: self.y - v1.y}
     }
@@ -837,6 +837,7 @@ impl NormalLUT {
                     // previous derivative
                     let ld_dist1 = Vector::distance(candidate_normal1, ld);
                     let ld_dist2 = Vector::distance(candidate_normal2, ld);
+                    println!("YEET");
 
                     normal = if ld_dist1 >= ld_dist2 { candidate_normal1 } else { candidate_normal2 };
                 }
@@ -857,7 +858,7 @@ impl NormalLUT {
         return Self{ normals: output };
     }
 
-    // Fetches normals from our vector and linearly interpolates between them.
+    // Fetches normals from our vector and linearly interpolates between them when t lies between two samples.
     pub fn evaluate(&self, u: f64) -> Vector
     {
         // lets clamp our t to 0-1 this prevents overreads but is a bit of a hack for things that need to get fixed
