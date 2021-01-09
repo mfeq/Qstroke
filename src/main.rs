@@ -1,3 +1,5 @@
+#![feature(clamp)]
+
 mod qmath;
 mod pattern_along_path;
 mod glifwriter;
