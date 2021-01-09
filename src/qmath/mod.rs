@@ -837,7 +837,6 @@ impl NormalLUT {
                     // previous derivative
                     let ld_dist1 = Vector::distance(candidate_normal1, ld);
                     let ld_dist2 = Vector::distance(candidate_normal2, ld);
-                    println!("YEET");
 
                     normal = if ld_dist1 >= ld_dist2 { candidate_normal1 } else { candidate_normal2 };
                 }
