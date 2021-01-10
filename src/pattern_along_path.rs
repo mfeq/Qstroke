@@ -152,7 +152,6 @@ fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piec
     let mut output_piecewise: Piecewise<Piecewise<Bezier>> = Piecewise { curves: Vec::new() };
 
     let prepared_pattern = prepare_pattern(path, pattern, &arclenparam, settings);
-    let normals = NormalLUT::from_piecewise(path, 1e+5 as usize, Some(&arclenparam));
 
     let transform = |point: &Vector| {
         let u = point.x/total_arclen;
@@ -168,7 +167,7 @@ fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piec
         // we rotate the vector by 90 degrees so that it's perpendicular to the direction of travel along the curve
         // normalize the vector and now we've got a unit vector perpendicular to the curve's surface in 'curve space'
         // check out NormalLUT for more info on this step
-        let N = normals.evaluate(t);
+        let N = Vector{x: d.y, y: -d.x}.normalize();
 
         // now we multiply this by the y value of the pattern this gives us a point
         // that is as far away from the curve as the input is tall in the direction of the
