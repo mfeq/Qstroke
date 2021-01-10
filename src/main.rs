@@ -2,7 +2,6 @@
 
 mod qmath;
 mod pattern_along_path;
-mod glifwriter;
 
 use clap::{Arg, App};
 use pattern_along_path::*;
@@ -185,6 +184,6 @@ fn main() {
 
 
     let output = pattern_along_glif(&path, &pattern, &settings);
-    let glifstring = glifwriter::write_ufo_glif(output);
+    let glifstring = glifparser::write_ufo_glif(output);
     fs::write(output_string, glifstring).expect("Unable to write file");
 }

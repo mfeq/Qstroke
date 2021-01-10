@@ -400,7 +400,7 @@ impl Evaluate for Bezier {
 // This struct models a simple piecewise function. It maps 0-1 such that 0 is the beginning of the first curve
 // in the collection and 1 is the end of the last. It does not currently support arbitrary cuts.
 pub struct Piecewise<T: Evaluate> {
-    // this should definitely change to private at some point with a getter
+    // this should definitely change to private at some point with an iterator or getter to access
     pub curves: Vec<T>,
 }
 
@@ -598,7 +598,6 @@ impl Piecewise<Bezier>
         };
 
         let mut lastpoint: Option<&glifparser::Point<U>> = None;
-        let firstpoint = contour.first().unwrap();
 
         for point in contour
         {
@@ -613,6 +612,7 @@ impl Piecewise<Bezier>
             lastpoint = Some(point);
         }
 
+        let firstpoint = contour.first().unwrap();
         if firstpoint.ptype != PointType::Move {
             ret.curves.push(Bezier::from(&lastpoint.unwrap(), firstpoint));
         }
