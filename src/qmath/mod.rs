@@ -353,7 +353,7 @@ impl Evaluate for Bezier {
     {
         let u = f64::clamp(_u, 0., 1.);
         let e = 1e-10;
-        let offset = 1e-5;
+        let offset = 1e-3;
         let mut t = u;
         
         // this is a bit of a hack because we might be sampling off-curve
@@ -362,6 +362,12 @@ impl Evaluate for Bezier {
         if u + e > 1. { t = t - offset};
         if u - e < 0. { t = t + offset};
 
+        // calculate the tangent vector for the point        
+        Vector {
+            x: 3. * self.A * t * t + 2. * self.B * t + self.C,
+            y: 3. * self.E * t * t + 2. * self.F * t + self.G 
+        }
+        /*
         let v0 = self.evaluate(t + e);
         let v1 = self.evaluate(t - e);
 
@@ -369,6 +375,7 @@ impl Evaluate for Bezier {
             x: (v1.x - v0.x) / (2. * e),
             y: (v1.y - v0.y) / (2. * e)
         }
+        */
     }
 
     fn apply_transform<F>(&self, transform: F) -> Self where F: Fn(&Vector) -> Vector
@@ -780,104 +787,4 @@ impl Parameterization for ArcLengthParameterization
             return (arclen_index as f64 + segment_fraction) / (self.arclens.len() - 1) as f64;
         }
     }
-}
-
-// Generates a look up table of normal vectors for a piecewise it's not an Evaluate because it doesn't
-// satisfy a few of the conditions, but it works similarly.
-pub struct NormalLUT {
-    normals: Vec<Vector>
-}
-
-impl NormalLUT {
-    // Generating normals is a bit harder than the blog post linked in pattern_along_path,rs makes it out to be. The problem lies in
-    // there always being two valid normals for each point along the curve. Naively flipping the derivative in one
-    // direction causes artifacts and inconsistencies. This function 'rides the curve' staying on one side. 
-    // This gives consistent normals along the input piecewise.
-    pub fn from_piecewise<T: Evaluate>(path: &Piecewise<T>,  increments: usize, param: Option<&impl Parameterization>) -> Self
-    {
-        let mut output = Vec::new();
-
-        // the distance between our samples 
-        let slice = 1. / increments as f64;
-
-        let mut last_derivative = None;
-        let mut last_normal = None;
-        for n in 0 .. increments {
-            // calculate our time and map it to arc-length
-            let u = n as f64 * slice;
-            
-            let t;
-            if let Some(parameterization) = param {
-                t = parameterization.parameterize(u);
-            } else {
-                t = u;
-            }
-
-            // calculate the derivative at this point on the curve
-            let d = path.derivative(t);
-
-            // we find our two candidates for the surface normal at the current point
-            let candidate_normal1 = Vector { x: -d.y, y: d.x }.normalize();
-            let candidate_normal2 = Vector { x: d.y, y: -d.x }.normalize();
-
-            let mut normal = candidate_normal1;
-
-            if let Some(ld) = last_derivative {
-                let ln = last_normal.unwrap();
-
-                // we measure the distance from our candidates to our last normal
-                let cn_dist1 = Vector::distance(candidate_normal1, ln);
-                let cn_dist2 = Vector::distance(candidate_normal2, ln);
-
-                // First we deal with the possible case of our normals being equidistant from the last one.
-                // This generally happens at right angles.
-                if cn_dist1 == cn_dist2 {
-                    // in cases where the normals are equidistant we choose the one that is closest to our
-                    // previous derivative
-                    let ld_dist1 = Vector::distance(candidate_normal1, ld);
-                    let ld_dist2 = Vector::distance(candidate_normal2, ld);
-
-                    normal = if ld_dist1 >= ld_dist2 { candidate_normal1 } else { candidate_normal2 };
-                }
-                else
-                {
-                    // if our normals aren't equally distant from the previous normal then we simply choose
-                    // the one which is closest to our previous normal so that the normal doesn't flip at curve
-                    // boundaries
-                    normal = if cn_dist1 >= cn_dist2 { candidate_normal2 } else { candidate_normal1 };
-                }
-            }
-
-            output.push(normal);
-            last_derivative = Some(d);
-            last_normal = Some(normal);
-        }
-
-        return Self{ normals: output };
-    }
-
-    // Fetches normals from our vector and linearly interpolates between them when t lies between two samples.
-    pub fn evaluate(&self, u: f64) -> Vector
-    {
-        // lets clamp our t to 0-1 this prevents overreads but is a bit of a hack for things that need to get fixed
-        // in the pattern preperation process
-        let t = f64::min(f64::max(u, 0.), 1.);
-
-        // we multiply t by our segments then subtract the floored version of this value from the original to get
-        // our offset t for that curve
-        let modified_time = (self.normals.len() - 1) as f64 * t;
-        let index = modified_time.floor().min((self.normals.len() - 1) as f64) as usize;
-        let offset_time = modified_time - index as f64;
-
-        let mut normal = self.normals[index];
-        
-        if offset_time != 0. {
-            let next_normal = self.normals[index+1];
-            normal = Vector::lerp(normal, next_normal, offset_time);
-        }
-
-
-        return normal;
-    }
-
 }
