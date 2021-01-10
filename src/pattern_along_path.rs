@@ -32,7 +32,8 @@ pub enum PatternSubdivide {
 
 pub enum PatternHandleDiscontinuity {
     Off, // no handling
-    Cut // We cut the input between discontinuities as if it were a film tape and resume the cut where it left off
+    Split(f64) 
+    // Cut TODO: implement
 }
 
 // This takes our pattern settings and translate/splits/etc our input pattern in preparation of the main algorithm. This is essentially so we don't need to keep track of offsets
@@ -229,10 +230,10 @@ pub fn pattern_along_glif<U>(path: &Glif<U>, pattern: &Glif<Option<PointData>>, 
     return Glif {
         outline: Some(output_outline), 
         order: pattern.order, // default when only corners
-        anchors: None,
-        width: pattern.width,
-        unicode: pattern.unicode,
-        name: String::new(),
+        anchors: path.anchors.clone(),
+        width: path.width,
+        unicode: path.unicode,
+        name: path.name.clone(),
         format: 2,
     };
 }
