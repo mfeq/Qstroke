@@ -1,4 +1,5 @@
 use crate::qmath::*;
+
 use glifparser::{Glif, Outline};
 
 pub struct PatternSettings {
