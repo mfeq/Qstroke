@@ -5,7 +5,7 @@ mod pattern_along_path;
 
 use clap::{Arg, App};
 use pattern_along_path::*;
-use qmath::{Vector};
+use qmath::Vector;
 use std::fs;
 
 fn main() {
