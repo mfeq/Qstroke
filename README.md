@@ -7,8 +7,6 @@ Stroke takes unified font object files and applies path stroking algorithms to t
 
 ## Pattern Along Path
 
-![alt text](https://user-images.githubusercontent.com/310356/104104000-4955ab80-5273-11eb-9d16-4b8052a05df7.PNG)
-
 This was generated with the following command:
 
 ```
