@@ -11,7 +11,7 @@ edition = "2018"
 clap = "2.33.3"
 
 # parses .glif files 
-glifparser = { git = "https://github.com/mfeq/glifparser" }
+glifparser = { git = "https://github.com/MFEK/glifparser" }
 
 # For reading and writing glifs
 xmltree = "0.10.1"

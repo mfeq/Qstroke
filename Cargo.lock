@@ -267,7 +267,7 @@ dependencies = [
 [[package]]
 name = "glifparser"
 version = "0.0.0"
-source = "git+https://github.com/mfeq/glifparser#8d671602e80a6424c5afd1b39cb50c31b4fff867"
+source = "git+https://github.com/MFEK/glifparser#8d671602e80a6424c5afd1b39cb50c31b4fff867"
 dependencies = [
  "log",
  "xmltree",
