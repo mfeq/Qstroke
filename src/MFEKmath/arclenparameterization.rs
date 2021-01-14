@@ -1,4 +1,5 @@
-use super::{Evaluate, Parameterization};
+use super::evaluate::Evaluate;
+use super::parameterization::Parameterization;
 use super::vector::Vector;
 
 // We build a table of total arc length along the line and use it to map 0-1

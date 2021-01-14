@@ -7,9 +7,14 @@ pub struct Vector {
 }
 
 impl Vector {
+    pub fn from_components(x: f64, y: f64) -> Self
+    {
+        Vector{ x: x, y: y }
+    }
+
     pub fn from_point<T>(point: &glifparser::Point<T>) -> Self
     {
-        return Vector { x: point.x as f64, y: point.y as f64 };
+        Vector { x: point.x as f64, y: point.y as f64 }
     }
 
     pub fn to_point<T>(self, handle_a: Handle, handle_b: Handle) -> glifparser::Point<T>
