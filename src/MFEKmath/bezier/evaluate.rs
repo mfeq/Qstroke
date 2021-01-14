@@ -1,7 +1,7 @@
 use super::super::{Vector, Evaluate, Rect, Bezier};
 
 impl Evaluate for Bezier {
-    // return the x, y of our curve at time t
+
     fn evaluate(&self, t: f64) -> Vector
     {
         Vector {

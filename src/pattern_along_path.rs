@@ -1,6 +1,8 @@
-use crate::qmath::*;
+use crate::MFEKmath::{ArcLengthParameterization, Bezier, Evaluate, EvaluateTransform, Parameterization, Piecewise, Vector};
+use crate::MFEKmath::piecewise::glif::PointData;
 
 use glifparser::{Glif, Outline};
+use skia_safe::{path, Path};
 
 pub struct PatternSettings {
     pub copies: PatternCopies,
@@ -168,7 +170,6 @@ fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piec
 
         // we rotate the vector by 90 degrees so that it's perpendicular to the direction of travel along the curve
         // normalize the vector and now we've got a unit vector perpendicular to the curve's surface in 'curve space'
-        // check out NormalLUT for more info on this step
         let N = Vector{x: d.y, y: -d.x}.normalize();
 
         // now we multiply this by the y value of the pattern this gives us a point
@@ -203,8 +204,8 @@ fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piec
 pub fn pattern_along_glif<U>(path: &Glif<U>, pattern: &Glif<Option<PointData>>, settings: &PatternSettings) -> Glif<Option<PointData>>
 {
     // convert our path and pattern to piecewise collections of beziers
-    let piece_path = Piecewise::from_outline(path.outline.as_ref().unwrap());
-    let piece_pattern = Piecewise::from_outline(pattern.outline.as_ref().unwrap());
+    let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
+    let piece_pattern = Piecewise::from(pattern.outline.as_ref().unwrap());
 
     let mut output_outline: Outline<Option<PointData>> = Vec::new();
 
@@ -216,8 +217,8 @@ pub fn pattern_along_glif<U>(path: &Glif<U>, pattern: &Glif<Option<PointData>>, 
             // we're gonna simplify our output, particularly useful when using a pattern like a 
             // square in single mode to generate a stroke, but skia is a bit finicky about how it returns the winding
             // order so with some complicated shapes it will return flawed results
-            let skpattern = temp_pattern.to_skpath();
-            temp_pattern = Piecewise::from_skpath(&skpattern.simplify().unwrap().as_winding().unwrap());
+            let skpattern: Path = temp_pattern.to_skpath();
+            temp_pattern = Piecewise::from(&skpattern.simplify().unwrap().as_winding().unwrap());
         }
 
         let temp_outline = temp_pattern.to_outline();

@@ -1,11 +1,13 @@
 #![feature(clamp)]
 
-mod qmath;
+mod MFEKmath;
 mod pattern_along_path;
 
 use clap::{Arg, App};
 use pattern_along_path::*;
-use qmath::Vector;
+use MFEKmath::Vector;
+use MFEKmath::piecewise::glif::PointData;
+
 use std::fs;
 
 fn main() {
@@ -76,10 +78,10 @@ fn main() {
     let pattern_string = matches.value_of("pattern").unwrap();
     let output_string = matches.value_of("output").unwrap();
 
-    let path: glifparser::Glif<Option<qmath::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(path_string)
+    let path: glifparser::Glif<Option<MFEKmath::piecewise::glif::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(path_string)
     .expect("Failed to read path file!"));
  
-    let pattern: glifparser::Glif<Option<qmath::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(pattern_string)
+    let pattern: glifparser::Glif<Option<MFEKmath::piecewise::glif::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(pattern_string)
         .expect("Failed to read pattern file!"));
 
 

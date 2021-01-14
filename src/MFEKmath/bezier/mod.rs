@@ -1,9 +1,9 @@
-use super::Evaluate;
 use super::vector::Vector;
-use super::rect::Rect;
 use glifparser::{WhichHandle};
 
 mod evaluate;
+mod characteristics;
+mod intersection;
 
 #[derive(Clone)]
 #[allow(non_snake_case)]
