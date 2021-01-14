@@ -1,15 +1,15 @@
-# Qstroke
+# MFEK/stroke
 
-(c) 2021 Matthew Blanchard, MFEQ authors
+(c) 2021 Matthew Blanchard, MFEK authors
 
 A set of utilities for stroking paths in font glyphs written in Rust.
 
-This program is part of the [MFEQ project](https://github.com/mfeq/mfeq/).
+This program is part of the [MFEK project](https://github.com/mfeq/MFEK/).
 
 Qstroke takes UFO `.glif` files and applies path stroking algorithms to them. Currently only pattern-along-path (PaP) is provided.
 
 ## Pattern Along Path
-### As seen in Qglif…
+### As seen in MFEK/glif…
 ![Chomsky `Q` patterned with arrows](https://user-images.githubusercontent.com/310356/104128458-9ac66f00-5335-11eb-94d3-f458f6cfb464.png)
 
 This was generated with the following command:
