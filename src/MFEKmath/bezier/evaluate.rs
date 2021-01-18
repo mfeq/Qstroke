@@ -13,21 +13,23 @@ impl Evaluate for Bezier {
     
     fn derivative(&self, _u: f64) -> Vector
     {
+        // TODO: Fix the code calling this and remove this terrible cludge. Luckily this is currently
+        // only called in the PaP code.
         let u = f64::clamp(_u, 0., 1.);
         let e = 1e-10;
         let offset = 1e-3;
         let mut t = u;
-        
+
         // this is a bit of a hack because we might be sampling off-curve
         // so we just shift t over a really tiny amount to keep our samples bounded
         // between 0-1
         if u + e > 1. { t = t - offset};
         if u - e < 0. { t = t + offset};
 
-        // calculate the tangent vector for the point        
+        // calculate the tangent vector for the point
         Vector {
             x: 3. * self.A * t * t + 2. * self.B * t + self.C,
-            y: 3. * self.E * t * t + 2. * self.F * t + self.G 
+            y: 3. * self.E * t * t + 2. * self.F * t + self.G
         }
     }
 
@@ -41,7 +43,7 @@ impl Evaluate for Bezier {
             transform(&original_points[3]),
         ];
 
-        return Bezier::from_control_points(tp[0], tp[1], tp[2], tp[3]);
+        return Bezier::from_points(tp[0], tp[1], tp[2], tp[3]);
     }
 
     fn bounds(&self) -> Rect

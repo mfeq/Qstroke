@@ -1,4 +1,6 @@
-use glifparser::{Handle, WhichHandle, PointType};
+mod skia;
+mod glif;
+mod flo;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vector {
@@ -10,53 +12,6 @@ impl Vector {
     pub fn from_components(x: f64, y: f64) -> Self
     {
         Vector{ x: x, y: y }
-    }
-
-    pub fn from_point<T>(point: &glifparser::Point<T>) -> Self
-    {
-        Vector { x: point.x as f64, y: point.y as f64 }
-    }
-
-    pub fn to_point<T>(self, handle_a: Handle, handle_b: Handle) -> glifparser::Point<T>
-    {
-        return glifparser::Point {
-            x: self.x as f32,
-            y: self.y as f32,
-            a: handle_a,
-            b: handle_b,
-            data: None,
-            name: None,
-            ptype: PointType::Curve
-        }
-    }
-
-    pub fn to_skia_point(self) -> (f32, f32)
-    {
-        return (self.x as f32, self.y as f32);
-    }
-
-    pub fn from_skia_point(p: &skia_safe::Point) -> Self
-    {
-        return Vector {x: p.x as f64, y: p.y as f64 }
-    }
-
-    pub fn from_handle<T>(point: &glifparser::Point<T>, which: WhichHandle) -> Vector
-    {
-        let handle = match which {
-            WhichHandle::A => point.a,
-            WhichHandle::B => point.b,
-            WhichHandle::Neither => Handle::Colocated,
-        };
-
-        match handle {
-            Handle::At(x, y) => Vector {x: x as f64, y: y as f64},
-            Handle::Colocated => Self::from_point(point),
-        }
-    }
-
-    pub fn to_handle(self) -> Handle
-    {
-        Handle::At(self.x as f32, self.y as f32)
     }
 
     pub fn is_near(self, v1: Vector, eps: f64) -> bool
@@ -122,7 +77,7 @@ impl std::ops::Add<Vector> for Vector {
 impl std::ops::Sub<Vector> for Vector {
     type Output = Vector;
     
-    fn sub(self, v1: Vector) -> Vector { return self.add(v1);}
+    fn sub(self, v1: Vector) -> Vector { return self.sub(v1);}
 }
 
 impl std::ops::Mul<f64> for Vector {

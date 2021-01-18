@@ -1,4 +1,5 @@
 use super::vector::Vector;
+
 // An axis-aligned rectangle. Sort of a stub right now to make some function outputs more legible.
 pub struct Rect {
     pub top: f64,

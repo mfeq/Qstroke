@@ -1,13 +1,15 @@
 use glifparser::*;
 
 pub mod glif;
-mod skpath;
+mod skia;
 mod evaluate;
 
 use super::*;
+use super::consts::SMALL_DISTANCE;
 use super::vector::*;
 use super::bezier::Bezier;
-use super::evaluate::Evaluate;
+use super::evaluate::{Evaluate, Primitive};
+
 
 // This struct models a simple piecewise function. It maps 0-1 such that 0 is the beginning of the first curve
 // in the collection and 1 is the end of the last. It does not currently support arbitrary cuts.
@@ -17,14 +19,14 @@ pub struct Piecewise<T: Evaluate> {
 }
 
 // TODO: Move these functions to a more appropriate submodule.
-impl Piecewise<Piecewise<Bezier>>
+impl<T: Evaluate+Primitive> Piecewise<Piecewise<T>>
 {
-
-    pub fn subdivide(&self, t: f64) -> Self
+    // we split the primitive that contains t at t
+    pub fn cut_at_t(&self, t: f64) -> Self
     {
         let mut output = Vec::new();
         for contour in &self.curves {
-            output.push(contour.subdivide(t));
+            output.push(contour.cut_at_t(t));
         }
 
         return Piecewise{
@@ -33,9 +35,9 @@ impl Piecewise<Piecewise<Bezier>>
     }
 }
 
-impl Piecewise<Bezier>
+impl<T: Evaluate+Primitive> Piecewise<T>
 {    
-    pub fn subdivide(&self, t: f64) -> Piecewise<Bezier>
+    pub fn cut_at_t(&self, t: f64) -> Piecewise<T>
     {
         let mut new_curves = Vec::new();
         for bez in &self.curves {
