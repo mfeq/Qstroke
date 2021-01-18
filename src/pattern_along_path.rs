@@ -70,7 +70,7 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
     match settings.subdivide {
         PatternSubdivide::Simple(times) => {
             for n in 0..times {
-                working_pattern = working_pattern.subdivide(0.5);
+                working_pattern = working_pattern.cut_at_t(0.5);
             }
         }
         _ => {} // We're gonna handle the other options later in the process.
@@ -200,7 +200,6 @@ fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piec
     return output_piecewise;
 }
 
-// this function is likely not sticking around
 pub fn pattern_along_glif<U>(path: &Glif<U>, pattern: &Glif<Option<PointData>>, settings: &PatternSettings) -> Glif<Option<PointData>>
 {
     // convert our path and pattern to piecewise collections of beziers
@@ -231,7 +230,7 @@ pub fn pattern_along_glif<U>(path: &Glif<U>, pattern: &Glif<Option<PointData>>, 
 
     return Glif {
         outline: Some(output_outline), 
-        order: pattern.order, // default when only corners
+        order: path.order, // default when only corners
         anchors: path.anchors.clone(),
         width: path.width,
         unicode: path.unicode,

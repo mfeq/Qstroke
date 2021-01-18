@@ -1,17 +1,19 @@
 #![feature(clamp)]
 
 mod MFEKmath;
+mod variable_width_stroking;
 mod pattern_along_path;
+mod consts;
 
 use clap::{Arg, App};
 use pattern_along_path::*;
 use MFEKmath::Vector;
-use MFEKmath::piecewise::glif::PointData;
+use variable_width_stroking::*;
 
 use std::fs;
 
 fn main() {
-    let matches = App::new("QPaP")
+    /*let matches = App::new("QPaP")
         .version("0.0.0")
         .author("Matthew Blanchard <matthewrblanchard@gmail.com")
         .about("A utility for applying pattern-along-path to ufo files.")
@@ -188,4 +190,12 @@ fn main() {
     let output = pattern_along_glif(&path, &pattern, &settings);
     let glifstring = glifparser::write_ufo_glif(output);
     fs::write(output_string, glifstring).expect("Unable to write file");
+    */
+
+    let path: glifparser::Glif<Option<MFEKmath::piecewise::glif::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string("O.glif")
+    .expect("Failed to read path file!"));
+ 
+    let out = variable_width_stroke_glif(&path);
+    let glifstring = glifparser::write_ufo_glif(out);
+    fs::write("O_stroked.glif", glifstring).expect("Unable to write file");
 }

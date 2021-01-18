@@ -2,14 +2,15 @@ use super::vector::Vector;
 use glifparser::{WhichHandle};
 
 mod evaluate;
-mod characteristics;
-mod intersection;
+mod primitive;
+mod flo;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[allow(non_snake_case)]
 pub struct Bezier {
     A:f64, B:f64, C:f64, D:f64,
     E:f64, F:f64, G:f64, H:f64,
+    control_points: [Vector; 4]
 }
 
 impl Bezier {
@@ -21,10 +22,10 @@ impl Bezier {
         let h1 = Vector::from_handle(point, WhichHandle::A);
         let h2 = Vector::from_handle(next_point, WhichHandle::B);
 
-        return Self::from_control_points(p, h1, h2, np);
+        return Self::from_points(p, h1, h2, np);
     }
 
-    pub fn from_control_points(p0: Vector, p1: Vector, p2: Vector, p3: Vector) -> Self
+    pub fn from_points(p0: Vector, p1: Vector, p2: Vector, p3: Vector) -> Self
     {
         let x0 = p0.x; let y0 = p0.y;
         let x1 = p1.x; let y1 = p1.y;
@@ -41,6 +42,7 @@ impl Bezier {
             F: (3. * y2 - 6. * y1 + 3. * y0),
             G: (3. * y1 - 3. * y0),
             H: y0,
+            control_points: [p0, p1, p2, p3]
         };
     }
 
@@ -66,33 +68,5 @@ impl Bezier {
         }
 
         return output;
-    }
-
-    // returns two curves one before t and one after
-    // https://www.malinc.se/m/DeCasteljauAndBezier.php
-    pub fn subdivide(&self,  t:f64) -> (Bezier, Bezier)
-    {
-        // easier to understand this operation when working in points
-        // it's just a bit of lerping
-        let points = self.to_control_points();
-
-        // We lerp between the control points and their handles 
-        let q0 = Vector::lerp(points[0], points[1], t);
-        let q1 = Vector::lerp(points[1], points[2], t);
-        let q2 = Vector::lerp(points[2], points[3], t);
-
-        // next we calculate the halfways between the qs
-        let r0 = Vector::lerp(q0, q1, t);
-        let r1 = Vector::lerp(q1, q2, t);
-
-        // and finally the half way between those two is the point at which we split the curve
-        let s0 = Vector::lerp(r0, r1, t);
-
-        // we reconstruct our two bezier curves from these points check out the link above
-        // for a visualization
-        let first = Self::from_control_points(points[0], q0, r0, s0);
-        let second = Self::from_control_points(s0, r1, q2, points[3]);
-
-        return (first, second);
     }
 }

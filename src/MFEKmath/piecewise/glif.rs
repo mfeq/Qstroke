@@ -1,5 +1,6 @@
 use super::{Bezier, Outline, Piecewise, Vector};
 use glifparser::{Contour, PointType, Handle};
+use super::super::consts::SMALL_DISTANCE;
 
 // stub PointData out here, really not sure how I should be handnling this because we need a concrete
 // type to construct our own glif
@@ -91,8 +92,17 @@ impl Piecewise<Bezier> {
             last_curve = Some(control_points);
         }
 
-        // we've got to connect the last point and the first point
-        output_contour.first_mut().unwrap().b = Vector::to_handle(last_curve.unwrap()[2]);
+
+        if output_contour.len() > 1 {
+            let fp = output_contour.first_mut().unwrap();
+            let (fv, lv) = (Vector::from_point(fp), last_curve.unwrap()[3]);
+
+            if  fv.is_near(lv, SMALL_DISTANCE)
+            {
+                // we've got to connect the last point and the first point
+                fp.b = Vector::to_handle(last_curve.unwrap()[2]);
+            }
+        }
     
         return output_contour;
     }

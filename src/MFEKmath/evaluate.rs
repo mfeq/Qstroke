@@ -38,3 +38,9 @@ impl<T> EvaluateTransform for T where T: Evaluate {
         return self.apply_transform(&transform);
     }
 }
+
+// This trait is implemented for a primitive shape like a line, bezier, spiro, etc within the piecewise.
+pub trait Primitive
+{
+    fn subdivide(&self, t: f64) -> (Self, Self) where Self: Sized;
+}

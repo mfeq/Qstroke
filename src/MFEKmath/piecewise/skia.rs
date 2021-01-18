@@ -66,7 +66,7 @@ impl From<&Path> for Piecewise<Piecewise<Bezier>>
                 path::Verb::Line => {
                     let lp = Vector::from_skia_point(&vp[0]);
                     let np = Vector::from_skia_point(&vp[1]);
-                    cur_contour.push(Bezier::from_control_points(lp, lp, np, np));
+                    cur_contour.push(Bezier::from_points(lp, lp, np, np));
                     last_point = np;
                 }
     
@@ -74,7 +74,7 @@ impl From<&Path> for Piecewise<Piecewise<Bezier>>
                     let lp = last_point;
                     let h2 = Vector::from_skia_point(&vp[0]);
                     let np = Vector::from_skia_point(&vp[1]);
-                    cur_contour.push(Bezier::from_control_points(lp, lp, h2, np));
+                    cur_contour.push(Bezier::from_points(lp, lp, h2, np));
                     last_point = np;
                 }
     
@@ -83,7 +83,7 @@ impl From<&Path> for Piecewise<Piecewise<Bezier>>
                     let h1 = Vector::from_skia_point(&vp[1]);
                     let h2 = Vector::from_skia_point(&vp[2]);
                     let np = Vector::from_skia_point(&vp[3]);
-                    cur_contour.push(Bezier::from_control_points(lp, h1, h2, np));
+                    cur_contour.push(Bezier::from_points(lp, h1, h2, np));
                     last_point = np;
                 }
     
