@@ -2,7 +2,7 @@ use crate::MFEKmath::{ArcLengthParameterization, Bezier, Evaluate, EvaluateTrans
 use crate::MFEKmath::piecewise::glif::PointData;
 
 use glifparser::{Glif, Outline};
-use skia_safe::{path, Path};
+use skia_safe::Path;
 
 pub struct PatternSettings {
     pub copies: PatternCopies,
@@ -17,13 +17,14 @@ pub struct PatternSettings {
     pub center_pattern: bool
 }
 
+#[allow(dead_code)]
 pub enum PatternCopies {
     Single,
     Repeated,
     Fixed(usize) // TODO: Implement
 }
 
-// pff - no splitting
+// off - no splitting
 // simple - split each curve at it's midpoint
 // angle - split the input pattern each x degrees in change in direction on the path
 pub enum PatternSubdivide {
@@ -32,7 +33,7 @@ pub enum PatternSubdivide {
     //Angle(f64) TODO: Implement.
 }
 
-
+#[allow(unused)]
 pub enum PatternHandleDiscontinuity {
     Off, // no handling
     Split(f64) 
@@ -43,7 +44,7 @@ pub enum PatternHandleDiscontinuity {
 // and such during the main algorithm. We prepare our input in 'curve space'. In this space 0 on the y-axis will fall onto a point on the path. A value greater or less than 0 represents offset
 // vertically from the path. The x axis represents it's travel along the arclength of the path. Once this is done the main function can naively loop over all the Piecewises in the output
 // vec without caring about any options except normal/tangent offset.
-fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewise<Bezier>>, arclenparam: &ArcLengthParameterization, settings: &PatternSettings) -> Vec<Piecewise<Piecewise<Bezier>>>
+fn prepare_pattern(pattern: &Piecewise<Piecewise<Bezier>>, arclenparam: &ArcLengthParameterization, settings: &PatternSettings) -> Vec<Piecewise<Piecewise<Bezier>>>
 {
     let mut output: Vec<Piecewise<Piecewise<Bezier>>> = Vec::new();
 
@@ -69,7 +70,7 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
     // if we've got a simple split we just do that now 
     match settings.subdivide {
         PatternSubdivide::Simple(times) => {
-            for n in 0..times {
+            for _ in 0..times {
                 working_pattern = working_pattern.subdivide(0.5);
             }
         }
@@ -118,7 +119,6 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
                 stretch_len = left_over/copies as f64;
                 // now we divide the length by the pattern width and get a fraction which we add to scale
                 working_pattern = working_pattern.scale(1. + stretch_len as f64, 1.);
-                let b = working_pattern.bounds();
             }
 
             for n in 0..copies {
@@ -126,8 +126,8 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
             }
         }
 
-        PatternCopies::Fixed(n) => {
-            // TODO: Implement
+        PatternCopies::Fixed(_) => {
+            todo!()
         }
     }
 
@@ -155,7 +155,7 @@ fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piec
 
     let mut output_piecewise: Piecewise<Piecewise<Bezier>> = Piecewise { curves: Vec::new() };
 
-    let prepared_pattern = prepare_pattern(path, pattern, &arclenparam, settings);
+    let prepared_pattern = prepare_pattern(pattern, &arclenparam, settings);
 
     let transform = |point: &Vector| {
         let u = point.x/total_arclen;

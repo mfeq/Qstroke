@@ -6,7 +6,7 @@ A set of utilities for stroking paths in font glyphs written in Rust.
 
 This program is part of the [MFEK project](https://github.com/mfeq/MFEK/).
 
-Qstroke takes UFO `.glif` files and applies path stroking algorithms to them. Currently only pattern-along-path (PaP) is provided.
+`MFEKstroke` takes UFO `.glif` files and applies path stroking algorithms to them. Currently only pattern-along-path (PaP) is provided.
 
 ## Pattern Along Path
 ### As seen in MFEK/glif…
@@ -25,15 +25,15 @@ cargo run -- --pattern simple.glif --path Q_.glif --out arrow.glif --sx 0.3 --sy
 cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Regular.ufo/glyphs/k.low.glif --pattern arrow.ufo/glyphs/arrow.glif -m repeated --sx 0.1 --sy 0.1 -s 3 --simplify true --stretch true
 ```
 
-## `Qstroke --help`
+## `MFEKstroke --help`
 ### Pattern Along Path
 ```
-QPaP 0.0.0
+MFEK PaP 0.0.0
 Matthew Blanchard <matthewrblanchard åţ gmail … com>
 A utility for applying pattern-along-path to ufo files.
 
 USAGE:
-    Qstroke [OPTIONS] --out <output> --path <path> --pattern <pattern>
+    MFEKstroke [OPTIONS] --out <output> --path <path> --pattern <pattern>
 
 FLAGS:
     -h, --help       Prints help information

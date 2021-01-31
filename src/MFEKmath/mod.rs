@@ -1,3 +1,5 @@
+#![allow(non_snake_case, dead_code)] // for our name MFEKmath
+
 pub mod vector;
 pub mod piecewise;
 pub mod rect;

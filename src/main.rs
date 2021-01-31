@@ -1,3 +1,4 @@
+#![allow(non_snake_case)] // for our name MFEKstroke
 #![feature(clamp)]
 
 mod MFEKmath;
@@ -6,7 +7,6 @@ mod pattern_along_path;
 use clap::{Arg, App};
 use pattern_along_path::*;
 use MFEKmath::Vector;
-use MFEKmath::piecewise::glif::PointData;
 
 use std::fs;
 
