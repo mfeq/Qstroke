@@ -1,3 +1,4 @@
+use consts::SMALL_T_DISTANCE;
 use glifparser::*;
 
 pub mod glif;
@@ -37,6 +38,15 @@ impl<T: Evaluate+Primitive> Piecewise<Piecewise<T>>
 
 impl<T: Evaluate+Primitive> Piecewise<T>
 {    
+    pub fn is_closed(&self) -> bool
+    {
+        if self.start_point().is_near(self.end_point(),SMALL_DISTANCE)
+        {
+            return true;
+        }
+        return false;
+    }
+    
     pub fn cut_at_t(&self, t: f64) -> Piecewise<T>
     {
         let mut new_curves = Vec::new();

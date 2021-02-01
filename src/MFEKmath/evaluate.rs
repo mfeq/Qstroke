@@ -11,6 +11,8 @@ pub trait Evaluate
     fn derivative(&self, u: f64) -> Vector;
     fn bounds(&self) -> Rect; // returns an AABB that contains all points 
     fn apply_transform<F>(&self, transform: F) -> Self where F: Fn(&Vector) -> Vector;
+    fn start_point(&self) -> Vector;
+    fn end_point(&self) -> Vector;
 }
 
 pub trait EvaluateTransform: Evaluate {
