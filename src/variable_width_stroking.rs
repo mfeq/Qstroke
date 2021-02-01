@@ -1,7 +1,5 @@
-use crate::MFEKmath::{Bezier, Piecewise, Vector};
+use crate::MFEKmath::{Bezier, Evaluate, Piecewise, Vector, consts::SMALL_DISTANCE};
 use crate::MFEKmath::piecewise::glif::PointData;
-use flo_curves::BezierCurve;
-use super::consts::SMALL_DISTANCE;
 
 use glifparser::{Glif, Outline};
 
@@ -14,74 +12,124 @@ fn line_to(path: &mut Vec<Bezier>, to: Vector)
     path.push(line);
 }
 
-pub fn variable_width_stroke(path: &Piecewise<Bezier>, start_width: f64, end_width: f64) -> Piecewise<Bezier> {
+fn is_closed(path: &Vec<Bezier>) -> bool
+{
+    let first_point = path.first().unwrap().to_control_points()[0];
+    let last_point = path.last().unwrap().to_control_points()[3];
 
+    return first_point.is_near(last_point, SMALL_DISTANCE)
+}
+
+// takes a vector of beziers and fills in discontinuities with joins
+fn fix_path(in_path: Vec<Bezier>) -> Vec<Bezier>
+{
+    let mut out: Vec<Bezier> = Vec::new();
+
+    let mut path_iter = in_path.iter().peekable();
+    
+    while let Some(bezier) = path_iter.next() {
+        if let Some(next_bezier) = path_iter.peek()
+        {
+            let next_start = next_bezier.start_point();
+            let last_end = bezier.end_point();
+            if !last_end.is_near(next_start, SMALL_DISTANCE)
+            {
+                // the end of our last curve doesn't match up with the start of our next so we need to
+                // deal with the discontinuity be creating a join
+
+                //TODO: implement more complicated joins
+                out.push(bezier.clone());
+                line_to(&mut out, next_start);
+            }
+            else
+            {
+                out.push(bezier.clone());
+            }
+        }
+        else if is_closed(&in_path)
+        {
+            // our path is closed and if there's not a next point we need to make sure that our current
+            // and last curve matches up with the first one
+
+            let first_point = in_path.first().unwrap().start_point();
+            let last_end = bezier.end_point();
+
+            if !last_end.is_near(first_point, SMALL_DISTANCE)
+            {
+                //TODO: implement more complicated joins
+                out.push(bezier.clone());
+                line_to(&mut out, first_point);
+            }
+        }
+        else
+        {
+            out.push(bezier.clone());
+        }
+    }
+
+    return out;
+}
+
+pub fn variable_width_stroke(path: &Piecewise<Bezier>, start_width: f64, end_width: f64) -> Piecewise<Piecewise<Bezier>> {
+ 
+    // check if our input path is closed
     // We're gonna keep track of a left line and a right line.
     let mut left_line: Vec<Bezier> = Vec::new();
     let mut right_line: Vec<Bezier> = Vec::new();
 
-   for bezier in &path.curves {
-        println!("{:?}", bezier);
+
+    let iter = path.curves.iter().enumerate();
+    for bezier in &path.curves {
         let mut left_offset = flo_curves::bezier::offset(bezier, 10., 10.);
-
-        if let Some(next_point) = left_offset.first() {
-            let next_start = next_point.start_point();
-
-            if let Some(last_point) = left_line.last() {
-                let last_end = last_point.end_point();
-        
-                if !last_end.is_near(next_start, SMALL_DISTANCE)
-                {
-                    // okay we've found a discontinuity for now we're gonna hit it with a bevel
-                    //line_to(&mut right_line, next_start)
-                }
-            }
-        }
-
         left_line.append(&mut left_offset);
 
-        let mut right_offset = flo_curves::bezier::offset(bezier, 0., 0.);
-
-        if let Some(last_point) = right_offset.first() {
-            let next_start = last_point.start_point();
-
-            if let Some(next_point) = right_line.last() {
-                let last_end = next_point.end_point();
-        
-                if !last_end.is_near(next_start, SMALL_DISTANCE)
-                {
-                    // okay we've found a discontinuity for now we're gonna hit it with a bevel
-                    //line_to(&mut right_line, next_start)
-                }
-            }
-        }
-
+        let mut right_offset = flo_curves::bezier::offset(bezier, -10., -10.);
         right_line.append(&mut right_offset);
     
     }
-
-    
+     
     right_line.reverse();
-    let final_right_line: Vec<Bezier> = right_line.iter()
+    let mut final_right_line: Vec<Bezier> = right_line.iter()
         .map(|bez| bez.clone().reverse())
         .collect();
 
-    if let Some(first_right) = right_line.first() {
-       let to = first_right.start_point();
-
-        //line_to(&mut left_line, to);
-    }
-
-    left_line.append(&mut right_line);
-
-    if let Some(first_left) = left_line.first() {
-        let to = first_left.start_point();
-        //line_to(&mut left_line, to);
-    }
     
+    left_line = fix_path(left_line);
+    final_right_line = fix_path(final_right_line);
 
-    return Piecewise {
-        curves: left_line
+    if path.is_closed() {
+        let mut out = Piecewise {
+            curves: Vec::new()
+        };
+
+        let left_pw = Piecewise { curves: left_line };
+        let right_pw = Piecewise { curves: final_right_line };
+
+        out.curves.push(left_pw);
+        out.curves.push(right_pw);
+        
+        return out;
+    }
+    else
+    {
+        let mut out_vec = left_line;
+
+        // path is not closed we need to cap the ends, for now that means a bevel
+        let to = final_right_line.last().unwrap().to_control_points();
+        line_to(&mut out_vec, to[0]);
+
+        // append the right line to the left now that we've connected them
+        out_vec.append(&mut final_right_line);
+
+        // we need to close the beginning now 
+        let to = out_vec.first().unwrap().to_control_points();
+        line_to(&mut out_vec, to[0]);
+
+        let mut outer = Piecewise { curves: Vec::new() };
+        let inner = Piecewise { curves: out_vec };
+        outer.curves.push(inner);
+
+        return outer;
     }
 }
 
@@ -92,12 +140,11 @@ pub fn variable_width_stroke_glif<U>(path: &Glif<U>) -> Glif<Option<PointData>>
     let mut output_outline: Outline<Option<PointData>> = Vec::new();
 
 
-    for contour in piece_path.curves {
-        let mut temp_pattern = variable_width_stroke(&contour, 0., 100.);
-
-
-        let temp_contour = temp_pattern.to_contour();
-        output_outline.push(temp_contour);
+    for pwpath_contour in piece_path.curves {
+        let mut results = variable_width_stroke(&pwpath_contour, 0., 100.);
+        for result_contour in results.curves {
+            output_outline.push(result_contour.to_contour());
+        }
     }
 
     return Glif {

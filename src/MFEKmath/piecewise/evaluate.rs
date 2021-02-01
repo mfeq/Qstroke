@@ -69,4 +69,26 @@ impl<T: Evaluate> Evaluate for Piecewise<T> {
             curves: output,
         };
     }
+
+    
+    fn start_point(&self) -> Vector
+    {
+        if let Some(path_fcurve) = self.curves.first() {
+            return path_fcurve.start_point();
+        }
+
+        // TODO: Add proper error handling to these functions.
+        panic!("Empty piecewise has no start point.")
+    }
+
+    fn end_point(&self) -> Vector
+    {
+        if let Some(path_lcurve) = self.curves.first() {
+            return path_lcurve.start_point();
+        }
+
+        // TODO: Add proper error handling to these functions.
+        panic!("Empty piecewise has no start point.")
+    }
+
 }

@@ -50,4 +50,16 @@ impl Evaluate for Bezier {
     {
         return Rect::AABB_from_points(self.to_control_points_vec());
     }
+
+    fn start_point(&self) -> Vector
+    {
+        return self.to_control_points()[0];
+
+    }
+
+    fn end_point(&self) -> Vector
+    {
+        return self.to_control_points()[3];
+    }
+
 }

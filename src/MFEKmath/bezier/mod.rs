@@ -10,7 +10,6 @@ mod flo;
 pub struct Bezier {
     A:f64, B:f64, C:f64, D:f64,
     E:f64, F:f64, G:f64, H:f64,
-    control_points: [Vector; 4]
 }
 
 impl Bezier {
@@ -32,7 +31,7 @@ impl Bezier {
         let x2 = p2.x; let y2 = p2.y;
         let x3 = p3.x; let y3 = p3.y;
 
-        return Self {
+        Self {
             A: (x3 - 3. * x2 + 3. * x1 - x0),
             B: (3. * x2 - 6. * x1 + 3. * x0),
             C: (3. * x1 - 3. * x0),
@@ -42,8 +41,7 @@ impl Bezier {
             F: (3. * y2 - 6. * y1 + 3. * y0),
             G: (3. * y1 - 3. * y0),
             H: y0,
-            control_points: [p0, p1, p2, p3]
-        };
+        }
     }
 
     pub fn to_control_points(&self) -> [Vector; 4]
@@ -69,4 +67,11 @@ impl Bezier {
 
         return output;
     }
+
+    pub fn reverse(&self) -> Self 
+    {
+        let bz = self.to_control_points();
+        Bezier::from_points(bz[3], bz[2], bz[1], bz[0])
+    }
+
 }
