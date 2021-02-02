@@ -10,7 +10,7 @@ This program is part of the [MFEK project](https://github.com/mfeq/MFEK/).
 
 ## Pattern Along Path
 ### As seen in MFEK/glif…
-![Chomsky `Q` patterned with arrows](https://user-images.githubusercontent.com/310356/104128458-9ac66f00-5335-11eb-94d3-f458f6cfb464.png)
+TODO: Add glif output photo of a K.
 
 This was generated with the following command:
 
