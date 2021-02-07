@@ -9,16 +9,14 @@ pub struct PointData;
 impl<T> From<&Outline<T>> for Piecewise<Piecewise<Bezier>>
 {
     fn from(outline: &Outline<T>) -> Self { 
-        let mut ret = Piecewise {
-            curves: Vec::new(),
-        };
-    
+        let mut new_segs = Vec::new();
+
         for contour in outline
         {
-            ret.curves.push(Piecewise::from(contour));
+            new_segs.push(Piecewise::from(contour));
         }
     
-        return ret;
+        return Piecewise::new(new_segs, None);
     }
 }
 
@@ -26,7 +24,7 @@ impl Piecewise<Piecewise<Bezier>> {
     pub fn to_outline(&self) -> Outline<Option<PointData>> {
         let mut output_outline: Outline<Option<PointData>> = Outline::new();
 
-        for contour in &self.curves
+        for contour in &self.segs
         {
             output_outline.push(contour.to_contour());
         }
@@ -38,9 +36,7 @@ impl Piecewise<Piecewise<Bezier>> {
 impl<T> From<&Contour<T>> for Piecewise<Bezier>
 {
     fn from(contour: &Contour<T>) -> Self {
-        let mut ret = Piecewise {
-            curves: Vec::new(),
-        };
+        let mut new_segs = Vec::new();
 
         let mut lastpoint: Option<&glifparser::Point<T>> = None;
 
@@ -50,7 +46,7 @@ impl<T> From<&Contour<T>> for Piecewise<Bezier>
             {
                 None => {},
                 Some(lastpoint) => {
-                    ret.curves.push(Bezier::from(&lastpoint, point));
+                    new_segs.push(Bezier::from(&lastpoint, point));
                 }
             }
 
@@ -59,10 +55,10 @@ impl<T> From<&Contour<T>> for Piecewise<Bezier>
 
         let firstpoint = contour.first().unwrap();
         if firstpoint.ptype != PointType::Move {
-            ret.curves.push(Bezier::from(&lastpoint.unwrap(), firstpoint));
+            new_segs.push(Bezier::from(&lastpoint.unwrap(), firstpoint));
         }
 
-        return ret
+        return Piecewise::new(new_segs, None);
     }
 }
 
@@ -71,7 +67,7 @@ impl Piecewise<Bezier> {
         let mut output_contour: Contour<Option<PointData>> = Vec::new();
         let mut last_curve: Option<[Vector; 4]> = None;
 
-        for curve in &self.curves
+        for curve in &self.segs
         {                       
             let control_points = curve.to_control_points();
 

@@ -7,6 +7,7 @@ pub mod consts;
 pub mod line;
 pub mod evaluate;
 pub mod parameterization;
+pub mod coordinate;
 
 pub use self::vector::Vector;
 pub use self::piecewise::Piecewise;

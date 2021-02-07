@@ -21,6 +21,6 @@ xmlwriter = "0.1.0"
 # For Skia pathops
 skia-safe = "0"
 
-flo_curves = { git = "https://github.com/Logicalshift/flo_curves" }
+flo_curves = { path = "../flo_curves" }
 
 clap-nested = "*"

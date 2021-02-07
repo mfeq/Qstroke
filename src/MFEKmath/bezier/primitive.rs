@@ -5,7 +5,7 @@ use super::super::evaluate::Primitive;
 impl Primitive for Bezier {
     // returns two curves one before t and one after
     // https://www.malinc.se/m/DeCasteljauAndBezier.php
-    fn subdivide(&self,  t:f64) -> (Self, Self)
+    fn subdivide(&self,  t:f64) -> Option<(Self, Self)>
     {
         // easier to understand this operation when working in points
         // it's just a bit of lerping
@@ -28,6 +28,6 @@ impl Primitive for Bezier {
         let first = Self::from_points(points[0], q0, r0, s0);
         let second = Self::from_points(s0, r1, q2, points[3]);
 
-        return (first, second);
+        return Some((first, second));
     }
 }

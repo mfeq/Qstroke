@@ -1,7 +1,7 @@
 use super::evaluate::Evaluate;
 use super::parameterization::Parameterization;
 use super::vector::Vector;
-
+use crate::MFEKmath::coordinate::*;
 // We build a table of total arc length along the line and use it to map 0-1
 // to the arclength of the curve such that 0.5 is halfway along the curve by arc-length
 pub struct ArcLengthParameterization
@@ -11,7 +11,7 @@ pub struct ArcLengthParameterization
 
 impl ArcLengthParameterization
 {
-    pub fn from(evaluable: &impl Evaluate) -> Self
+    pub fn from<T: Evaluate>(evaluable: &T) -> Self
     {
         let mut output = Vec::new();
         // TODO: this is an arbitrary number and should be replaced with something more robust
@@ -28,7 +28,7 @@ impl ArcLengthParameterization
         {
             let t = i as f64 / arclen_cuts as f64;
             let point = evaluable.evaluate(t);
-            let dist = Vector::distance(point, prev_point);
+            let dist = point.distance(prev_point);
             sum = sum + dist;
             output.push(sum);
 

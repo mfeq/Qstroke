@@ -1,7 +1,8 @@
 use super::super::{Vector, Evaluate, Rect, Bezier};
 
 impl Evaluate for Bezier {
-
+    type EvalResult = Vector;
+    
     fn evaluate(&self, t: f64) -> Vector
     {
         Vector {
