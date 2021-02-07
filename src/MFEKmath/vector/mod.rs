@@ -2,10 +2,20 @@ mod skia;
 mod glif;
 mod flo;
 
+use super::coordinate::Coordinate;
+use super::coordinate::Coordinate2D;
+
 #[derive(Clone, Copy, Debug)]
 pub struct Vector {
     pub x: f64,
     pub y: f64,
+}
+
+#[macro_export]
+macro_rules! vec2 {
+    ($x: expr, $y: expr) => {
+        Vector {x: $x, y: $y}
+    };
 }
 
 impl Vector {
@@ -28,6 +38,11 @@ impl Vector {
     pub fn sub(self, v1: Vector) -> Self
     {
         Vector {x: self.x - v1.x, y: self.y - v1.y}
+    }
+
+    pub fn mul(self, v1: Vector) -> Self
+    {
+        vec2!(self.x * v1.x, self.y * v1.y)
     }
 
     pub fn multiply_scalar(self, s: f64) -> Self
@@ -80,6 +95,12 @@ impl std::ops::Sub<Vector> for Vector {
     fn sub(self, v1: Vector) -> Vector { return self.sub(v1);}
 }
 
+impl std::ops::Mul<Vector> for Vector {
+    type Output = Vector;
+    
+    fn mul(self, s: Vector) -> Vector { return self.mul(s);}
+}
+
 impl std::ops::Mul<f64> for Vector {
     type Output = Vector;
     
@@ -90,4 +111,21 @@ impl std::ops::Neg for Vector {
     type Output = Vector;
 
     fn neg(self) -> Vector { Vector{x: -self.x, y: -self.y} }
+}
+
+impl Coordinate for Vector {
+    fn magnitude(self) -> f64 
+    {
+        self.magnitude()
+    }
+
+    fn distance(self, v1: Self) -> f64
+    {
+        self.distance(v1)
+    }
+
+    fn lerp(self, v1: Self, t: f64) -> Self
+    {
+        self.lerp(v1, t)
+    }
 }

@@ -1,5 +1,7 @@
 use crate::MFEKmath::{ArcLengthParameterization, Bezier, Evaluate, EvaluateTransform, Parameterization, Piecewise, Vector};
 use crate::MFEKmath::piecewise::glif::PointData;
+use crate::MFEKmath::coordinate::Coordinate2D;
+use crate::vec2;
 
 use glifparser::{Glif, Outline};
 use skia_safe::{path, Path};
@@ -43,13 +45,13 @@ pub enum PatternHandleDiscontinuity {
 // and such during the main algorithm. We prepare our input in 'curve space'. In this space 0 on the y-axis will fall onto a point on the path. A value greater or less than 0 represents offset
 // vertically from the path. The x axis represents it's travel along the arclength of the path. Once this is done the main function can naively loop over all the Piecewises in the output
 // vec without caring about any options except normal/tangent offset.
-fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewise<Bezier>>, arclenparam: &ArcLengthParameterization, settings: &PatternSettings) -> Vec<Piecewise<Piecewise<Bezier>>>
+fn prepare_pattern<T: Evaluate<EvalResult = Vector>>(path: &Piecewise<T>, pattern: &Piecewise<Piecewise<Bezier>>, arclenparam: &ArcLengthParameterization, settings: &PatternSettings) -> Vec<Piecewise<Piecewise<Bezier>>>
 {
     let mut output: Vec<Piecewise<Piecewise<Bezier>>> = Vec::new();
 
     // we clone our original pattern so we can work with it and have ownership
     // there is definitely a better faster way of doing this, but my rust knowledge is holding me back
-    let mut working_pattern = pattern.translate(1., 1.);
+    let mut working_pattern = pattern.translate(vec2!(1., 1.));
  
     let pattern_bounds = pattern.bounds();
     let pattern_width = f64::abs(pattern_bounds.left - pattern_bounds.right) * settings.pattern_scale.x;
@@ -62,15 +64,15 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
         let pattern_offset_x = -pattern_bounds.left as f64 - 1.;
         let pattern_offset_y = -pattern_bounds.bottom as f64 - 1.;
 
-        working_pattern = working_pattern.translate(pattern_offset_x, pattern_offset_y - pattern_height/2.);
-        working_pattern = working_pattern.scale(settings.pattern_scale.x, settings.pattern_scale.y);
+        working_pattern = working_pattern.translate(vec2!(pattern_offset_x, pattern_offset_y - pattern_height/2.));
+        working_pattern = working_pattern.scale(vec2!(settings.pattern_scale.x, settings.pattern_scale.y));
     }
 
     // if we've got a simple split we just do that now 
     match settings.subdivide {
         PatternSubdivide::Simple(times) => {
             for n in 0..times {
-                working_pattern = working_pattern.cut_at_t(0.5);
+                working_pattern = working_pattern.subdivide(0.5);
             }
         }
         _ => {} // We're gonna handle the other options later in the process.
@@ -98,7 +100,7 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
 
                 if settings.stretch {
                     let stretch_len = total_arclen - single_width;
-                    single = single.scale(1. + stretch_len/pattern_width, 1.);
+                    single = single.scale(vec2!(1. + stretch_len/pattern_width, 1.));
                 }
 
                 output.push(single);
@@ -117,12 +119,12 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
                 // divide that by the number of copies and now we've got how much we should stretch each
                 stretch_len = left_over/copies as f64;
                 // now we divide the length by the pattern width and get a fraction which we add to scale
-                working_pattern = working_pattern.scale(1. + stretch_len as f64, 1.);
+                working_pattern = working_pattern.scale(vec2!(1. + stretch_len as f64, 1.));
                 let b = working_pattern.bounds();
             }
 
             for n in 0..copies {
-                output.push(working_pattern.translate(n as f64 * total_width + n as f64 * stretch_len * pattern_width, 0.));
+                output.push(working_pattern.translate(vec2!(n as f64 * total_width + n as f64 * stretch_len * pattern_width, 0.)));
             }
         }
 
@@ -146,14 +148,14 @@ fn prepare_pattern<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewi
 // The inkscape implemnetation seems to be very similar to the algorithm described above. The aim is that this implementation gives
 // comparable outputs to inkscape's.
 #[allow(non_snake_case)]
-fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piecewise<Bezier>>, settings: &PatternSettings) -> Piecewise<Piecewise<Bezier>>
+fn pattern_along_path<T: Evaluate<EvalResult = Vector>>(path: &Piecewise<T>, pattern: &Piecewise<Piecewise<Bezier>>, settings: &PatternSettings) -> Piecewise<Piecewise<Bezier>>
 {
     // we're gonna parameterize the input path such that 0-1 = 0 -> totalArcLength
     // this is important because samples will be spaced equidistant along the input path
     let arclenparam = ArcLengthParameterization::from(path);
     let total_arclen = arclenparam.get_total_arclen();
 
-    let mut output_piecewise: Piecewise<Piecewise<Bezier>> = Piecewise { curves: Vec::new() };
+    let mut output_segments: Vec<Piecewise<Bezier>> = Vec::new();
 
     let prepared_pattern = prepare_pattern(path, pattern, &arclenparam, settings);
 
@@ -192,12 +194,12 @@ fn pattern_along_path<T: Evaluate>(path: &Piecewise<T>, pattern: &Piecewise<Piec
     for p in prepared_pattern {
         let transformed_pattern = p.apply_transform(&transform);
 
-        for contour in transformed_pattern.curves {
-            output_piecewise.curves.push(contour);
+        for contour in transformed_pattern.segs {
+            output_segments.push(contour);
         }
     }
 
-    return output_piecewise;
+    return Piecewise::new(output_segments, None);
 }
 
 pub fn pattern_along_glif<U>(path: &Glif<U>, pattern: &Glif<Option<PointData>>, settings: &PatternSettings) -> Glif<Option<PointData>>
@@ -209,7 +211,7 @@ pub fn pattern_along_glif<U>(path: &Glif<U>, pattern: &Glif<Option<PointData>>, 
     let mut output_outline: Outline<Option<PointData>> = Vec::new();
 
 
-    for contour in piece_path.curves {
+    for contour in piece_path.segs {
         let mut temp_pattern = pattern_along_path(&contour, &piece_pattern, settings);
 
         if settings.simplify {

@@ -11,7 +11,7 @@ impl Piecewise<Piecewise<Bezier>>
     }
 
     pub fn append_to_skpath(&self, mut skpath: Path) -> Path {
-        for contour in &self.curves {
+        for contour in &self.segs {
             skpath = contour.append_to_skpath(skpath);
         }
 
@@ -24,7 +24,7 @@ impl Piecewise<Bezier>
     pub fn append_to_skpath(&self, mut skpath: Path) -> Path
     {
         let mut first = true;
-        for bez in &self.curves {
+        for bez in &self.segs {
             let controlp = bez.to_control_points();
 
             if first {
@@ -56,7 +56,7 @@ impl From<&Path> for Piecewise<Piecewise<Bezier>>
             match v {
                 path::Verb::Move => {
                     if !cur_contour.is_empty() {
-                        contours.push(Piecewise { curves: cur_contour })
+                        contours.push(Piecewise::new(cur_contour, None));
                     }
     
                     cur_contour = Vec::new();  
@@ -88,7 +88,7 @@ impl From<&Path> for Piecewise<Piecewise<Bezier>>
                 }
     
                 path::Verb::Close => {
-                    contours.push(Piecewise { curves: cur_contour.clone()});
+                    contours.push(Piecewise::new(cur_contour.clone(), None));
                     cur_contour = Vec::new();
                 }
                 
@@ -100,11 +100,9 @@ impl From<&Path> for Piecewise<Piecewise<Bezier>>
         }
     
         if !cur_contour.is_empty() {
-            contours.push(Piecewise{ curves: cur_contour });
+            contours.push(Piecewise::new(cur_contour, None));
         }
     
-        return Piecewise {
-            curves: contours
-        }
+        return Piecewise::new(contours, None);
     }
 }

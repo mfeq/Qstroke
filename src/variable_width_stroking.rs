@@ -78,8 +78,8 @@ pub fn variable_width_stroke(path: &Piecewise<Bezier>, start_width: f64, end_wid
     let mut right_line: Vec<Bezier> = Vec::new();
 
 
-    let iter = path.curves.iter().enumerate();
-    for bezier in &path.curves {
+    let iter = path.segs.iter().enumerate();
+    for bezier in &path.segs {
         let mut left_offset = flo_curves::bezier::offset(bezier, 10., 10.);
         left_line.append(&mut left_offset);
 
@@ -98,17 +98,15 @@ pub fn variable_width_stroke(path: &Piecewise<Bezier>, start_width: f64, end_wid
     final_right_line = fix_path(final_right_line);
 
     if path.is_closed() {
-        let mut out = Piecewise {
-            curves: Vec::new()
-        };
+        let mut out = Vec::new();
 
-        let left_pw = Piecewise { curves: left_line };
-        let right_pw = Piecewise { curves: final_right_line };
+        let left_pw = Piecewise::new(left_line, None);
+        let right_pw = Piecewise::new(final_right_line, None);
 
-        out.curves.push(left_pw);
-        out.curves.push(right_pw);
+        out.push(left_pw);
+        out.push(right_pw);
         
-        return out;
+        return Piecewise::new(out, None);
     }
     else
     {
@@ -125,11 +123,8 @@ pub fn variable_width_stroke(path: &Piecewise<Bezier>, start_width: f64, end_wid
         let to = out_vec.first().unwrap().to_control_points();
         line_to(&mut out_vec, to[0]);
 
-        let mut outer = Piecewise { curves: Vec::new() };
-        let inner = Piecewise { curves: out_vec };
-        outer.curves.push(inner);
-
-        return outer;
+        let inner = Piecewise::new(out_vec, None);
+        return Piecewise::new(vec![inner], None);
     }
 }
 
@@ -140,9 +135,9 @@ pub fn variable_width_stroke_glif<U>(path: &Glif<U>) -> Glif<Option<PointData>>
     let mut output_outline: Outline<Option<PointData>> = Vec::new();
 
 
-    for pwpath_contour in piece_path.curves {
+    for pwpath_contour in piece_path.segs {
         let mut results = variable_width_stroke(&pwpath_contour, 0., 100.);
-        for result_contour in results.curves {
+        for result_contour in results.segs {
             output_outline.push(result_contour.to_contour());
         }
     }
