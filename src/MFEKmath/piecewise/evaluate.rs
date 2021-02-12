@@ -9,7 +9,7 @@ impl<T: Evaluate> Evaluate for Piecewise<T> {
     type EvalResult = T::EvalResult;
 
     // return the x, y of our curve at time t
-    fn evaluate(&self, t: f64) -> Self::EvalResult
+    fn at(&self, t: f64) -> Self::EvalResult
     {
         /*
         // there needs to be better handling than this probably through a fail/success
@@ -28,11 +28,11 @@ impl<T: Evaluate> Evaluate for Piecewise<T> {
 
         let ref dir = self.segs[curve_index];
 
-        return dir.evaluate(offset_time);  
+        return dir.at(offset_time);  
     }
 
     // returns the derivative at time t
-    fn derivative(&self, t: f64) -> Self::EvalResult
+    fn tangent_at(&self, t: f64) -> Self::EvalResult
     {
         /*
         // there needs to be better handling than this probably through a fail/success
@@ -50,7 +50,7 @@ impl<T: Evaluate> Evaluate for Piecewise<T> {
 
         let ref dir = self.segs[curve_index];
 
-        return dir.derivative(offset_time);  
+        return dir.tangent_at(offset_time);  
     }
 
     fn bounds(&self) -> Rect {

@@ -14,6 +14,7 @@ use variable_width_stroking::*;
 use std::fs;
 
 fn main() {
+    /*
     let matches = App::new("QPaP")
         .version("0.0.0")
         .author("Matthew Blanchard <matthewrblanchard@gmail.com")
@@ -191,7 +192,7 @@ fn main() {
     let output = pattern_along_glif(&path, &pattern, &settings);
     let glifstring = glifparser::write_ufo_glif(output);
     fs::write(output_string, glifstring).expect("Unable to write file");
-    /*
+    */
 
     let path: glifparser::Glif<Option<MFEKmath::piecewise::glif::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string("M_.glif")
     .expect("Failed to read path file!"));
@@ -199,5 +200,5 @@ fn main() {
     let out = variable_width_stroke_glif(&path);
     let glifstring = glifparser::write_ufo_glif(out);
     fs::write("O_stroked.glif", glifstring).expect("Unable to write file");
-    */
+    
 }

@@ -19,7 +19,7 @@ impl ArcLengthParameterization
         let arclen_cuts = 10000;
         let max_cuts = 10000 + 1;
 
-        let mut prev_point = evaluable.evaluate(0.0);
+        let mut prev_point = evaluable.at(0.0);
         let mut sum = 0.0;
         output.push(sum);
         
@@ -27,7 +27,7 @@ impl ArcLengthParameterization
         while i < max_cuts
         {
             let t = i as f64 / arclen_cuts as f64;
-            let point = evaluable.evaluate(t);
+            let point = evaluable.at(t);
             let dist = point.distance(prev_point);
             sum = sum + dist;
             output.push(sum);
