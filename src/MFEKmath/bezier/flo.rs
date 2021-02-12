@@ -12,7 +12,6 @@ impl Geo for Bezier {
 impl BezierCurveFactory for Bezier {
     fn from_points(start: Vector, (control_point1, control_point2): (Vector, Vector), end: Vector) -> Self {
         let bez = Bezier::from_points(start, control_point1, control_point2, end);
-        println!("{:?}", bez);
         return bez;
     }
 }

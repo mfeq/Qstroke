@@ -4,7 +4,6 @@ pub mod rect;
 pub mod bezier;
 pub mod arclenparameterization;
 pub mod consts;
-pub mod line;
 pub mod evaluate;
 pub mod parameterization;
 pub mod coordinate;

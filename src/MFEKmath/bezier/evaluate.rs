@@ -1,37 +1,41 @@
 use super::super::{Vector, Evaluate, Rect, Bezier};
+use super::super::consts::SMALL_DISTANCE;
+use flo_curves::BezierCurve;
+
+use flo_curves::bezier::{derivative4, de_casteljau3, de_casteljau4, characterize_curve};
 
 impl Evaluate for Bezier {
     type EvalResult = Vector;
     
-    fn evaluate(&self, t: f64) -> Vector
+    fn at(&self, t: f64) -> Vector
     {
-        Vector {
-            x: self.A * t * t * t + self.B * t * t + self.C * t + self.D,
-            y: self.E * t * t * t + self.F * t * t + self.G * t + self.H
-        }
+        let d1 = BezierCurve::start_point(self);
+        let (d2, d3) = BezierCurve::control_points(self);
+        let d4 = BezierCurve::end_point(self);
+
+        de_casteljau4(t, d1, d2, d3, d4)
     }
 
     
-    fn derivative(&self, _u: f64) -> Vector
+    fn tangent_at(&self, t: f64) -> Vector
     {
-        // TODO: Fix the code calling this and remove this terrible cludge. Luckily this is currently
-        // only called in the PaP code.
-        let u = f64::clamp(_u, 0., 1.);
-        let e = 1e-10;
-        let offset = 1e-3;
-        let mut t = u;
-
-        // this is a bit of a hack because we might be sampling off-curve
-        // so we just shift t over a really tiny amount to keep our samples bounded
-        // between 0-1
-        if u + e > 1. { t = t - offset};
-        if u - e < 0. { t = t + offset};
-
-        // calculate the tangent vector for the point
-        Vector {
-            x: 3. * self.A * t * t + 2. * self.B * t + self.C,
-            y: 3. * self.E * t * t + 2. * self.F * t + self.G
-        }
+            // Extract the points that make up this curve
+            let w1          = BezierCurve::start_point(self);
+            let (w2, w3)    = BezierCurve::control_points(self);
+            let w4          = BezierCurve::end_point(self);
+    
+            // If w1 == w2 or w3 == w4 there will be an anomaly at t=0.0 and t=1.0 
+            // (it's probably mathematically correct to say there's no tangent at these points but the result is surprising and probably useless in a practical sense)
+            let t = if t == 0.0 { f64::EPSILON }        else { t };
+            let t = if t == 1.0 { 1.0-f64::EPSILON }    else { t };
+    
+            // Get the deriviative
+            let (d1, d2, d3) = derivative4(w1, w2, w3, w4);
+    
+            // Get the tangent and the point at the specified t value
+            let tangent     = de_casteljau3(t, d1, d2, d3);
+    
+            tangent
     }
 
     fn apply_transform<F>(&self, transform: F) -> Self where F: Fn(&Vector) -> Vector

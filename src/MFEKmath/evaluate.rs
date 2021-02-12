@@ -8,8 +8,8 @@ use super::coordinate::Coordinate;
 pub trait Evaluate
 {
     type EvalResult: Coordinate;
-    fn evaluate(&self, t: f64) -> Self::EvalResult; 
-    fn derivative(&self, u: f64) -> Self::EvalResult;
+    fn at(&self, t: f64) -> Self::EvalResult; 
+    fn tangent_at(&self, u: f64) -> Self::EvalResult;
     fn bounds(&self) -> Rect; // returns an AABB that contains all points 
     fn apply_transform<F>(&self, transform: F) -> Self where F: Fn(&Self::EvalResult) -> Self::EvalResult;
     fn start_point(&self) -> Self::EvalResult;

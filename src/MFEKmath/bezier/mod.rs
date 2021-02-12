@@ -1,5 +1,6 @@
 use super::vector::Vector;
 use glifparser::{WhichHandle};
+use super::consts::SMALL_DISTANCE;
 
 mod evaluate;
 mod primitive;
@@ -8,8 +9,10 @@ mod flo;
 #[derive(Clone, Debug)]
 #[allow(non_snake_case)]
 pub struct Bezier {
-    A:f64, B:f64, C:f64, D:f64,
-    E:f64, F:f64, G:f64, H:f64,
+    w1: Vector,
+    w2: Vector,
+    w3: Vector,
+    w4: Vector
 }
 
 impl Bezier {
@@ -24,6 +27,30 @@ impl Bezier {
         return Self::from_points(p, h1, h2, np);
     }
 
+    pub fn fuse_nearby_handles(&self) -> Bezier
+    {
+        let (w1, mut w2, mut w3, w4) = (self.w1, self.w2, self.w3, self.w4);
+    
+        if self.w1.is_near(self.w2, SMALL_DISTANCE*10000.) {
+            w2 = w1;
+        }
+
+        if self.w3.is_near(self.w4, SMALL_DISTANCE*10000.) {
+            w3 = w4;
+        }
+
+        return Self {
+            w1: w1,
+            w2: w2,
+            w3: w3,
+            w4: w4
+        }
+    }
+    pub fn from_points(p0: Vector, p1: Vector, p2: Vector, p3: Vector) -> Self
+    {
+        return Bezier { w1: p0, w2: p1, w3: p2, w4: p3};
+    }
+    /*
     pub fn from_points(p0: Vector, p1: Vector, p2: Vector, p3: Vector) -> Self
     {
         let x0 = p0.x; let y0 = p0.y;
@@ -43,17 +70,11 @@ impl Bezier {
             H: y0,
         }
     }
+    */
 
     pub fn to_control_points(&self) -> [Vector; 4]
     {
-        let output: [Vector; 4] = [
-            Vector {x: self.D, y: self.H},
-            Vector {x: (self.D + self.C / 3.), y: (self.H + self.G / 3.)},
-            Vector {x: (self.D + 2. * self.C / 3. + self.B / 3.), y: (self.H + 2. * self.G / 3. + self.F / 3.)}, 
-            Vector {x: (self.D + self.C + self.B + self.A), y: (self.H + self.G + self.F + self.E)},
-        ];
-
-        return output;
+        [self.w1, self.w2, self.w3, self.w4]
     }
 
     pub fn to_control_points_vec(&self) -> Vec<Vector>

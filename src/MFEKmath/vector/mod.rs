@@ -67,6 +67,11 @@ impl Vector {
         Vector { x: self.x / magnitude, y: self.y / magnitude }
     }
 
+    pub fn dot(self, v1: Vector) -> f64
+    {
+        self.x * v1.x + self.y * v1.y
+    }
+
     pub fn lerp(self, v1:Vector, t: f64) -> Self
     {
         let v0 = self;

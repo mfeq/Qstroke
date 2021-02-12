@@ -164,11 +164,11 @@ fn pattern_along_path<T: Evaluate<EvalResult = Vector>>(path: &Piecewise<T>, pat
     
         // Paramaterize u such that 0-1 maps to the curve by arclength
         let t = arclenparam.parameterize(u);
-        let path_point = path.evaluate(t);
+        let path_point = path.at(t);
 
         // the derivative here is essentially a velocity or tangent line on the point we're evaulating
         // it faces in the direction of travel along the path
-        let d = path.derivative(t);
+        let d = path.tangent_at(t);
 
         // we rotate the vector by 90 degrees so that it's perpendicular to the direction of travel along the curve
         // normalize the vector and now we've got a unit vector perpendicular to the curve's surface in 'curve space'
