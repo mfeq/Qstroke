@@ -23,8 +23,8 @@ impl<T: Evaluate> Evaluate for Piecewise<T> {
         */
 
         
-        let curve_index = self.segN(t);
-        let offset_time = self.segT(t);
+        let curve_index = self.seg_n(t);
+        let offset_time = self.seg_t(t);
 
         let ref dir = self.segs[curve_index];
 
@@ -45,8 +45,8 @@ impl<T: Evaluate> Evaluate for Piecewise<T> {
         let offset_time = modified_time - curve_index as f64;
         */
 
-        let curve_index = self.segN(t);
-        let offset_time = self.segT(t);
+        let curve_index = self.seg_n(t);
+        let offset_time = self.seg_t(t);
 
         let ref dir = self.segs[curve_index];
 

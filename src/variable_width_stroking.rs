@@ -1,14 +1,10 @@
-use crate::MFEKmath::{Bezier, Evaluate, Piecewise, Vector, consts::SMALL_DISTANCE};
+use crate::MFEKmath::{Bezier, Evaluate, Piecewise, Vector, consts::SMALL_DISTANCE, Interpolator, InterpolationType, EvaluateTransform, ArcLengthParameterization, Parameterization};
 use crate::MFEKmath::piecewise::glif::PointData;
+use crate::MFEKmath::piecewise::SegmentIterator;
+use crate::vec2;
+use std::time::Instant;
 use flo_curves::line::{line_intersects_line};
-use flo_curves::bezier::{characterize_curve, CurveCategory};
-
 use glifparser::{Glif, Outline};
-
-enum Winding {
-    Clockwise,
-    Counter
-}
 
 fn find_discontinuity_intersection(from: Vector, to: Vector, tangent1: Vector, tangent2: Vector) -> Option<Vector>
 {
@@ -75,8 +71,24 @@ fn arc_to(path: &mut Vec<Bezier>, to: Vector, tangent1: Vector, tangent2: Vector
     }
 }
 
+fn prepare_in_pw(in_pw: &Piecewise<Bezier>, right_pw: &Piecewise<Interpolator>, left_pw: &Piecewise<Interpolator>, arclen: &ArcLengthParameterization) -> Piecewise<Bezier> {
+    let mut out_pw = in_pw.translate(vec2!(0., 0.));
+
+    for cut in &right_pw.cuts {
+        let _t = arclen.parameterize(*cut);
+        out_pw = out_pw.cut_at_t(_t);
+    }
+
+    for cut in &left_pw.cuts {
+        let _t = arclen.parameterize(*cut);
+        out_pw = out_pw.cut_at_t(_t);
+    }
+
+    return out_pw;
+}
+
 // takes a vector of beziers and fills in discontinuities with joins
-fn fix_path(in_path: Vec<Bezier>, winding: Winding, closed: bool) -> Vec<Bezier>
+fn fix_path(in_path: Vec<Bezier>, closed: bool) -> Vec<Bezier>
 {
     let mut out: Vec<Bezier> = Vec::new();
 
@@ -96,10 +108,8 @@ fn fix_path(in_path: Vec<Bezier>, winding: Winding, closed: bool) -> Vec<Bezier>
                 let tangent2 = -next_bezier.tangent_at(0.).normalize();
                 let discontinuity_vec = next_start - last_end;
 
-                let on_outside = match winding {
-                    Winding::Clockwise => Vector::dot(tangent2, discontinuity_vec) >= 0.,
-                    Winding::Counter => Vector::dot(tangent2, -discontinuity_vec) >= 0.
-                };
+                let on_outside = Vector::dot(tangent2, discontinuity_vec) >= 0.;
+
                 
                 if !on_outside {
                     //TODO: implement more complicated joins
@@ -136,6 +146,10 @@ fn fix_path(in_path: Vec<Bezier>, winding: Winding, closed: bool) -> Vec<Bezier>
                 out.push(bezier.clone());
                 arc_to(&mut out, first_point, tangent1, tangent2);
             }
+            else
+            {
+                out.push(bezier.clone());
+            }
         }
         else
         {
@@ -146,26 +160,31 @@ fn fix_path(in_path: Vec<Bezier>, winding: Winding, closed: bool) -> Vec<Bezier>
     return out;
 }
 
-pub fn variable_width_stroke(path: &Piecewise<Bezier>) -> Piecewise<Piecewise<Bezier>> {
+
+pub fn variable_width_stroke(in_pw: &Piecewise<Bezier>, right_pw: &Piecewise<Interpolator>, left_pw: Option<&Piecewise<Interpolator>>) -> Piecewise<Piecewise<Bezier>> {
+    let left_pw = left_pw.unwrap_or(right_pw);
+
  
+    let closed = in_pw.is_closed();
+
     // check if our input path is closed
     // We're gonna keep track of a left line and a right line.
     let mut left_line: Vec<Bezier> = Vec::new();
     let mut right_line: Vec<Bezier> = Vec::new();
 
+    let copy_pw = in_pw.translate(vec2!(0., 0.));
 
-    let iter = path.segs.iter().enumerate();
-    for bezier in &path.segs {
-        let mut left_offset = flo_curves::bezier::offset(bezier, 10., 10.);
+    let arclen = ArcLengthParameterization::from(&copy_pw);
+    let in_pw = prepare_in_pw(in_pw, right_pw, left_pw, &arclen);
+
+    let iter = SegmentIterator::new(copy_pw);
+    for (bezier, su, eu) in iter {
+        let (st, et) = (arclen.parameterize(su) + SMALL_DISTANCE, arclen.parameterize(eu) + SMALL_DISTANCE);
+        let mut left_offset = flo_curves::bezier::offset(&bezier, -left_pw.at(st), -left_pw.at(et));
         left_line.append(&mut left_offset);
 
-        let mut right_offset = flo_curves::bezier::offset(bezier, -10., -10.);
+        let mut right_offset = flo_curves::bezier::offset(&bezier, right_pw.at(st), right_pw.at(et));
         right_line.append(&mut right_offset);
-
-        if characterize_curve(bezier) == CurveCategory::Linear {
-            assert!(characterize_curve(right_line.last().unwrap()) == CurveCategory::Linear);
-        }
-    
     }
      
     right_line.reverse();
@@ -173,11 +192,10 @@ pub fn variable_width_stroke(path: &Piecewise<Bezier>) -> Piecewise<Piecewise<Be
         .map(|bez| bez.clone().reverse())
         .collect();
 
-    let closed = path.is_closed();
-    right_line = fix_path(right_line, Winding::Clockwise, closed);
-    left_line = fix_path(left_line, Winding::Counter, closed);
+    right_line = fix_path(right_line, closed);
+    left_line = fix_path(left_line, closed);
 
-    if path.is_closed() {
+    if in_pw.is_closed() {
         let mut out = Vec::new();
 
         let left_pw = Piecewise::new(left_line, None);
@@ -208,20 +226,134 @@ pub fn variable_width_stroke(path: &Piecewise<Bezier>) -> Piecewise<Piecewise<Be
     }
 }
 
+struct VWSHandle {
+    t: f64,
+    left_offset: Option<f64>,
+    right_offset: Option<f64>,
+    interpolation: InterpolationType
+}
+
+struct InternalVWSHandle {
+    t: f64,
+    offset: f64,
+    interpolation: InterpolationType
+}
+
+fn split_stroke_handles(handles: Vec<VWSHandle>) -> [Vec<InternalVWSHandle>; 2] {
+    let mut left_internal = Vec::new();
+    let mut right_internal = Vec::new();
+
+    for handle in handles {
+        if let Some(left_offset) = handle.left_offset {
+            left_internal.push(InternalVWSHandle {
+                t: handle.t,
+                offset: left_offset,
+                interpolation: handle.interpolation
+            })
+        }
+
+        if let Some(right_offset) = handle.right_offset {
+            right_internal.push(InternalVWSHandle {
+                t: handle.t,
+                offset: right_offset,
+                interpolation: handle.interpolation
+            })
+        }
+    }
+
+    if left_internal.is_empty() || right_internal.is_empty() {
+        panic!("There must be at least one handle on each side of the line. If you want to have one side not be offset use a single 0.0 offset handle.")
+    }
+
+    return [left_internal, right_internal];
+}
+
+fn create_pw_from_handles(handles: Vec<VWSHandle>) -> [Piecewise<Interpolator>; 2] {
+    let split_handles = split_stroke_handles(handles);
+    let mut output_pws = Vec::new();
+
+    let iter = split_handles.iter().enumerate();
+    for (i, handle_vec) in iter {
+        let mut out_pw_segs: Vec<Interpolator> = Vec::new();
+        let mut out_pw_cuts: Vec<f64> = Vec::new();
+
+        let mut first = true;
+        let mut handle_iter = handle_vec.iter().peekable();
+        while let Some(handle) = handle_iter.next() {
+            if let Some(peek_handle) = handle_iter.peek() {
+                let start_offset = handle.offset;
+                let end_offset = peek_handle.offset;
+
+                if first && handle.t < SMALL_DISTANCE {
+                    first = false;        
+                    out_pw_cuts.push(0.);
+                    out_pw_segs.push(Interpolator::new(start_offset, end_offset, handle.interpolation));
+                }
+                else {
+    
+                    out_pw_cuts.push(handle.t);
+                    out_pw_segs.push(Interpolator::new(start_offset, end_offset, handle.interpolation));
+                }
+            } else if handle.t < 1. - SMALL_DISTANCE {
+                let start_offset = handle.offset;
+
+                out_pw_cuts.push(handle.t);
+                out_pw_segs.push(Interpolator::new(start_offset, start_offset, handle.interpolation));
+                out_pw_cuts.push(1.);
+            } else {
+                out_pw_cuts.push(1.);
+            }
+        }
+
+        output_pws.push(Piecewise::new(out_pw_segs, Some(out_pw_cuts)));
+    }
+
+
+    let right = output_pws.pop().unwrap();
+    let left = output_pws.pop().unwrap();
+    return [left, right];
+}
+
 pub fn variable_width_stroke_glif<U>(path: &Glif<U>) -> Glif<Option<PointData>>
 {
+    let start = Instant::now();
+
     // convert our path and pattern to piecewise collections of beziers
     let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
     let mut output_outline: Outline<Option<PointData>> = Vec::new();
 
+    let handles = vec![
+        VWSHandle {
+            t: 0.0,
+            left_offset: Some(1.),
+            right_offset: Some(1.),
+            interpolation: InterpolationType::Linear
+        },
+        VWSHandle {
+            t: 0.5,
+            left_offset: Some(10.),
+            right_offset: Some(10.),
+            interpolation: InterpolationType::Linear
+        },
+        VWSHandle {
+            t: 1.0,
+            left_offset: Some(1.),
+            right_offset: Some(1.),
+            interpolation: InterpolationType::Linear
+        }
+    ];
+
+    let pws = create_pw_from_handles(handles);
 
     for pwpath_contour in piece_path.segs {
-        let results = variable_width_stroke(&pwpath_contour);
+        let results = variable_width_stroke(&pwpath_contour, &pws[0], Some(&pws[1]));
         for result_contour in results.segs {
             output_outline.push(result_contour.to_contour());
         }
     }
 
+    let elapsed = start.elapsed();
+    print!("{0}", elapsed.as_millis());
     return Glif {
         outline: Some(output_outline),
         order: path.order, // default when only corners
