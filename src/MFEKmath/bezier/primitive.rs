@@ -1,12 +1,18 @@
 use super::Bezier;
 use super::Vector;
 use super::super::evaluate::Primitive;
+use super::super::consts::SMALL_DISTANCE;
 
 impl Primitive for Bezier {
     // returns two curves one before t and one after
     // https://www.malinc.se/m/DeCasteljauAndBezier.php
     fn subdivide(&self,  t:f64) -> Option<(Self, Self)>
     {
+        if t == 0. || t == 1. {
+            // if we're really close to 0 or 1 it doesn't make sense to split
+            return None;
+        }
+
         // easier to understand this operation when working in points
         // it's just a bit of lerping
         let points = self.to_control_points();

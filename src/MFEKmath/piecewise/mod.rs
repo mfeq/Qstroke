@@ -53,7 +53,8 @@ impl<T: Evaluate> Piecewise<T> {
         }
     }
 
-    fn segN(&self, t: f64) -> usize
+    // implementation ripped from lib2geom, performs a binary search to find our segment
+    fn seg_n(&self, t: f64) -> usize
     {
         let (mut low, mut high) = (0, self.segs.len() - 1);
         if t < *self.cuts.first().unwrap() { return 0; }
@@ -75,10 +76,9 @@ impl<T: Evaluate> Piecewise<T> {
         return low;
     }
 
-    fn segT(&self, t: f64) -> f64 
+    fn seg_t(&self, t: f64) -> f64 
     {
-        let i = self.segN(t);
-        println!("{0}", i);
+        let i = self.seg_n(t);
         return (t - self.cuts[i]) / (self.cuts[i+1] - self.cuts[i]);
     }
 }
@@ -112,8 +112,8 @@ impl<T: Evaluate<EvalResult = Vector>+Primitive> Piecewise<T>
     pub fn subdivide(&self, t: f64) -> Piecewise<T>
     {
         let mut new_segments = Vec::new();
-        for bez in &self.segs {
-            let subdivisions = bez.subdivide(t);
+        for primitive in &self.segs {
+            let subdivisions = primitive.subdivide(t);
 
             match subdivisions {
                 Some(subs) => {         
@@ -121,7 +121,7 @@ impl<T: Evaluate<EvalResult = Vector>+Primitive> Piecewise<T>
                     new_segments.push(subs.1);
                 }
                 _ => {
-                    new_segments.push(bez.clone());
+                    new_segments.push(primitive.clone());
                 }
             }
         }
@@ -129,21 +129,29 @@ impl<T: Evaluate<EvalResult = Vector>+Primitive> Piecewise<T>
         return Piecewise::new(new_segments, None);
     }
 
-    
     pub fn cut_at_t(&self, t: f64) -> Piecewise<T>
     {
         let mut new_segments = Vec::new();
-        for bez in &self.segs {
-            let subdivisions = bez.subdivide(t);
+        let seg_num = self.seg_n(t);
+        let primitive = &self.segs[seg_num];
+        let seg_time = self.seg_t(t);
 
-            match subdivisions {
-                Some(subs) => {         
-                    new_segments.push(subs.0);
-                    new_segments.push(subs.1);
-                }
-                _ => {
-                    new_segments.push(bez.clone());
-                }
+        let iter = self.segs.iter().enumerate();
+        for (i, seg) in iter {
+            if i == seg_num {
+                let subdivisions = seg.subdivide(seg_time);
+
+                match subdivisions {
+                    Some(subs) => {         
+                        new_segments.push(subs.0);
+                        new_segments.push(subs.1);
+                    }
+                    _ => {
+                        new_segments.push(primitive.clone());
+                    }
+                }        
+            } else {
+                new_segments.push(primitive.clone());
             }
         }
 
@@ -152,24 +160,32 @@ impl<T: Evaluate<EvalResult = Vector>+Primitive> Piecewise<T>
 }
 
 // Returns a primitive and the range of t values that it covers.
-pub struct CurveIterator<T: Evaluate+Primitive+Sized> {
+pub struct SegmentIterator<T: Evaluate+Primitive+Sized> {
     piecewise: Piecewise<T>,
-    len: usize,
     counter: usize
 }
 
-impl<T: Evaluate+Primitive+Sized> Iterator for CurveIterator<T> {
+impl<T: Evaluate+Primitive+Sized> SegmentIterator<T> {
+    pub fn new(pw: Piecewise<T>) -> Self {
+        Self {
+            piecewise: pw,
+            counter: 0
+        }
+    }
+}
+
+impl<T: Evaluate+Primitive+Sized> Iterator for SegmentIterator<T> {
     type Item = (T, f64, f64); // primitive, start time, end time
 
     fn next(&mut self) -> Option<Self::Item>
     {
-        let start_time = self.counter as f64 / self.len as f64;
-        let end_time = (self.counter + 1) as f64 / self.len as f64;
-        let item = &self.piecewise.segs[self.counter];
-
-        if self.counter == self.len {
+        if self.counter == self.piecewise.segs.len() {
             return None;
         }
+
+        let start_time = self.piecewise.cuts[self.counter];
+        let end_time = self.piecewise.cuts[self.counter + 1];
+        let item = &self.piecewise.segs[self.counter];
 
         self.counter = self.counter + 1;
         return Some((item.clone(), start_time, end_time));
