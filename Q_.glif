@@ -77,4 +77,13 @@
       <point x="463" y="301" type="line"/>
     </contour>
   </outline>
+  <lib>
+    <vws id="5">
+      <handle left="10" right="10" interpolation="linear"/>
+      <handle left="10" right="10" interpolation="linear"/>
+      <handle left="10" right="10" interpolation="linear"/>
+      <handle left="10" right="10" interpolation="linear"/>
+      <handle left="10" right="10" interpolation="linear"/>
+    </vws>
+  </lib>
 </glyph>
