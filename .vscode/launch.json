@@ -12,14 +12,14 @@
                 "args": [
                     "build",
                     "--bin=Qstroke",
-                    "--package=Qstroke"
+                    "--package=Qstroke",
                 ],
                 "filter": {
                     "name": "Qstroke",
                     "kind": "bin"
                 }
             },
-            "args": [],
+            "args": ["VWS", "-i", "Q_.glif", "-o", "Q2.glif"],
             "cwd": "${workspaceFolder}"
         },
         {
