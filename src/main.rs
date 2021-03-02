@@ -171,7 +171,7 @@ fn vws_cli(matches: &clap::ArgMatches)
     }
 
     let out = variable_width_stroke_glif(&input, settings);
-    let glifstring = glifparser::write_ufo_glif(out);
+    let glifstring = glifparser::write_ufo_glif(&out);
     fs::write(output_string, glifstring).expect("Unable to write file");
 }
 
@@ -289,6 +289,6 @@ fn pap_cli(matches: &clap::ArgMatches)
 
 
     let output = pattern_along_glif(&path, &pattern, &settings);
-    let glifstring = glifparser::write_ufo_glif(output);
+    let glifstring = glifparser::write_ufo_glif(&output);
     fs::write(output_string, glifstring).expect("Unable to write file");
 }

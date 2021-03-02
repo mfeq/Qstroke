@@ -8,6 +8,7 @@ dependencies = [
  "glifparser",
  "skia-safe",
  "xmltree",
+ "xmlwriter",
 ]
 
 [[package]]
