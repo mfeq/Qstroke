@@ -89,19 +89,6 @@ fn main() {
                 .takes_value(true)
                 .help("The path where the output will be saved.")
                 .required(true))
-            .arg(Arg::with_name("join_type")
-                .short("jt")
-                .long("join_type")
-                .takes_value(true)
-                .help("<bevel/miter/round> which type of join to use."))
-            .arg(Arg::with_name("cap_type_start")
-                .long("cts")
-                .takes_value(true)
-                .help("<round/square/path to custom cap> which type of cap to use for the starting cap."))
-            .arg(Arg::with_name("cap_type_end")
-                .long("noffset")
-                .takes_value(true)
-                .help("<round/square/path to custom cap> which type of cap to use for the ending cap."))
         )
         .get_matches();
 
@@ -124,51 +111,9 @@ fn vws_cli(matches: &clap::ArgMatches)
     .expect("Failed to read path file!"));
 
     let mut settings = VWSSettings {
-        join_type: JoinType::Bevel,
-        cap_type_start: CapType::Square,
-        cap_type_end: CapType::Square,
         cap_custom_end: None,
         cap_custom_start: None
     };
-
-    if let Some(joins) = matches.value_of("join_type") { 
-        match joins {
-            "bevel" => settings.join_type = JoinType::Bevel,
-            "round" => settings.join_type = JoinType::Round,
-            "miter" => settings.join_type = JoinType::Miter,
-            _ => eprintln!("Invalid join type argument. Falling back to default. (Bevel)")
-        }
-    }
-
-    if let Some(capstart) = matches.value_of("cap_type_start") { 
-        match capstart {
-            "round" => settings.cap_type_start = CapType::Round,
-            "square" => settings.cap_type_start = CapType::Square,
-            _ => {
-                // if our input isn't round or square it should be a path to a glif
-                let cap: glifparser::Glif<Option<MFEKMath::piecewise::glif::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(capstart)
-                    .expect("Failed to read cap start file!"));
-                
-                settings.cap_type_start = CapType::Custom;
-                settings.cap_custom_start = Some(cap);
-            }
-        }
-    }
-
-    if let Some(capend) = matches.value_of("cap_type_end") { 
-        match capend {
-            "round" => settings.cap_type_end = CapType::Round,
-            "square" => settings.cap_type_end = CapType::Square,
-            _ => {
-                // if our input isn't round or square it should be a path to a glif
-                let cap: glifparser::Glif<Option<MFEKMath::piecewise::glif::PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(capend)
-                    .expect("Failed to read cap start file!"));
-                
-                settings.cap_type_end = CapType::Custom;
-                settings.cap_custom_end = Some(cap);
-            }
-        }
-    }
 
     let out = variable_width_stroke_glif(&input, settings);
     let glifstring = glifparser::write_ufo_glif(&out);
