@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "Qstroke"
+name = "MFEKstroke"
 version = "0.0.0"
 dependencies = [
  "MFEKMath",
