@@ -6,10 +6,19 @@ A set of utilities for stroking paths in font glyphs written in Rust.
 
 This program is part of the [MFEK project](https://github.com/mfeq/MFEK/).
 
-`MFEKstroke` takes UFO `.glif` files and applies path stroking algorithms to them. Currently only pattern-along-path (PaP) is provided.
+MFEKstroke takes UFO `.glif` files and applies path stroking algorithms to them.
+
+Three stroking algorithms are provided:
+
+* PAP (**P**attern-**A**long-**P**ath)
+* VWS (**V**ariable **W**idth **S**troking)
+* CWS (**C**onstant **W**idth **S**troking)
+
+This makes MFEKstroke more complete in this department than FontForge or Runebender.
 
 ## Pattern Along Path
 ### As seen in MFEK/glif…
+![Chomsky `Q` patterned with arrows](https://user-images.githubusercontent.com/310356/104128458-9ac66f00-5335-11eb-94d3-f458f6cfb464.png)
 
 This was generated with the following command:
 
@@ -27,7 +36,7 @@ cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Reg
 ## `MFEKstroke --help`
 ### Pattern Along Path
 ```
-MFEK PaP 0.0.0
+MFEK-PaP 0.0.0
 Matthew Blanchard <matthewrblanchard åţ gmail … com>
 A utility for applying pattern-along-path to ufo files.
 
@@ -54,6 +63,48 @@ OPTIONS:
     -s, --subdivide <subdivide>              <f64 (0)> how many times to subdivide the patterns at their midpoint.
         --toffset <tangent_offset>           <f64 (0)> how much to offset the pattern along the tangent of the path.
 ````
+### Variable Width Stroking
+(Note: In VWS mode, it is expected that you are using MFEKglif to generate the input files. Therefore, not many helpful command line options are provided. If you wish to use VWS programatically, play with MFEKglif's VWS tool, get some output, and study it; then generate conformant XML.)
+
+```
+MFEKstroke-VWS 0.0
+Matthew Blanchard <matthewrblanchard@gmail.com>
+Takes a .glif file and strokes it with variable width.
+
+USAGE:
+    MFEKstroke VWS -i <input> -o <output>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -i <input>         The path to the input file.
+    -o <output>        The path where the output will be saved.
+```
+
+### Constant Width Stroking
+
+```
+MFEKstroke-CWS 0.0
+Fredrick R. Brennan <copypasteⒶkittens⊙ph>; Matthew Blanchard <matthewrblanchard@gmail.com>
+Takes a .glif file and strokes it at a constant width.
+
+USAGE:
+    MFEKstroke CWS [OPTIONS] --input <input> --output <output> --width <width>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -i, --input <input>          The path to the input file.
+    -o, --output <output>        The path where the output will be saved.
+    -e, --endcap <endcap>        Either the constant strings "round" or "square", or a .glif file. [default: round]
+    -j, --jointype <jointype>    Either of the constant strings "round", "miter", or "bevel". [default: round]
+    -s, --startcap <startcap>    Either the constant strings "round" or "square", or a .glif file. [default: round]
+    -w, --width <width>          <f64> Constant stroke width.
+```
 
 ## License
 
