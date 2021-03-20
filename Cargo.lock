@@ -3,6 +3,7 @@
 [[package]]
 name = "MFEKMath"
 version = "0.1.0"
+source = "git+https://github.com/MFEK/math?branch=main#454943394f40558cdf30f4f6ad4a0d28d3218f9b"
 dependencies = [
  "flo_curves",
  "glifparser",
