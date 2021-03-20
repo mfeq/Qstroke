@@ -11,7 +11,8 @@ edition = "2018"
 clap = "2.33.3"
 
 # parses .glif files 
-glifparser = { git = "https://github.com/MFEK/glifparser" }
+glifparser = { git = "https://github.com/MatthewBlanchard/glifparser", branch = "variable-width-stroking"}
+MFEKMath = { path = "../math" }
 
 # For reading and writing glifs
 xmltree = "0.10.1"
@@ -20,3 +21,7 @@ xmlwriter = "0.1.0"
 
 # For Skia pathops
 skia-safe = "0"
+
+clap-nested = "*"
+
+flo_curves = { git = "https://github.com/MFEK/flo_curves", branch = "master" }

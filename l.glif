@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<glyph name="l" format="2">
+  <advance width="255" />
+  <unicode hex="6C" />
+  <outline>
+    <contour>
+      <point y="240" x="115" type="move" />
+      <point x="123.916" y="248.439" />
+      <point y="255.323" x="131.602" />
+      <point type="curve" x="140" y="264" />
+      <point y="411.884" x="283.144" />
+      <point y="455.523" x="327.258" />
+      <point y="498" x="327.258" type="curve" />
+      <point x="327.258" y="532.688" />
+      <point y="543.162" x="305.776" />
+      <point y="543.162" type="curve" x="287" />
+      <point x="253.837" y="543.162" />
+      <point x="216.538" y="507.103" />
+      <point y="416" type="curve" x="188" />
+      <point y="333" x="162" />
+      <point y="135.3943" x="60.3543" />
+      <point type="curve" y="98" x="46" />
+      <point y="58" x="30" />
+      <point x="6.038" y="-5.47531" />
+      <point y="-5.47531" type="curve" x="69" />
+      <point y="-5.47531" x="125.267" />
+      <point y="40.8131" x="203.32" />
+      <point type="curve" x="255" y="77" />
+    </contour>
+  </outline>
+  <lib>
+    <vws join="bevel" cap_end="square" id="0" cap_start="square">
+      <handle right="10" interpolation="linear" left="29.758810886934246" />
+      <handle interpolation="linear" left="29.758810886934246" right="10" />
+      <handle left="110.03321102525962" right="10" interpolation="linear" />
+      <handle interpolation="linear" right="10" left="29.758810886934246" />
+      <handle left="29.758810886934246" right="10" interpolation="linear" />
+      <handle interpolation="linear" right="10" left="161.75598906995685" />
+      <handle interpolation="linear" right="10" left="29.758810886934246" />
+      <handle left="29.758810886934246" right="10" interpolation="linear" />
+      <handle interpolation="linear" left="29.758810886934246" right="10" />
+    </vws>
+  </lib>
+</glyph>
