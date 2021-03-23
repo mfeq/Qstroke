@@ -1,14 +1,14 @@
 #![feature(clamp)]
 #![macro_use]
 
-extern crate MFEKMath;
+use MFEKmath;
 use clap::{Arg, App};
 use glifparser::{Glif, Outline};
-use MFEKMath::Piecewise;
-use MFEKMath::pattern_along_path::*;
-use MFEKMath::vector::Vector;
-use MFEKMath::variable_width_stroking::*;
-use MFEKMath::piecewise::glif::PointData;
+use MFEKmath::Piecewise;
+use MFEKmath::pattern_along_path::*;
+use MFEKmath::vector::Vector;
+use MFEKmath::variable_width_stroking::*;
+use MFEKmath::piecewise::glif::PointData;
 use std::fs;
 
 fn main() {

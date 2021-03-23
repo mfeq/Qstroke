@@ -11,8 +11,8 @@ edition = "2018"
 clap = "2.33.3"
 
 # parses .glif files 
-glifparser = { git = "https://github.com/MatthewBlanchard/glifparser", branch = "variable-width-stroking"}
-MFEKMath = { git = "https://github.com/MFEK/math", branch = "main"}
+glifparser = { git = "https://github.com/MFEK/glifparser.rlib" }
+MFEKmath = { git = "https://github.com/MFEK/math.rlib", branch = "main"}
 
 # For reading and writing glifs
 xmltree = "0.10.1"
