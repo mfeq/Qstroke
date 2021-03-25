@@ -151,10 +151,11 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -n, --nib <nib>          The path to the nib file. FontForge is quite strict about these. The .glif must contain a
-                             single closed spline, running clockwise, which represents a convex shape.
-    -i, --input <input>      The path to the input path file.
-    -o, --output <output>    The path where the output .glif will be saved.
+    -n, --nib <nib>              The path to the nib file. FontForge is quite strict about these. The .glif must contain
+                                 a single closed spline, running clockwise, which represents a convex shape.
+    -i, --input <input>          The path to the input path file.
+    -o, --output <output>        The path where the output .glif will be saved.
+    -a, --accuracy <accuracy>    <f64> Accuracy target [default: 0.25]
 ```
 
 ## License

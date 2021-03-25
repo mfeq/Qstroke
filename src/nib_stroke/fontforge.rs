@@ -243,6 +243,7 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (Vec<fontforge::SplineSe
 pub struct NibSettings {
     pub nib: String,
     pub path: String,
+    pub accuracy: f64,
     pub quiet: bool,
 }
 
@@ -288,6 +289,7 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
         (*si).stroke_type = fontforge::si_type_si_nib;
         (*si).nib = nibss;
         (*si).width = 10.;
+        (*si).accuracy_target = settings.accuracy;
         (*si).simplify = -1;
         (*si).rmov = fontforge::stroke_rmov_srmov_none;
         // Do the stroke for each contour. We do it this way to avoid constructing linked lists of

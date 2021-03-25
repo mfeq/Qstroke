@@ -31,16 +31,27 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .takes_value(true)
             .help("The path where the output .glif will be saved.")
             .required(true))
+       .arg(Arg::with_name("accuracy")
+            .display_order(4)
+            .short("a")
+            .long("accuracy")
+            .takes_value(true)
+            .default_value("0.25")
+            .help("<f64> Accuracy target")
+            .validator(super::arg_validator_positive_f64)
+            .required(false))
 }
 
 pub fn nib_cli(matches: &clap::ArgMatches) {
     let nib_file = matches.value_of("nib").unwrap();
     let input_file = matches.value_of("input").unwrap();
     let output_file = matches.value_of("output").unwrap();
+    let accuracy = matches.value_of("accuracy").unwrap();
 
     let settings = fontforge::NibSettings {
         nib: nib_file.to_string(),
         path: input_file.to_string(),
+        accuracy: accuracy.parse().unwrap(), //validated by super::arg_validator_positive_f64
         quiet: true,
     };
 

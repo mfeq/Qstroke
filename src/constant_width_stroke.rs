@@ -11,19 +11,6 @@ use glifparser::{Glif, Outline};
 use clap::{App, Arg};
 
 pub fn clap_app() -> clap::App<'static, 'static> {
-    fn arg_validator_width(v: String) -> Result<(), String> {
-        match v.parse::<f64>() {
-            Ok(i) => {
-                if i <= 0.0 + f64::EPSILON {
-                    Err(String::from("Value too small"))
-                } else {
-                    Ok(())
-                }
-            }
-            Err(_) => Err(String::from("Value must be a float")),
-        }
-    }
-
     App::new("CWS")
         .alias("constant")
         .alias("cws")
@@ -67,7 +54,7 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .short("w")
             .takes_value(true)
             .help(r#"<f64> Constant stroke width."#)
-            .validator(arg_validator_width)
+            .validator(super::arg_validator_positive_f64)
             .required(true))
 }
 
