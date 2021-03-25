@@ -2,7 +2,7 @@
 #![allow(non_snake_case)] // for our name MFEKstroke
 
 use MFEKmath;
-use clap::{Arg, App};
+use clap::{Arg, App, AppSettings};
 use glifparser::{Glif, Outline};
 use MFEKmath::Piecewise;
 use MFEKmath::pattern_along_path::*;
@@ -30,6 +30,7 @@ fn main() {
 
     #[allow(unused_mut)] // we actually use it if cfg(feature=fontforge)
     let mut argparser = App::new("MFEKstroke")
+        .setting(AppSettings::ArgRequiredElseHelp)
         .version("0.1.0")
         .author("Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens⊙ph>")
         .about("A utility for applying stroking techniques to UFO contours.")
