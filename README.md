@@ -57,6 +57,9 @@ cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Reg
 ## Nib Stroking
 ![FRB Standard Cursive with a calligraphic nib](https://raw.githubusercontent.com/MFEK/stroke/main/docs/blob/MFEKstroke%20NIB%20Q.png)
 
+## Variable Width Stroke
+![Besley Small Caps Q](https://raw.githubusercontent.com/MFEK/stroke/main/docs/blob/MFEKstroke%20VWS%20Q.png)
+
 ## `MFEKstroke --help`
 ### Pattern Along Path
 ```
