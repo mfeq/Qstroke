@@ -1,14 +1,13 @@
 use std::fs;
 
-use MFEKmath::piecewise::glif::PointData;
 use MFEKmath::pattern_along_path::pattern_along_glif;
 use MFEKmath::pattern_along_path::*;
+use MFEKmath::piecewise::glif::PointData;
 use MFEKmath::vector::Vector;
 
 use clap::{App, Arg};
 
-pub fn clap_app() -> clap::App<'static, 'static>
-{
+pub fn clap_app() -> clap::App<'static, 'static> {
     App::new("PAP")
             .alias("patterned")
             .about("Maps a pattern glyph along a path glyph.")
@@ -73,37 +72,37 @@ pub fn clap_app() -> clap::App<'static, 'static>
                 .help("<boolean (true)> if you want to align a pattern manually you can change this to false."))
 }
 
-pub fn pap_cli(matches: &clap::ArgMatches)
-{
+pub fn pap_cli(matches: &clap::ArgMatches) {
     let path_string = matches.value_of("path").unwrap(); // required options shouldn't panic
     let pattern_string = matches.value_of("pattern").unwrap();
     let output_string = matches.value_of("output").unwrap();
 
-    let path: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(path_string)
-    .expect("Failed to read path file!"));
+    let path: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(
+        &fs::read_to_string(path_string).expect("Failed to read path file!"),
+    );
 
-    let pattern: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(pattern_string)
-        .expect("Failed to read pattern file!"));
+    let pattern: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(
+        &fs::read_to_string(pattern_string).expect("Failed to read pattern file!"),
+    );
 
-
-    let mut settings = PatternSettings{
+    let mut settings = PatternSettings {
         copies: PatternCopies::Single,
         subdivide: PatternSubdivide::Off,
         is_vertical: false,
         normal_offset: 0.,
         tangent_offset: 0.,
         center_pattern: true,
-        pattern_scale: Vector{x:1., y: 1.},
+        pattern_scale: Vector { x: 1., y: 1. },
         spacing: 0.,
         stretch: false,
-        simplify: false
+        simplify: false,
     };
 
-    if let Some(copies) = matches.value_of("mode") { 
+    if let Some(copies) = matches.value_of("mode") {
         match copies {
             "single" => settings.copies = PatternCopies::Single,
             "repeated" => settings.copies = PatternCopies::Repeated,
-            _ => eprintln!("Invalid mode argument. Falling back to default. (Single)")
+            _ => eprintln!("Invalid mode argument. Falling back to default. (Single)"),
         }
     }
 
@@ -112,7 +111,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
 
         match sx {
             Ok(n) => settings.pattern_scale.x = n,
-            Err(_e) => eprintln!("Invalid scale x argument. Falling back to default. (1)")
+            Err(_e) => eprintln!("Invalid scale x argument. Falling back to default. (1)"),
         }
     }
 
@@ -121,7 +120,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
 
         match sy {
             Ok(n) => settings.pattern_scale.y = n,
-            Err(_e) => eprintln!("Invalid scale y argument. Falling back to default. (1)")
+            Err(_e) => eprintln!("Invalid scale y argument. Falling back to default. (1)"),
         }
     }
 
@@ -130,7 +129,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
 
         match subs {
             Ok(n) => settings.subdivide = PatternSubdivide::Simple(n),
-            Err(_e) => eprintln!("Invalid subdivision count. Falling back to default. (0)")
+            Err(_e) => eprintln!("Invalid subdivision count. Falling back to default. (0)"),
         }
     }
 
@@ -139,7 +138,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
 
         match spacing {
             Ok(n) => settings.spacing = n,
-            Err(_e) => eprintln!("Invalid spacing. Falling back to default. (0)")
+            Err(_e) => eprintln!("Invalid spacing. Falling back to default. (0)"),
         }
     }
 
@@ -148,7 +147,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
 
         match spacing {
             Ok(n) => settings.normal_offset = n,
-            Err(_e) => eprintln!("Invalid normal offset. Falling back to default. (0)")
+            Err(_e) => eprintln!("Invalid normal offset. Falling back to default. (0)"),
         }
     }
 
@@ -157,7 +156,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
 
         match spacing {
             Ok(n) => settings.tangent_offset = n,
-            Err(_e) => eprintln!("Invalid tangent offset. Falling back to default. (0)")
+            Err(_e) => eprintln!("Invalid tangent offset. Falling back to default. (0)"),
         }
     }
 
@@ -165,7 +164,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
         match center_string {
             "true" => settings.center_pattern = true,
             "false" => settings.center_pattern = false,
-            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)")
+            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)"),
         }
     }
 
@@ -173,7 +172,7 @@ pub fn pap_cli(matches: &clap::ArgMatches)
         match simplify_string {
             "true" => settings.simplify = true,
             "false" => settings.simplify = false,
-            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)")
+            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)"),
         }
     }
 
@@ -181,10 +180,9 @@ pub fn pap_cli(matches: &clap::ArgMatches)
         match stretch_string {
             "true" => settings.stretch = true,
             "false" => settings.stretch = false,
-            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)")
+            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)"),
         }
     }
-
 
     let output = pattern_along_glif(&path, &pattern, &settings);
     let glifstring = glifparser::write_ufo_glif(&output);

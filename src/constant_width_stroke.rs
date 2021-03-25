@@ -1,17 +1,16 @@
 use std::fs;
 
-use MFEKmath::Piecewise;
 use MFEKmath::piecewise::glif::PointData;
-use MFEKmath::VWSHandle;
 use MFEKmath::variable_width_stroke;
 use MFEKmath::variable_width_stroking::*;
+use MFEKmath::Piecewise;
+use MFEKmath::VWSHandle;
 
 use glifparser::{Glif, Outline};
 
 use clap::{App, Arg};
 
-pub fn clap_app() -> clap::App<'static, 'static>
-{
+pub fn clap_app() -> clap::App<'static, 'static> {
     fn arg_validator_width(v: String) -> Result<(), String> {
         match v.parse::<f64>() {
             Ok(i) => {
@@ -20,8 +19,8 @@ pub fn clap_app() -> clap::App<'static, 'static>
                 } else {
                     Ok(())
                 }
-            },
-            Err(_) => Err(String::from("Value must be a float"))
+            }
+            Err(_) => Err(String::from("Value must be a float")),
         }
     }
 
@@ -76,14 +75,13 @@ pub fn clap_app() -> clap::App<'static, 'static>
 // the width, divide by two to make handles from it, and use those to stroke at a tangent of 0.
 //
 // Some of this was copied from MFEK/math.rlib file src/variable_width_stroking.rs fn variable_width_stroke_glif
-pub fn cws_cli(matches: &clap::ArgMatches)
-{
+pub fn cws_cli(matches: &clap::ArgMatches) {
     fn str_to_jointype(s: &str) -> JoinType {
         match s {
             "bevel" => JoinType::Bevel,
             "miter" => JoinType::Miter,
             "round" => JoinType::Round,
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
 
@@ -91,14 +89,15 @@ pub fn cws_cli(matches: &clap::ArgMatches)
         match s {
             "round" => CapType::Round,
             "square" => CapType::Square,
-            _ => CapType::Custom
+            _ => CapType::Custom,
         }
     }
 
     fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<Option<PointData>>> {
         if ct == CapType::Custom {
-            let path: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(input_file)
-            .expect("Failed to read file!"));
+            let path: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(
+                &fs::read_to_string(input_file).expect("Failed to read file!"),
+            );
             Some(path)
         } else {
             None
@@ -112,20 +111,20 @@ pub fn cws_cli(matches: &clap::ArgMatches)
     let jointype = str_to_jointype(matches.value_of("jointype").unwrap());
 
     let width: f64 = matches.value_of("width").unwrap().parse().unwrap();
-    let path: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(input_file)
-    .expect("Failed to read file!"));
+    let path: glifparser::Glif<Option<PointData>> =
+        glifparser::read_ufo_glif(&fs::read_to_string(input_file).expect("Failed to read file!"));
 
     let vws_contour = VWSContour {
         id: 0,
         join_type: jointype,
         cap_start_type: startcap,
         cap_end_type: endcap,
-        handles: vec![] // to be populated based on number of points
+        handles: vec![], // to be populated based on number of points
     };
 
     let settings = VWSSettings {
         cap_custom_end: custom_cap_if_requested(endcap, matches.value_of("endcap").unwrap()),
-        cap_custom_start: custom_cap_if_requested(startcap, matches.value_of("startcap").unwrap())
+        cap_custom_start: custom_cap_if_requested(startcap, matches.value_of("startcap").unwrap()),
     };
 
     // convert our path and pattern to piecewise collections of beziers
@@ -138,7 +137,7 @@ pub fn cws_cli(matches: &clap::ArgMatches)
         left_offset: width / 2.0,
         right_offset: width / 2.0,
         tangent_offset: 0.0,
-        interpolation: InterpolationType::Linear
+        interpolation: InterpolationType::Linear,
     };
 
     for outline in path.outline.as_ref() {
@@ -170,7 +169,7 @@ pub fn cws_cli(matches: &clap::ArgMatches)
         unicode: path.unicode,
         name: path.name,
         format: 2,
-        lib: None
+        lib: None,
     };
     let glifstring = glifparser::write_ufo_glif(&out);
     fs::write(output_file, glifstring).expect("Unable to write file");

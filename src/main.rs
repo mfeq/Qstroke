@@ -3,11 +3,11 @@
 
 use clap::{App, AppSettings};
 
+mod constant_width_stroke;
+#[cfg(feature = "fontforge")]
+mod nib_stroke;
 mod pattern_along_path;
 mod variable_width_stroke;
-mod constant_width_stroke;
-#[cfg(feature="fontforge")]
-mod nib_stroke;
 
 fn main() {
     #[allow(unused_mut)] // we actually use it if cfg(feature=fontforge)
@@ -20,7 +20,7 @@ fn main() {
         .subcommand(variable_width_stroke::clap_app())
         .subcommand(constant_width_stroke::clap_app());
 
-    #[cfg(feature="fontforge")]
+    #[cfg(feature = "fontforge")]
     {
         argparser = argparser.subcommand(nib_stroke::clap_app());
     }
@@ -31,7 +31,7 @@ fn main() {
         Some("PAP") => pattern_along_path::pap_cli(&matches.subcommand_matches("PAP").unwrap()),
         Some("VWS") => variable_width_stroke::vws_cli(&matches.subcommand_matches("VWS").unwrap()),
         Some("CWS") => constant_width_stroke::cws_cli(&matches.subcommand_matches("CWS").unwrap()),
-        #[cfg(feature="fontforge")]
+        #[cfg(feature = "fontforge")]
         Some("NIB") => nib_stroke::nib_cli(&matches.subcommand_matches("NIB").unwrap()),
         _ => {}
     }

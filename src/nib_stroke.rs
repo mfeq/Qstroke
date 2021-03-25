@@ -4,8 +4,7 @@ use std::fs;
 
 use clap::{App, Arg};
 
-pub fn clap_app() -> clap::App<'static, 'static>
-{
+pub fn clap_app() -> clap::App<'static, 'static> {
     App::new("NIB")
         .alias("nib")
         .about("Takes a nib and a path, both in .glif format, and emulates a pen, with the chosen nib, stroking the path.\n\nImportant note: FontForge is used for this, so it may be more unstable than other modes as FontForge is implemented in C and not memory safe. To prevent bugs, we turn off simplification and overlap removal. Use MFEK for that.")
@@ -34,8 +33,7 @@ pub fn clap_app() -> clap::App<'static, 'static>
             .required(true))
 }
 
-pub fn nib_cli(matches: &clap::ArgMatches)
-{
+pub fn nib_cli(matches: &clap::ArgMatches) {
     let nib_file = matches.value_of("nib").unwrap();
     let input_file = matches.value_of("input").unwrap();
     let output_file = matches.value_of("output").unwrap();
@@ -43,12 +41,12 @@ pub fn nib_cli(matches: &clap::ArgMatches)
     let settings = fontforge::NibSettings {
         nib: nib_file.to_string(),
         path: input_file.to_string(),
-        quiet: true
+        quiet: true,
     };
 
     let converted = fontforge::convert_glif(&settings);
     match converted {
         Some(glifstring) => fs::write(output_file, glifstring).expect("Unable to write file"),
-        None => eprintln!("Failed to nib stroke")
+        None => eprintln!("Failed to nib stroke"),
     }
 }
