@@ -259,6 +259,11 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
     let ssglif: glifparser::Glif<()> = glifparser::read_ufo_glif(
         &fs::read_to_string(&settings.path).expect("Path to stroke .glif inaccessible"),
     );
+
+    if ssglif.outline.is_none() {
+        return Some(glifparser::write_ufo_glif(&ssglif));
+    }
+
     let mut outglif = ssglif.clone();
     // The "raw"'s are fontforge::SplineSet's that are having their memory managed by Rust.
     let (nibss_raw, _nibss_ffsps) = glif_to_ffsplineset(nibglif);
