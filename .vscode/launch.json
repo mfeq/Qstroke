@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'Qstroke'",
+            "name": "Debug executable 'MFEKstroke'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=Qstroke",
-                    "--package=Qstroke",
+                    "--bin=MFEKstroke",
+                    "--package=MFEKstroke",
                 ],
                 "filter": {
-                    "name": "Qstroke",
+                    "name": "MFEKstroke",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'Qstroke'",
+            "name": "Debug unit tests in executable 'MFEKstroke'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=Qstroke",
-                    "--package=Qstroke"
+                    "--bin=MFEKstroke",
+                    "--package=MFEKstroke"
                 ],
                 "filter": {
-                    "name": "Qstroke",
+                    "name": "MFEKstroke",
                     "kind": "bin"
                 }
             },
