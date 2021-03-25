@@ -25,13 +25,17 @@ A Makefile is provided for your convenience.
 
 The build command is:
 
-```
+```bash
 make
 ```
 
 Which runs ``cargo build``.
 
 You can provide the environment variables `FONTFORGE` and `DEBUG` to `make`. Without `DEBUG`, the binary goes in `target/release`; otherwise `target/debug`. `FONTFORGE` will compile the nib stroking mode; it will only work if `libfontforge.so` (`.dll`) on Windows is locatable by `cargo`.
+
+```bash
+DEBUG=y FONTFORGE=y make
+```
 
 ## Pattern Along Path
 ### As seen in MFEK/glif…
