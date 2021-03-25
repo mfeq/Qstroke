@@ -18,7 +18,6 @@ version = "0.0.0"
 dependencies = [
  "MFEKmath",
  "clap",
- "clap-nested",
  "fontforge-sys",
  "glifparser",
  "log",
@@ -159,15 +158,6 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
-]
-
-[[package]]
-name = "clap-nested"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "faa5865f3ba063d4f7db76f514e14cfa8af09b5f2c584371452a8c86d1c383b4"
-dependencies = [
- "clap",
 ]
 
 [[package]]
