@@ -63,12 +63,12 @@ cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Reg
 ## `MFEKstroke --help`
 ### Pattern Along Path
 ```
-MFEK-PaP 0.0.0
-Matthew Blanchard <matthewrblanchard åţ gmail … com>
-A utility for applying pattern-along-path to ufo files.
+MFEKstroke-PAP 0.1
+Matthew Blanchard <matthewrblanchard@gmail.com>
+Maps a pattern glyph along a path glyph.
 
 USAGE:
-    MFEKstroke [OPTIONS] --out <output> --path <path> --pattern <pattern>
+    MFEKstroke PAP [OPTIONS] --out <output> --path <path> --pattern <pattern>
 
 FLAGS:
     -h, --help       Prints help information
@@ -89,7 +89,7 @@ OPTIONS:
         --stretch <stretch>                  <boolean (false)> whether to stretch the input pattern or not.
     -s, --subdivide <subdivide>              <f64 (0)> how many times to subdivide the patterns at their midpoint.
         --toffset <tangent_offset>           <f64 (0)> how much to offset the pattern along the tangent of the path.
-````
+```
 ### Variable Width Stroking
 (Note: In VWS mode, it is expected that you are using MFEKglif to generate the input files. Therefore, not many helpful command line options are provided. If you wish to use VWS programatically, play with MFEKglif's VWS tool, get some output, and study it; then generate conformant XML.)
 

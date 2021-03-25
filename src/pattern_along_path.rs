@@ -10,6 +10,7 @@ use clap::{App, Arg};
 pub fn clap_app() -> clap::App<'static, 'static> {
     App::new("PAP")
             .alias("patterned")
+            .alias("pap")
             .about("Maps a pattern glyph along a path glyph.")
             .version("0.1")
             .author("Matthew Blanchard <matthewrblanchard@gmail.com>")
