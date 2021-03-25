@@ -1,8 +1,6 @@
 use std::fs;
 
 use MFEKmath::piecewise::glif::PointData;
-use MFEKmath::VWSHandle;
-use MFEKmath::variable_width_stroke;
 use MFEKmath::variable_width_stroking::*;
 
 use clap::{App, Arg};
@@ -36,7 +34,8 @@ pub fn vws_cli(matches: &clap::ArgMatches)
     let input: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(&fs::read_to_string(input_string)
     .expect("Failed to read path file!"));
 
-    let mut settings = VWSSettings {
+    // TODO: Copy logic from CWS here
+    let settings = VWSSettings {
         cap_custom_end: None,
         cap_custom_start: None
     };

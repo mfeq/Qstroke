@@ -1,13 +1,7 @@
 #![feature(clamp, fn_traits)]
 #![allow(non_snake_case)] // for our name MFEKstroke
 
-use MFEKmath;
-use clap::{Arg, App, AppSettings};
-use glifparser::{Glif, Outline};
-use MFEKmath::Piecewise;
-use MFEKmath::vector::Vector;
-use MFEKmath::piecewise::glif::PointData;
-use std::fs;
+use clap::{App, AppSettings};
 
 mod pattern_along_path;
 mod variable_width_stroke;

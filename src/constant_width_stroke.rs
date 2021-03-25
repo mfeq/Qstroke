@@ -123,7 +123,7 @@ pub fn cws_cli(matches: &clap::ArgMatches)
         handles: vec![] // to be populated based on number of points
     };
 
-    let mut settings = VWSSettings {
+    let settings = VWSSettings {
         cap_custom_end: custom_cap_if_requested(endcap, matches.value_of("endcap").unwrap()),
         cap_custom_start: custom_cap_if_requested(startcap, matches.value_of("startcap").unwrap())
     };
@@ -145,7 +145,7 @@ pub fn cws_cli(matches: &clap::ArgMatches)
         for (cidx, contour) in outline.iter().enumerate() {
             let pointiter = contour.iter().enumerate();
 
-            for (pidx, point) in pointiter {
+            for (_, _) in pointiter {
                 vws_contours[cidx].handles.push(vws_handle);
             }
             vws_contours[cidx].handles.push(vws_handle);
@@ -154,7 +154,7 @@ pub fn cws_cli(matches: &clap::ArgMatches)
 
     let iter = piece_path.segs.iter().enumerate();
     for (i, pwpath_contour) in iter {
-        let mut vws_contour = &vws_contours[i];
+        let vws_contour = &vws_contours[i];
 
         let results = variable_width_stroke(&pwpath_contour, &vws_contour, &settings);
         for result_contour in results.segs {
@@ -168,7 +168,7 @@ pub fn cws_cli(matches: &clap::ArgMatches)
         anchors: path.anchors.clone(),
         width: path.width,
         unicode: path.unicode,
-        name: path.name.clone(),
+        name: path.name,
         format: 2,
         lib: None
     };
