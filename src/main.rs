@@ -196,11 +196,13 @@ fn main() {
         Some("PAP") => pap_cli(&matches.subcommand_matches("PAP").unwrap()),
         Some("VWS") => vws_cli(&matches.subcommand_matches("VWS").unwrap()),
         Some("CWS") => cws_cli(&matches.subcommand_matches("CWS").unwrap()),
+        #[cfg(feature="fontforge")]
         Some("NIB") => nib_cli(&matches.subcommand_matches("NIB").unwrap()),
         _ => {}
     }
 }
 
+#[cfg(feature="fontforge")]
 fn nib_cli(matches: &clap::ArgMatches)
 {
     let nib_file = matches.value_of("nib").unwrap();
