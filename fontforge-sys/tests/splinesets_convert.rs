@@ -34,12 +34,6 @@ impl SplinePointBitField {
     }
 }
 
-#[derive(Debug)]
-struct FFContour {
-    data: Vec<Box<fontforge::SplinePoint>>,
-    open: bool
-}
-
 fn ffbasepoint_to_handle(sp: Option<fontforge::BasePoint>) -> glifparser::Handle {
     match sp {
         Some(pt) => {glifparser::Handle::At(pt.x as f32, pt.y as f32)},
