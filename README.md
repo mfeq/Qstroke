@@ -15,7 +15,23 @@ Four stroking algorithms are provided:
 * CWS (**C**onstant **W**idth **S**troking)
 * Nib (requires FontForge be installed, uses `libfontforge.(so|dll)`)
 
-This makes MFEKstroke more complete in this department than FontForge or Runebender.
+This makes MFEKstroke more complete in this department than Glyphsapp, FontForge or Runebender.
+
+# Building
+
+MFEKstroke is a Rust project. The best way to get the Rust toolchain is via [rustup](https://rustup.rs/).
+
+A Makefile is provided for your convenience.
+
+The build command is:
+
+```
+make
+```
+
+Which runs ``cargo build``.
+
+You can provide the environment variables `FONTFORGE` and `DEBUG` to `make`. Without `DEBUG`, the binary goes in `target/release`; otherwise `target/debug`. `FONTFORGE` will compile the nib stroking mode; it will only work if `libfontforge.so` (`.dll`) on Windows is locatable by `cargo`.
 
 ## Pattern Along Path
 ### As seen in MFEK/glif…
