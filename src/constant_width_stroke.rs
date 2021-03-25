@@ -148,6 +148,7 @@ pub fn cws_cli(matches: &clap::ArgMatches)
             for (pidx, point) in pointiter {
                 vws_contours[cidx].handles.push(vws_handle);
             }
+            vws_contours[cidx].handles.push(vws_handle);
         }
     }
 
