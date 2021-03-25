@@ -1,18 +1,19 @@
-# MFEK/stroke
+# MFEKstroke
 
-(c) 2021 Matthew Blanchard, MFEK authors
+(c) 2021 Matthew Blanchard, Fredrick R. Brennan & MFEK authors
 
 A set of utilities for stroking paths in font glyphs written in Rust.
 
-This program is part of the [MFEK project](https://github.com/mfeq/MFEK/).
+This program is part of the [MFEK project](https://github.com/MFEK/).
 
 MFEKstroke takes UFO `.glif` files and applies path stroking algorithms to them.
 
-Three stroking algorithms are provided:
+Four stroking algorithms are provided:
 
 * PAP (**P**attern-**A**long-**P**ath)
 * VWS (**V**ariable **W**idth **S**troking)
 * CWS (**C**onstant **W**idth **S**troking)
+* Nib (requires FontForge be installed, uses `libfontforge.(so|dll)`)
 
 This makes MFEKstroke more complete in this department than FontForge or Runebender.
 
@@ -32,6 +33,9 @@ cargo run -- --pattern simple.glif --path Q_.glif --out arrow.glif --sx 0.3 --sy
 ```
 cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Regular.ufo/glyphs/k.low.glif --pattern arrow.ufo/glyphs/arrow.glif -m repeated --sx 0.1 --sy 0.1 -s 3 --simplify true --stretch true
 ```
+
+## Nib Stroking
+![FRB Standard Cursive with a calligraphic nib](https://raw.githubusercontent.com/MFEK/stroke/main/docs/blob/MFEKstroke%20NIB%20Q.png)
 
 ## `MFEKstroke --help`
 ### Pattern Along Path
@@ -104,6 +108,30 @@ OPTIONS:
     -j, --jointype <jointype>    Either of the constant strings "round", "miter", or "bevel". [default: round]
     -s, --startcap <startcap>    Either the constant strings "round" or "square", or a .glif file. [default: round]
     -w, --width <width>          <f64> Constant stroke width.
+```
+
+### Nib Stroking
+
+```
+MFEKstroke-NIB 0.1.0
+Fredrick R. Brennan <copypasteⒶkittens⊙ph>; Skef Iterum (FontForge)
+Takes a nib and a path, both in .glif format, and emulates a pen, with the chosen nib, stroking the path.
+
+Important note: FontForge is used for this, so it may be more unstable than other modes as FontForge is implemented in C
+and not memory safe. To prevent bugs, we turn off simplification and overlap removal. Use MFEK for that.
+
+USAGE:
+    MFEKstroke NIB --input <input> --nib <nib> --output <output>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -n, --nib <nib>          The path to the nib file. FontForge is quite strict about these. The .glif must contain a
+                             single closed spline, running clockwise, which represents a convex shape.
+    -i, --input <input>      The path to the input path file.
+    -o, --output <output>    The path where the output .glif will be saved.
 ```
 
 ## License
