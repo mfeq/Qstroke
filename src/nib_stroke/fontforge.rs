@@ -26,27 +26,10 @@ struct SplinePointBitField {
     watched: raw::c_uint,
 }
 
+#[rustfmt::skip]
 impl SplinePointBitField {
-    fn to_bitfield(
-        self,
-    ) -> (
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-        u32,
-    ) {
+    fn to_bitfield(self) -> (u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32)
+    {
         return (
             self.nonextcp,
             self.noprevcp,
@@ -105,12 +88,12 @@ fn ffsplineset_to_outline(ss_in: fontforge::SplineSet) -> glifparser::Outline<()
             splinesets.push(*ss.next);
             ss = *ss.next
         }
-        for ss in splinesets.iter() {
+        for ss2 in splinesets.iter() {
             let mut contour = vec![];
-            let first = ss.first;
-            let mut pt = *(ss.first);
+            let first = ss2.first;
+            let mut pt = *(ss2.first);
             let mut i = 0;
-            while pt.next != ptr::null_mut() && (*pt.next).to != first {
+            while pt.next != ptr::null_mut() {
                 // `noprevcp`/`nonextcp` is a method because it's a bitfield in fontforge. It's a
                 // bindgen artifact due to the fact Rust has no native support for bitfields.
                 let prevcp = if pt.noprevcp() != 0 {
@@ -125,6 +108,9 @@ fn ffsplineset_to_outline(ss_in: fontforge::SplineSet) -> glifparser::Outline<()
                 };
                 let should_move = pt.prev == ptr::null_mut() && i == 0;
                 contour.push(ffbasepoint_to_point(pt.me, prevcp, nextcp, should_move));
+                if (*pt.next).to == first {
+                    break;
+                }
                 pt = *((*pt.next).to);
                 i = i + 1;
             }
@@ -149,7 +135,7 @@ fn make_spline(
 
 type RustSplineSet = Vec<Vec<fontforge::SplinePoint>>;
 
-fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (fontforge::SplineSet, RustSplineSet) {
+fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (Vec<fontforge::SplineSet>, RustSplineSet) {
     let mut ffsps = vec![];
     for c in glif.outline.unwrap().iter() {
         let mut cffsps = vec![];
@@ -171,8 +157,14 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (fontforge::SplineSet, R
             let mut spbf = SplinePointBitField {
                 ..Default::default()
             };
-            spbf.nonextcp = (p.a == glifparser::Handle::Colocated) as u32;
-            spbf.noprevcp = (p.b == glifparser::Handle::Colocated) as u32;
+
+            let nonextcp = p.a == glifparser::Handle::Colocated;
+            let noprevcp = p.b == glifparser::Handle::Colocated;
+
+            spbf.nonextcp = nonextcp as u32;
+            spbf.noprevcp = noprevcp as u32;
+            spbf.pointtype = fontforge::pointtype_pt_corner;
+
             let bf = Fn::call(&fontforge::splinepoint::new_bitfield_1, spbf.to_bitfield());
 
             let sp = fontforge::SplinePoint {
@@ -195,37 +187,17 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (fontforge::SplineSet, R
         // Calculating the len here prevents immutable borrows inside mutable borrows
         let cffsps_len = cffsps.len();
         // First, we treat all SplinePoint's as if they form a loop.
+        #[rustfmt::skip]
         for idx in 0..cffsps_len {
             if idx == 0 {
-                cffsps[0].prev = make_spline(
-                    &mut cffsps[idx] as *mut _,
-                    &mut cffsps[cffsps_len - 1] as *mut _,
-                    false,
-                );
-                cffsps[0].next = make_spline(
-                    &mut cffsps[idx] as *mut _,
-                    &mut cffsps[idx + 1] as *mut _,
-                    false,
-                );
+                cffsps[idx].prev = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[cffsps_len - 1] as *mut _, false);
+                cffsps[idx].next = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[idx + 1] as *mut _, false);
             } else if idx == cffsps_len - 1 {
-                cffsps[idx].prev = make_spline(
-                    &mut cffsps[idx] as *mut _,
-                    &mut cffsps[idx - 1] as *mut _,
-                    false,
-                );
-                cffsps[idx].next =
-                    make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[0] as *mut _, false);
+                cffsps[idx].prev = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[idx - 1] as *mut _, false);
+                cffsps[idx].next = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[0] as *mut _, false);
             } else {
-                cffsps[idx].prev = make_spline(
-                    &mut cffsps[idx] as *mut _,
-                    &mut cffsps[idx - 1] as *mut _,
-                    false,
-                );
-                cffsps[idx].next = make_spline(
-                    &mut cffsps[idx] as *mut _,
-                    &mut cffsps[idx + 1] as *mut _,
-                    false,
-                );
+                cffsps[idx].prev = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[idx - 1] as *mut _, false);
+                cffsps[idx].next = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[idx + 1] as *mut _, false);
             }
             //eprintln!("{} {:?} {:?}", idx, cffsps[idx].prev, cffsps[idx].next);
         }
@@ -235,11 +207,11 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (fontforge::SplineSet, R
             cffsps[0].prev = ptr::null_mut();
             cffsps[cffsps_len - 1].next = ptr::null_mut();
         }
-
         ffsps.push(cffsps);
     }
     let mut ffsss = vec![];
     for spl in ffsps.iter_mut() {
+        //eprintln!("SPL: {:?}", spl);
         ffsss.push(fontforge::SplineSet {
             first: spl.first_mut().unwrap(),
             last: spl.last_mut().unwrap(),
@@ -248,21 +220,23 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (fontforge::SplineSet, R
             spiro_cnt: 0,
             spiro_max: 0,
             ticked: 0,
-            beziers_need_optimizer: 1,
+            beziers_need_optimizer: 0,
             is_clip_path: 0,
             start_offset: 0,
             contour_name: ptr::null_mut(),
         });
     }
+    /*
     for idx in 0..ffsss.len() {
-        if idx == ffsss.len() - 1 {
+        if idx + 1 > ffsss.len() - 1 {
             break;
         } else {
             ffsss[idx].next = Box::new(ffsss[idx + 1]).as_mut()
         }
     }
+    */
     // We return ffsps so its valuable data doesn't go out of scope.
-    (ffsss[0], ffsps)
+    (ffsss, ffsps)
 }
 
 #[derive(Clone, Debug)]
@@ -288,14 +262,13 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
     let mut outglif = ssglif.clone();
     // The "raw"'s are fontforge::SplineSet's that are having their memory managed by Rust.
     let (nibss_raw, _nibss_ffsps) = glif_to_ffsplineset(nibglif);
-    let (ss_raw, _ss_ffsps) = glif_to_ffsplineset(ssglif);
+    let (mut ss_raw, _ss_ffsps) = glif_to_ffsplineset(ssglif);
     // These are Rust Box<_> types for holding types that will be transferred to C
-    let mut nibss_boxed = Box::new(nibss_raw);
-    let mut ss_boxed = Box::new(ss_raw);
+    let mut nibss_boxed = Box::new(nibss_raw[0]);
+    let mut ss_vec: Vec<Box<_>> = ss_raw.iter_mut().map(|v| Box::new(v)).collect();
     // These are integer null pointers passable to C
     let nibss = nibss_boxed.as_mut();
-    let ss = ss_boxed.as_mut();
-    let out_ss;
+    let mut out_ss = vec![];
     unsafe {
         let shape = fontforge::NibIsValid(nibss);
         if shape != 0 {
@@ -312,15 +285,25 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
         (*si).width = 10.;
         (*si).simplify = -1;
         (*si).rmov = fontforge::stroke_rmov_srmov_none;
-        // Do the stroke:
-        let newss = fontforge::SplineSetStroke(ss, si, 0);
-        if newss == ptr::null_mut() {
-            eprintln!("SplineSetStroke returned NULL. Try to recreate the bug in FontForge. If it happens there, report it upstream to FontForge. Otherwise, report it to MFEKstroke bug tracker.");
+        // Do the stroke for each contour. We do it this way to avoid constructing linked lists of
+        // SplineSet's. It seems more reliable:
+        for ss in ss_vec.iter_mut() {
+            let newss = fontforge::SplineSetStroke(*(ss.as_mut()), si, 0);
+            if newss == ptr::null_mut() {
+                eprintln!("SplineSetStroke returned NULL. Try to recreate the bug in FontForge. If it happens there, report it upstream to FontForge. Otherwise, report it to MFEKstroke bug tracker.");
+            }
+            //eprintln!("{:?}", *newss);
+            out_ss.push(*newss);
         }
-        //eprintln!("{:?}", *newss);
-        out_ss = *newss;
     }
-    let out = ffsplineset_to_outline(out_ss);
-    outglif.outline = Some(out);
+    let mut outlines = vec![];
+    for oss in out_ss.iter() {
+        outlines.push(ffsplineset_to_outline(*oss));
+    }
+    let mut outline = vec![];
+    for o in outlines {
+        outline.extend(o);
+    }
+    outglif.outline = Some(outline);
     Some(glifparser::write_ufo_glif(&outglif))
 }
