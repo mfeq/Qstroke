@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 # parse command line arguments
 clap = "2.33.3"
+clap-nested = "*"
 
 # parses .glif files 
 glifparser = { git = "https://github.com/MFEK/glifparser.rlib" }
@@ -19,9 +20,8 @@ xmltree = "0.10.1"
 log = "0.4.11"
 xmlwriter = "0.1.0"
 
-# For Skia pathops
-skia-safe = "0"
+# Can link FontForge as a dylib, if you have it installed. For nib stroking
+fontforge-sys = { path = "fontforge-sys", optional = true }
 
-clap-nested = "*"
-
-flo_curves = { git = "https://github.com/MFEK/flo_curves", branch = "master" }
+[features]
+fontforge = ["fontforge-sys"]
