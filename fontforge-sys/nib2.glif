@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<glyph name="nib" format="2">
-  <advance width="0" />
+<?xml version="1.0"?>
+<glyph name="uni0000" format="2">
+  <advance width="1000"/>
+  <unicode hex="0000"/>
   <outline>
     <contour>
-      <point type="curve" y="55" x="25.5" />
-      <point y="65.555115" type="curve" x="34.814835" />
-      <point type="curve" x="71.11115" y="29.62915" />
-      <point x="61" y="19" type="curve" />
+      <point x="25.5" y="29.5547" type="line"/>
+      <point x="61" y="65.5547" type="line"/>
+      <point x="71.1113" y="54.9258" type="line"/>
+      <point x="34.8145" y="19" type="line"/>
     </contour>
   </outline>
-  <lib />
 </glyph>
