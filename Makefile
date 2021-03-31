@@ -9,3 +9,7 @@ FONTFORGE := $(if $(FONTFORGE),"fontforge","")
 .PHONY: all
 all:
 	cargo build $(DEBUGARGS) --features $(FONTFORGE)
+
+.PHONY: fmt
+fmt:
+	find src -type f -iname '*.rs' | parallel --bar RUST_LOG=error rustfmt {}

@@ -79,7 +79,10 @@ struct CWSSettings {
     remove_external: bool,
 }
 
-fn constant_width_stroke(path: &glifparser::Glif<Option<PointData>>, settings: &CWSSettings) -> Outline<Option<PointData>> {
+fn constant_width_stroke(
+    path: &glifparser::Glif<Option<PointData>>,
+    settings: &CWSSettings,
+) -> Outline<Option<PointData>> {
     let vws_contour = VWSContour {
         id: 0,
         join_type: settings.jointype,
@@ -87,7 +90,7 @@ fn constant_width_stroke(path: &glifparser::Glif<Option<PointData>>, settings: &
         cap_end_type: settings.endcap,
         handles: vec![], // to be populated based on number of points
         remove_internal: settings.remove_internal,
-        remove_external: settings.remove_external
+        remove_external: settings.remove_external,
     };
 
     // convert our path and pattern to piecewise collections of beziers
@@ -186,7 +189,11 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         remove_external: remove_external,
     };
 
-    let output_outline = path.outline.as_ref().map(|_|Some(constant_width_stroke(&path, &cws_settings))).unwrap_or_else(||None);
+    let output_outline = path
+        .outline
+        .as_ref()
+        .map(|_| Some(constant_width_stroke(&path, &cws_settings)))
+        .unwrap_or_else(|| None);
 
     let out = Glif {
         outline: output_outline,
