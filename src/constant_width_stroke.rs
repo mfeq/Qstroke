@@ -56,6 +56,77 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .help(r#"<f64> Constant stroke width."#)
             .validator(super::arg_validator_positive_f64)
             .required(true))
+        .arg(Arg::with_name("remove-internal")
+            .long("remove-internal")
+            .short("I")
+            .takes_value(false)
+            .help(r#"Remove internal contour"#))
+        .arg(Arg::with_name("remove-external")
+            .long("remove-external")
+            .short("E")
+            .takes_value(false)
+            .help(r#"Remove external contour"#))
+}
+
+#[derive(Debug)]
+struct CWSSettings {
+    vws_settings: VWSSettings,
+    width: f64,
+    jointype: JoinType,
+    startcap: CapType,
+    endcap: CapType,
+    remove_internal: bool,
+    remove_external: bool,
+}
+
+fn constant_width_stroke(
+    path: &glifparser::Glif<Option<PointData>>,
+    settings: &CWSSettings,
+) -> Outline<Option<PointData>> {
+    let vws_contour = VWSContour {
+        id: 0,
+        join_type: settings.jointype,
+        cap_start_type: settings.startcap,
+        cap_end_type: settings.endcap,
+        handles: vec![], // to be populated based on number of points
+        remove_internal: settings.remove_internal,
+        remove_external: settings.remove_external,
+    };
+
+    // convert our path and pattern to piecewise collections of beziers
+    let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
+    let mut output_outline: Outline<Option<PointData>> = Vec::new();
+
+    let mut vws_contours = vec![vws_contour; path.outline.as_ref().unwrap().len()];
+
+    let vws_handle = VWSHandle {
+        left_offset: settings.width / 2.0,
+        right_offset: settings.width / 2.0,
+        tangent_offset: 0.0,
+        interpolation: InterpolationType::Linear,
+    };
+
+    for outline in path.outline.as_ref() {
+        for (cidx, contour) in outline.iter().enumerate() {
+            let pointiter = contour.iter().enumerate();
+
+            for (_, _) in pointiter {
+                vws_contours[cidx].handles.push(vws_handle);
+            }
+            vws_contours[cidx].handles.push(vws_handle);
+        }
+    }
+
+    let iter = piece_path.segs.iter().enumerate();
+    for (i, pwpath_contour) in iter {
+        let vws_contour = &vws_contours[i];
+
+        let results = variable_width_stroke(&pwpath_contour, &vws_contour, &settings.vws_settings);
+        for result_contour in results.segs {
+            output_outline.push(result_contour.to_contour());
+        }
+    }
+    output_outline
 }
 
 // Constant width stroking is really just a special case of variable width stroking. So, we take
@@ -96,60 +167,36 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     let startcap = str_to_cap(matches.value_of("startcap").unwrap());
     let endcap = str_to_cap(matches.value_of("endcap").unwrap());
     let jointype = str_to_jointype(matches.value_of("jointype").unwrap());
+    let remove_internal = matches.is_present("remove-internal");
+    let remove_external = matches.is_present("remove-external");
 
     let width: f64 = matches.value_of("width").unwrap().parse().unwrap();
     let path: glifparser::Glif<Option<PointData>> =
         glifparser::read_ufo_glif(&fs::read_to_string(input_file).expect("Failed to read file!"));
 
-    let vws_contour = VWSContour {
-        id: 0,
-        join_type: jointype,
-        cap_start_type: startcap,
-        cap_end_type: endcap,
-        handles: vec![], // to be populated based on number of points
-    };
-
-    let settings = VWSSettings {
+    let vws_settings = VWSSettings {
         cap_custom_end: custom_cap_if_requested(endcap, matches.value_of("endcap").unwrap()),
         cap_custom_start: custom_cap_if_requested(startcap, matches.value_of("startcap").unwrap()),
     };
 
-    // convert our path and pattern to piecewise collections of beziers
-    let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
-    let mut output_outline: Outline<Option<PointData>> = Vec::new();
-
-    let mut vws_contours = vec![vws_contour; path.outline.as_ref().unwrap().len()];
-
-    let vws_handle = VWSHandle {
-        left_offset: width / 2.0,
-        right_offset: width / 2.0,
-        tangent_offset: 0.0,
-        interpolation: InterpolationType::Linear,
+    let cws_settings = CWSSettings {
+        vws_settings: vws_settings,
+        width: width,
+        startcap: startcap,
+        endcap: endcap,
+        jointype: jointype,
+        remove_internal: remove_internal,
+        remove_external: remove_external,
     };
 
-    for outline in path.outline.as_ref() {
-        for (cidx, contour) in outline.iter().enumerate() {
-            let pointiter = contour.iter().enumerate();
-
-            for (_, _) in pointiter {
-                vws_contours[cidx].handles.push(vws_handle);
-            }
-            vws_contours[cidx].handles.push(vws_handle);
-        }
-    }
-
-    let iter = piece_path.segs.iter().enumerate();
-    for (i, pwpath_contour) in iter {
-        let vws_contour = &vws_contours[i];
-
-        let results = variable_width_stroke(&pwpath_contour, &vws_contour, &settings);
-        for result_contour in results.segs {
-            output_outline.push(result_contour.to_contour());
-        }
-    }
+    let output_outline = path
+        .outline
+        .as_ref()
+        .map(|_| Some(constant_width_stroke(&path, &cws_settings)))
+        .unwrap_or_else(|| None);
 
     let out = Glif {
-        outline: Some(output_outline),
+        outline: output_outline,
         order: path.order,
         anchors: path.anchors.clone(),
         width: path.width,
@@ -158,6 +205,7 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         format: 2,
         lib: None,
     };
+
     let glifstring = glifparser::write_ufo_glif(&out);
     fs::write(output_file, glifstring).expect("Unable to write file");
 }
