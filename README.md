@@ -1,3 +1,7 @@
+# Archived
+
+This repo is archived. Please do not use this code. You can find an updated version of this stroking utility at https://github.com/MFEK/stroke. You can also find an updated version of the algorithms at https://github.com/MFEK/math.rlib.
+
 # Stroke
 A set of utilities for stroking paths in font glyphs written in rust.
 
