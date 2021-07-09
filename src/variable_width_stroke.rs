@@ -1,8 +1,8 @@
 use std::fs;
 
-use MFEKmath::piecewise::glif::PointData;
-use MFEKmath::variable_width_stroking::*;
-
+use MFEKmath::{variable_width_stroke_glif, VWSSettings};
+use glifparser::glif::MFEKPointData;
+use glifparser::glif::VWSContour;
 use clap::{App, Arg};
 
 pub fn clap_app() -> clap::App<'static, 'static> {
@@ -32,9 +32,9 @@ pub fn vws_cli(matches: &clap::ArgMatches) {
     let input_string = matches.value_of("input").unwrap();
     let output_string = matches.value_of("output").unwrap();
 
-    let input: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(
+    let input: glifparser::Glif<Option<MFEKPointData>> = glifparser::read(
         &fs::read_to_string(input_string).expect("Failed to read path file!"),
-    );
+    ).unwrap(); // TODO: Proper error handling!
 
     // TODO: Copy logic from CWS here
     let settings = VWSSettings {
@@ -43,6 +43,6 @@ pub fn vws_cli(matches: &clap::ArgMatches) {
     };
 
     let out = variable_width_stroke_glif(&input, settings);
-    let glifstring = glifparser::write_ufo_glif(&out);
+    let glifstring = glifparser::write(&out).unwrap(); // TODO: Proper error handling!
     fs::write(output_string, glifstring).expect("Unable to write file");
 }

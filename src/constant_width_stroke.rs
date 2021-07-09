@@ -1,10 +1,9 @@
 use std::fs;
 
-use MFEKmath::piecewise::glif::PointData;
-use MFEKmath::variable_width_stroke;
-use MFEKmath::variable_width_stroking::*;
-use MFEKmath::Piecewise;
-use MFEKmath::VWSHandle;
+use MFEKmath::{variable_width_stroke, VWSSettings, Piecewise};
+use glifparser::glif::{
+    MFEKPointData, CapType, JoinType, VWSHandle, VWSContour, InterpolationType,
+};
 
 use glifparser::{Glif, Outline};
 
@@ -80,11 +79,10 @@ struct CWSSettings {
 }
 
 fn constant_width_stroke(
-    path: &glifparser::Glif<Option<PointData>>,
+    path: &glifparser::Glif<MFEKPointData>,
     settings: &CWSSettings,
-) -> Outline<Option<PointData>> {
+) -> Outline<MFEKPointData> {
     let vws_contour = VWSContour {
-        id: 0,
         join_type: settings.jointype,
         cap_start_type: settings.startcap,
         cap_end_type: settings.endcap,
@@ -95,7 +93,7 @@ fn constant_width_stroke(
 
     // convert our path and pattern to piecewise collections of beziers
     let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
-    let mut output_outline: Outline<Option<PointData>> = Vec::new();
+    let mut output_outline: Outline<MFEKPointData> = Vec::new();
 
     let mut vws_contours = vec![vws_contour; path.outline.as_ref().unwrap().len()];
 
@@ -151,11 +149,11 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         }
     }
 
-    fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<Option<PointData>>> {
+    fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<MFEKPointData>> {
         if ct == CapType::Custom {
-            let path: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(
+            let path: glifparser::Glif<MFEKPointData> = glifparser::read(
                 &fs::read_to_string(input_file).expect("Failed to read file!"),
-            );
+            ).unwrap(); // TODO: Proper error handling!
             Some(path)
         } else {
             None
@@ -171,8 +169,10 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     let remove_external = matches.is_present("remove-external");
 
     let width: f64 = matches.value_of("width").unwrap().parse().unwrap();
-    let path: glifparser::Glif<Option<PointData>> =
-        glifparser::read_ufo_glif(&fs::read_to_string(input_file).expect("Failed to read file!"));
+    
+    // TODO: Proper error handling!
+    let path: glifparser::Glif<MFEKPointData> =
+        glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!")).unwrap();
 
     let vws_settings = VWSSettings {
         cap_custom_end: custom_cap_if_requested(endcap, matches.value_of("endcap").unwrap()),
@@ -204,8 +204,15 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         name: path.name,
         format: 2,
         lib: None,
+        components: path.components,
+        guidelines: path.guidelines,
+        images: path.images,
+        note: path.note,
+        filename: path.filename,
+        private_lib: path.private_lib,
+        private_lib_root: path.private_lib_root,
     };
 
-    let glifstring = glifparser::write_ufo_glif(&out);
+    let glifstring = glifparser::write(&out).unwrap(); // TODO: Proper error handling!
     fs::write(output_file, glifstring).expect("Unable to write file");
 }

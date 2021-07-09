@@ -11,7 +11,7 @@ edition = "2018"
 clap = "2.33.3"
 
 # parses .glif files 
-glifparser = { git = "https://github.com/MFEK/glifparser.rlib" }
+glifparser = { git = "https://github.com/MFEK/glifparser.rlib", branch = "master", features=["mfek"] }
 MFEKmath = { git = "https://github.com/MFEK/math.rlib", branch = "main"}
 
 # For reading and writing glifs

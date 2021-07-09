@@ -2,8 +2,8 @@ use std::fs;
 
 use MFEKmath::pattern_along_path::pattern_along_glif;
 use MFEKmath::pattern_along_path::*;
-use MFEKmath::piecewise::glif::PointData;
 use MFEKmath::vector::Vector;
+use glifparser::glif::{MFEKPointData, PatternCopies, PatternSubdivide, PatternHandleDiscontinuity};
 
 use clap::{App, Arg};
 
@@ -78,13 +78,14 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     let pattern_string = matches.value_of("pattern").unwrap();
     let output_string = matches.value_of("output").unwrap();
 
-    let path: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(
+    // TODO: Handle errors properly!
+    let path: glifparser::Glif<Option<MFEKPointData>> = glifparser::read(
         &fs::read_to_string(path_string).expect("Failed to read path file!"),
-    );
+    ).unwrap();
 
-    let pattern: glifparser::Glif<Option<PointData>> = glifparser::read_ufo_glif(
+    let pattern: glifparser::Glif<Option<MFEKPointData>> = glifparser::read(
         &fs::read_to_string(pattern_string).expect("Failed to read pattern file!"),
-    );
+    ).unwrap();
 
     let mut settings = PatternSettings {
         copies: PatternCopies::Single,
@@ -186,6 +187,6 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     }
 
     let output = pattern_along_glif(&path, &pattern, &settings);
-    let glifstring = glifparser::write_ufo_glif(&output);
+    let glifstring = glifparser::write(&output).unwrap(); // TODO: Proper error handling.
     fs::write(output_string, glifstring).expect("Unable to write file");
 }
