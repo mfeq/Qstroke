@@ -3,7 +3,7 @@ use std::fs;
 use MFEKmath::pattern_along_path::pattern_along_glif;
 use MFEKmath::pattern_along_path::*;
 use MFEKmath::vector::Vector;
-use glifparser::glif::{MFEKPointData, PatternCopies, PatternSubdivide, PatternHandleDiscontinuity};
+use glifparser::glif::{MFEKPointData, PatternCopies, PatternSubdivide, PatternStretch};
 
 use clap::{App, Arg};
 
@@ -62,15 +62,27 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .arg(Arg::with_name("stretch")
                 .long("stretch")
                 .takes_value(true)
-                .help("<boolean (false)> whether to stretch the input pattern or not."))
+                .help("<mode (spacing)> possible inputs are on, off, and spacing."))
             .arg(Arg::with_name("simplify")
                 .long("simplify")
                 .takes_value(true)
                 .help("<boolean (false)> if we should run the result through a simplify routine."))
+            .arg(Arg::with_name("overdraw")
+                .long("overdraw")
+                .takes_value(true)
+                .help("<f64 (0.15)> any patterns that overlap more than arg * 100 percent are removed."))
+            .arg(Arg::with_name("two-pass culling")
+                .long("twopass")
+                .takes_value(true)
+                .help("<boolean (true)> whether we should reflow the path after culling during overdraw."))
             .arg(Arg::with_name("center_pattern")
                 .long("center_pattern")
                 .takes_value(true)
                 .help("<boolean (true)> if you want to align a pattern manually you can change this to false."))
+            .arg(Arg::with_name("contour")
+                .long("contour")
+                .takes_value(true)
+                .help("<usize (-1)> if this is a positive number we stroke only that specific contour in the outline by index."))
 }
 
 pub fn pap_cli(matches: &clap::ArgMatches) {
@@ -96,8 +108,10 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         center_pattern: true,
         pattern_scale: Vector { x: 1., y: 1. },
         spacing: 0.,
-        stretch: false,
+        stretch: PatternStretch::Spacing,
         simplify: false,
+        cull_overlap: 1.,
+        two_pass_culling: false,
     };
 
     if let Some(copies) = matches.value_of("mode") {
@@ -180,13 +194,42 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
 
     if let Some(stretch_string) = matches.value_of("stretch") {
         match stretch_string {
-            "true" => settings.stretch = true,
-            "false" => settings.stretch = false,
+            "on" => settings.stretch = PatternStretch::On,
+            "off" => settings.stretch = PatternStretch::Off,
+            "spacing" => settings.stretch = PatternStretch::Spacing,
+            _ => eprintln!("Invalid stretch argument. Falling back to default. (true)"),
+        }
+    }
+
+    if let Some(simplify_string) = matches.value_of("two-pass") {
+        match simplify_string {
+            "true" => settings.two_pass_culling = true,
+            "false" => settings.two_pass_culling = false,
             _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)"),
         }
     }
 
-    let output = pattern_along_glif(&path, &pattern, &settings);
+    if let Some(overdraw_string) = matches.value_of("overdraw") {
+        let overdraw = overdraw_string.parse::<f64>();
+
+        match overdraw {
+            Ok(n) => settings.cull_overlap = n,
+            Err(_e) => eprintln!("Invalid overdraw percentage. Falling back to default. (0)"),
+        }
+    }
+
+    let mut target_contour = None;
+    if let Some(contour) = matches.value_of("contour") {
+        let idx = contour.parse::<usize>();
+
+        match idx {
+            Ok(n) => if n >= 0 {target_contour = Some(n)},
+            Err(_e) => eprintln!("Invalid contour argument. Falling back to default. (1)"),
+        }
+    }
+
+
+    let output = pattern_along_glif(&path, &pattern, &settings, target_contour);
     let glifstring = glifparser::write(&output).unwrap(); // TODO: Proper error handling.
     fs::write(output_string, glifstring).expect("Unable to write file");
 }
