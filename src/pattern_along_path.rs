@@ -83,6 +83,14 @@ pub fn clap_app() -> clap::App<'static, 'static> {
                 .long("contour")
                 .takes_value(true)
                 .help("<usize (-1)> if this is a positive number we stroke only that specific contour in the outline by index."))
+            .arg(Arg::with_name("reverse")
+                .long("reverse")
+                .takes_value(true)
+                .help("<bool(false)> true will reverse the path."))
+            .arg(Arg::with_name("reverse_culling")
+                .long("reverse_culling")
+                .takes_value(true)
+                .help("<bool(false)> true will reverse the order we check for overlaps during overlap culling."))
 }
 
 pub fn pap_cli(matches: &clap::ArgMatches) {
@@ -112,6 +120,8 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         simplify: false,
         cull_overlap: 1.,
         two_pass_culling: false,
+        reverse_path: false,
+        reverse_culling: false,
     };
 
     if let Some(copies) = matches.value_of("mode") {
@@ -228,6 +238,21 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         }
     }
 
+    if let Some(simplify_string) = matches.value_of("two-pass") {
+        match simplify_string {
+            "true" => settings.two_pass_culling = true,
+            "false" => settings.two_pass_culling = false,
+            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)"),
+        }
+    }
+
+    if let Some(simplify_string) = matches.value_of("reverse") {
+        match simplify_string {
+            "true" => settings.two_pass_culling = true,
+            "false" => settings.two_pass_culling = false,
+            _ => eprintln!("Invalid center pattern argument. Falling back to default. (true)"),
+        }
+    }
 
     let output = pattern_along_glif(&path, &pattern, &settings, target_contour);
     let glifstring = glifparser::write(&output).unwrap(); // TODO: Proper error handling.
