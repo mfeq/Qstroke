@@ -3,7 +3,11 @@ use std::fs;
 use MFEKmath::pattern_along_path::pattern_along_glif;
 use MFEKmath::pattern_along_path::*;
 use MFEKmath::vector::Vector;
+use MFEKmath::Piecewise;
+use MFEKmath::Evaluate;
+use MFEKmath::EvalScale;
 use glifparser::glif::{MFEKPointData, PatternCopies, PatternSubdivide, PatternStretch};
+use MFEKmath::vec2;
 
 use clap::{App, Arg};
 
@@ -99,13 +103,34 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     let output_string = matches.value_of("output").unwrap();
 
     // TODO: Handle errors properly!
-    let path: glifparser::Glif<Option<MFEKPointData>> = glifparser::read(
+    let path: glifparser::Glif<MFEKPointData> = glifparser::read(
         &fs::read_to_string(path_string).expect("Failed to read path file!"),
     ).unwrap();
 
-    let pattern: glifparser::Glif<Option<MFEKPointData>> = glifparser::read(
-        &fs::read_to_string(pattern_string).expect("Failed to read pattern file!"),
-    ).unwrap();
+    let pattern: glifparser::Glif<MFEKPointData> = match pattern_string {
+        "DOT" => {
+            let mut dot = glifparser::read(include_str!("dot.glif")).unwrap();
+            let piece_pattern = Piecewise::from(dot.outline.as_ref().unwrap());
+            let normalized_pattern = piece_pattern.scale(vec2!(1./20., 1./20.));
+
+            dot.outline = Some(normalized_pattern.to_outline());
+            dot
+        }
+        "DASH" => {
+            let mut dash = glifparser::read(include_str!("dash.glif")).unwrap();
+
+            let piece_pattern = Piecewise::from(dash.outline.as_ref().unwrap());
+            let normalized_pattern = piece_pattern.scale(vec2!(1./20., 1./20.));
+
+            dash.outline = Some(normalized_pattern.to_outline());
+            dash
+        }
+        _ => { 
+            glifparser::read(
+                &fs::read_to_string(pattern_string).expect("Failed to read pattern file!"),
+            ).unwrap()
+        }
+    };
 
     let mut settings = PatternSettings {
         copies: PatternCopies::Single,

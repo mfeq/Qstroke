@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<glyph name="dot" format="2">
+  <advance width="780" />
+  <unicode hex="51" />
+  <outline>
+    <contour>
+      <point x="20" y="10" type="curve" />
+      <point y="7.238576" x="19.999998" />
+      <point x="19.023687" y="4.881553" />
+      <point type="curve" x="17.071066" y="2.928932" />
+      <point x="15.118445" y="0.9763106" />
+      <point x="12.761423" y="0" />
+      <point type="curve" x="10" y="0" />
+      <point y="0" x="7.238576" />
+      <point y="0.9763106" x="4.881553" />
+      <point x="2.928932" type="curve" y="2.928932" />
+      <point x="0.9763106" y="4.881553" />
+      <point x="0" y="7.238576" />
+      <point type="curve" x="0" y="10" />
+      <point x="0" y="12.761423" />
+      <point x="0.9763106" y="15.118445" />
+      <point type="curve" x="2.928932" y="17.071066" />
+      <point x="4.881553" y="19.023687" />
+      <point x="7.238576" y="19.999998" />
+      <point type="curve" y="20" x="10" />
+      <point x="12.761423" y="19.999998" />
+      <point x="15.118445" y="19.023687" />
+      <point x="17.071066" y="17.071066" type="curve" />
+      <point y="15.118445" x="19.023687" />
+      <point x="19.999998" y="12.761423" />
+    </contour>
+  </outline>
+  <!-- !!MFEK!!{
+  "layers": [
+    {
+      "name": "Layer 0",
+      "visible": true,
+      "color": null,
+      "outline": [
+        {
+          "inner": [
+            {
+              "x": 20.0,
+              "y": 10.0,
+              "a": {
+                "At": [
+                  19.999998,
+                  7.238576
+                ]
+              },
+              "b": {
+                "At": [
+                  19.999998,
+                  12.761423
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            },
+            {
+              "x": 17.071066,
+              "y": 2.928932,
+              "a": {
+                "At": [
+                  15.118445,
+                  0.9763106
+                ]
+              },
+              "b": {
+                "At": [
+                  19.023687,
+                  4.881553
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            },
+            {
+              "x": 10.0,
+              "y": 0.0,
+              "a": {
+                "At": [
+                  7.238576,
+                  0.0
+                ]
+              },
+              "b": {
+                "At": [
+                  12.761423,
+                  0.0
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            },
+            {
+              "x": 2.928932,
+              "y": 2.928932,
+              "a": {
+                "At": [
+                  0.9763106,
+                  4.881553
+                ]
+              },
+              "b": {
+                "At": [
+                  4.881553,
+                  0.9763106
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            },
+            {
+              "x": 0.0,
+              "y": 10.0,
+              "a": {
+                "At": [
+                  0.0,
+                  12.761423
+                ]
+              },
+              "b": {
+                "At": [
+                  0.0,
+                  7.238576
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            },
+            {
+              "x": 2.928932,
+              "y": 17.071066,
+              "a": {
+                "At": [
+                  4.881553,
+                  19.023687
+                ]
+              },
+              "b": {
+                "At": [
+                  0.9763106,
+                  15.118445
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            },
+            {
+              "x": 10.0,
+              "y": 20.0,
+              "a": {
+                "At": [
+                  12.761423,
+                  19.999998
+                ]
+              },
+              "b": {
+                "At": [
+                  7.238576,
+                  19.999998
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            },
+            {
+              "x": 17.071066,
+              "y": 17.071066,
+              "a": {
+                "At": [
+                  19.023687,
+                  15.118445
+                ]
+              },
+              "b": {
+                "At": [
+                  15.118445,
+                  19.023687
+                ]
+              },
+              "name": null,
+              "ptype": "Curve",
+              "data": null
+            }
+          ],
+          "operation": null
+        }
+      ],
+      "operation": null,
+      "images": []
+    }
+  ],
+  "history": [],
+  "order": "Cubic",
+  "anchors": [],
+  "components": {
+    "root": "Q",
+    "vec": []
+  },
+  "flattened": [],
+  "component_rects": [],
+  "guidelines": [],
+  "width": 780,
+  "unicode": [
+    "Q"
+  ],
+  "name": "Q",
+  "note": null,
+  "format": 2,
+  "filename": "C:\\Users\\matth\\Documents\\GitHub\\glif\\examples\\Q_.glif"
+} -->
+</glyph>
