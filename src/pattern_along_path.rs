@@ -4,7 +4,6 @@ use MFEKmath::pattern_along_path::pattern_along_glif;
 use MFEKmath::pattern_along_path::*;
 use MFEKmath::vector::Vector;
 use MFEKmath::Piecewise;
-use MFEKmath::Evaluate;
 use MFEKmath::EvalScale;
 use glifparser::glif::{MFEKPointData, PatternCopies, PatternSubdivide, PatternStretch};
 use MFEKmath::vec2;
@@ -15,6 +14,7 @@ pub fn clap_app() -> clap::App<'static, 'static> {
     App::new("PAP")
             .alias("patterned")
             .alias("pap")
+            .alias("PaP")
             .about("Maps a pattern glyph along a path glyph.")
             .version("0.1")
             .author("Matthew Blanchard <matthewrblanchard@gmail.com>")
@@ -229,8 +229,8 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
 
     if let Some(stretch_string) = matches.value_of("stretch") {
         match stretch_string {
-            "on" => settings.stretch = PatternStretch::On,
-            "off" => settings.stretch = PatternStretch::Off,
+            "true" | "on" => settings.stretch = PatternStretch::On,
+            "false" | "off" => settings.stretch = PatternStretch::Off,
             "spacing" => settings.stretch = PatternStretch::Spacing,
             _ => eprintln!("Invalid stretch argument. Falling back to default. (true)"),
         }
@@ -258,7 +258,7 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         let idx = contour.parse::<usize>();
 
         match idx {
-            Ok(n) => if n >= 0 {target_contour = Some(n)},
+            Ok(n) => {target_contour = Some(n)},
             Err(_e) => eprintln!("Invalid contour argument. Falling back to default. (1)"),
         }
     }

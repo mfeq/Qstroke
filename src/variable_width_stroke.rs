@@ -2,7 +2,6 @@ use std::fs;
 
 use MFEKmath::{variable_width_stroke_glif, VWSSettings};
 use glifparser::glif::MFEKPointData;
-use glifparser::glif::VWSContour;
 use clap::{App, Arg};
 
 pub fn clap_app() -> clap::App<'static, 'static> {

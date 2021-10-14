@@ -1,4 +1,4 @@
-#![feature(clamp, fn_traits, stmt_expr_attributes)]
+#![feature(fn_traits, stmt_expr_attributes)]
 #![allow(non_snake_case)] // for our name MFEKstroke
 
 use clap::{App, AppSettings};
