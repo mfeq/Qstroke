@@ -54,7 +54,23 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .takes_value(true)
             .help(r#"<f64> Constant stroke width."#)
             .validator(super::arg_validator_positive_f64)
-            .required(true))
+            .conflicts_with("left")
+            .conflicts_with("right")
+            .required_unless_all(&["left", "right"]))
+        .arg(Arg::with_name("left")
+            .long("left")
+            .short("l")
+            .takes_value(true)
+            .help(r#"<f64> Constant stroke width (left)."#)
+            .validator(super::arg_validator_positive_f64)
+            .requires("right"))
+        .arg(Arg::with_name("right")
+            .long("right")
+            .short("l")
+            .takes_value(true)
+            .help(r#"<f64> Constant stroke width (right)."#)
+            .validator(super::arg_validator_positive_f64)
+            .requires("left"))
         .arg(Arg::with_name("remove-internal")
             .long("remove-internal")
             .short("I")
@@ -70,7 +86,8 @@ pub fn clap_app() -> clap::App<'static, 'static> {
 #[derive(Debug)]
 struct CWSSettings {
     vws_settings: VWSSettings,
-    width: f64,
+    left: f64,
+    right: f64,
     jointype: JoinType,
     startcap: CapType,
     endcap: CapType,
@@ -98,8 +115,8 @@ fn constant_width_stroke(
     let mut vws_contours = vec![vws_contour; path.outline.as_ref().unwrap().len()];
 
     let vws_handle = VWSHandle {
-        left_offset: settings.width / 2.0,
-        right_offset: settings.width / 2.0,
+        left_offset: settings.left,
+        right_offset: settings.right,
         tangent_offset: 0.0,
         interpolation: InterpolationType::Linear,
     };
@@ -167,8 +184,18 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     let jointype = str_to_jointype(matches.value_of("jointype").unwrap());
     let remove_internal = matches.is_present("remove-internal");
     let remove_external = matches.is_present("remove-external");
+    let left: f64;
+    let right: f64;
 
-    let width: f64 = matches.value_of("width").unwrap().parse().unwrap();
+    if matches.is_present("left") {
+        left = matches.value_of("left").unwrap().parse().unwrap();
+        right = matches.value_of("right").unwrap().parse().unwrap();
+    } else {
+        let width: f64 = matches.value_of("width").unwrap().parse().unwrap();
+        left = width / 2.0;
+        right = width / 2.0;
+    }
+
     
     // TODO: Proper error handling!
     let path: glifparser::Glif<MFEKPointData> =
@@ -181,7 +208,8 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
 
     let cws_settings = CWSSettings {
         vws_settings: vws_settings,
-        width: width,
+        left: left,
+        right: right,
         startcap: startcap,
         endcap: endcap,
         jointype: jointype,
