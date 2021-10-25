@@ -1,9 +1,9 @@
 use std::fs;
 
-use MFEKmath::{variable_width_stroke, VWSSettings, Piecewise};
 use glifparser::glif::{
-    MFEKPointData, CapType, JoinType, VWSHandle, VWSContour, InterpolationType,
+    CapType, InterpolationType, JoinType, MFEKPointData, VWSContour, VWSHandle,
 };
+use MFEKmath::{variable_width_stroke, Piecewise, VWSSettings};
 
 use glifparser::{Glif, Outline};
 
@@ -66,7 +66,7 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .requires("right"))
         .arg(Arg::with_name("right")
             .long("right")
-            .short("l")
+            .short("r")
             .takes_value(true)
             .help(r#"<f64> Constant stroke width (right)."#)
             .validator(super::arg_validator_positive_f64)
@@ -168,9 +168,9 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
 
     fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<MFEKPointData>> {
         if ct == CapType::Custom {
-            let path: glifparser::Glif<MFEKPointData> = glifparser::read(
-                &fs::read_to_string(input_file).expect("Failed to read file!"),
-            ).unwrap(); // TODO: Proper error handling!
+            let path: glifparser::Glif<MFEKPointData> =
+                glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!"))
+                    .unwrap(); // TODO: Proper error handling!
             Some(path)
         } else {
             None
@@ -196,7 +196,6 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         right = width / 2.0;
     }
 
-    
     // TODO: Proper error handling!
     let path: glifparser::Glif<MFEKPointData> =
         glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!")).unwrap();
