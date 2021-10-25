@@ -63,38 +63,46 @@ cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Reg
 ## `MFEKstroke --help`
 ### Pattern Along Path
 ```
-MFEKstroke-PAP 0.1
-Matthew Blanchard <matthewrblanchard@gmail.com>
+MFEKstroke-PAP 0.2
+Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK Authors
 Maps a pattern glyph along a path glyph.
 
 USAGE:
-    MFEKstroke PAP [OPTIONS] --out <output> --path <path> --pattern <pattern>
+    MFEKstroke PAP [FLAGS] [OPTIONS] --path <path> --pattern <pattern>
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -h, --help                 Prints help information
+    -C, --no_center_pattern    <boolean> supply if you wish to center the pattern
+    -r, --reverse              <boolean> true will reverse the path.
+    -R, --reverse_culling      <boolean> true will reverse the order we check for overlaps during overlap culling.
+    -S, --simplify             <boolean> if we should run the result through a simplify routine.
+    -!, --stretch              <stretch> false if not given, true if given, spacing mode if value of spacing given
+    -V, --version              Prints version information
 
 OPTIONS:
-        --center_pattern <center_pattern>    <boolean (true)> if you want to align a pattern manually you can change
-                                             this to false.
-    -m, --mode <mode>                        <[single|repeated] (single)> set our repeat mode.
-        --noffset <normal_offset>            <f64 (0)> how much to offset the pattern along the normal of the path.
-        --out <output>                       The path where the output will be saved.
-        --path <path>                        The path to the input path file.
-        --pattern <pattern>                  The path to the input pattern file.
-        --sx <scale_x>                       <f64 (1)> how much we scale our input pattern on the x-axis.
-        --sy <scale_y>                       <f64 (1)> how much we scale our input pattern on the y-axis.
-        --simplify <simplify>                <boolean (false)> if we should run the result through a simplify routine.
-        --spacing <spacing>                  <f64 (0)> how much padding to trail each copy with.
-        --stretch <stretch>                  <boolean (false)> whether to stretch the input pattern or not.
-    -s, --subdivide <subdivide>              <f64 (0)> how many times to subdivide the patterns at their midpoint.
-        --toffset <tangent_offset>           <f64 (0)> how much to offset the pattern along the tangent of the path.
+    -p, --pattern <pattern>           The path to the input pattern file. You may also provide either --dot-pattern or
+                                      --dash-pattern to use built-in patterns.
+    -P, --path <path>                 The path to the input path file.
+    -o, --output <output>             The path where the output will be saved. If omitted, or `-`, stdout.
+    -c, --contour <contour>           <isize> if this is a positive number we stroke only that specific contour in the
+                                      outline by index. [default: -1]
+    -m, --mode <mode>                 Repeat mode. [default: single]  [possible values: single, repeated]
+    -s, --subdivide <subdivide>       <usize> how many times to subdivide the patterns at their midpoint. [default: 0]
+    -X, --sx <sx>                     <f64> how much we scale our input pattern on the x-axis. [default: 1]
+    -Y, --sy <sy>                     <f64> how much we scale our input pattern on the y-axis. [default: 1]
+    -n, --noffset <normal_offset>     <f64> how much to offset the pattern along the normal of the path. [default: 0]
+    -t, --toffset <tangent_offset>    <f64> how much to offset the pattern along the tangent of the path. [default: 0]
+    -1, --onepass <one-pass>          <boolean> whether we should not reflow the path after culling during overdraw
+                                      (faster but worse).
+    -O, --overdraw <overdraw>         <f64> any patterns that overlap more than arg * 100 percent are removed. [default:
+                                      0.15]
+    -0, --spacing <spacing>           <f64> how much padding to trail each copy with. [default: 0]
 ```
 ### Variable Width Stroking
 (Note: In VWS mode, it is expected that you are using MFEKglif to generate the input files. Therefore, not many helpful command line options are provided. If you wish to use VWS programatically, play with MFEKglif's VWS tool, get some output, and study it; then generate conformant XML.)
 
 ```
-MFEKstroke-VWS 0.0
+MFEKstroke-VWS 0.1
 Matthew Blanchard <matthewrblanchard@gmail.com>
 Takes a .glif file and strokes it with variable width.
 
@@ -113,22 +121,26 @@ OPTIONS:
 ### Constant Width Stroking
 
 ```
-MFEKstroke-CWS 0.0
+MFEKstroke-CWS 0.1
 Fredrick R. Brennan <copypasteⒶkittens⊙ph>; Matthew Blanchard <matthewrblanchard@gmail.com>
 Takes a .glif file and strokes it at a constant width.
 
 USAGE:
-    MFEKstroke CWS [OPTIONS] --input <input> --output <output> --width <width>
+    MFEKstroke CWS [FLAGS] [OPTIONS] --input <input> --output <output> --width <width>
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -h, --help               Prints help information
+    -E, --remove-external    Remove external contour
+    -I, --remove-internal    Remove internal contour
+    -V, --version            Prints version information
 
 OPTIONS:
     -i, --input <input>          The path to the input file.
     -o, --output <output>        The path where the output will be saved.
     -e, --endcap <endcap>        Either the constant strings "round" or "square", or a .glif file. [default: round]
     -j, --jointype <jointype>    Either of the constant strings "round", "miter", or "bevel". [default: round]
+    -l, --left <left>            <f64> Constant stroke width (left).
+    -r, --right <right>          <f64> Constant stroke width (right).
     -s, --startcap <startcap>    Either the constant strings "round" or "square", or a .glif file. [default: round]
     -w, --width <width>          <f64> Constant stroke width.
 ```

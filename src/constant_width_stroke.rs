@@ -14,7 +14,7 @@ pub fn clap_app() -> clap::App<'static, 'static> {
         .alias("constant")
         .alias("cws")
         .about("Takes a .glif file and strokes it at a constant width.")
-        .version("0.0")
+        .version("0.1")
         .author("Fredrick R. Brennan <copypasteⒶkittens⊙ph>; Matthew Blanchard <matthewrblanchard@gmail.com>")
         .arg(Arg::with_name("input")
             .display_order(1)

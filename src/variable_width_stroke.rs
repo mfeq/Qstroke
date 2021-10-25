@@ -9,7 +9,7 @@ pub fn clap_app() -> clap::App<'static, 'static> {
         .alias("variable")
         .alias("vws")
         .about("Takes a .glif file and strokes it with variable width.")
-        .version("0.0")
+        .version("0.1")
         .author("Matthew Blanchard <matthewrblanchard@gmail.com>")
         .arg(
             Arg::with_name("input")
