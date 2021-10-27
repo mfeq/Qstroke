@@ -157,14 +157,14 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     let pattern: glifparser::Glif<MFEKPointData> = match pattern_string {
         None => {
             if matches.is_present("dot-pattern") {
-                let mut dot = glifparser::read(include_str!("dot.glif")).unwrap();
+                let mut dot = glifparser::read(include_str!("../assets/dot.glif")).unwrap();
                 let piece_pattern = Piecewise::from(dot.outline.as_ref().unwrap());
                 let normalized_pattern = piece_pattern.scale(vec2!(1. / 20., 1. / 20.));
 
                 dot.outline = Some(normalized_pattern.to_outline());
                 dot
             } else if matches.is_present("dash-pattern") {
-                let mut dash = glifparser::read(include_str!("dash.glif")).unwrap();
+                let mut dash = glifparser::read(include_str!("../assets/dash.glif")).unwrap();
 
                 let piece_pattern = Piecewise::from(dash.outline.as_ref().unwrap());
                 let normalized_pattern = piece_pattern.scale(vec2!(1. / 20., 1. / 20.));
