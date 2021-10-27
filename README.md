@@ -94,8 +94,8 @@ OPTIONS:
     -W, --spacing <spacing>           <f64> how much padding to trail each copy with. [default: 0]
     -!, --stretch <stretch>           <stretch> false if not given, true if given, spacing mode if value of spacing
                                       given [possible values: spacing]
-    -S, --simplify                    <boolean> if we should run the result through a simplify routine.
-    -O, --overdraw <overdraw>         <f64> pattern copies overlapping more than arg% are removed. [default: 15%]
+    -S, --simplify                    <boolean> if we should run the result through Skia's (buggy) simplify routine.
+    -O, --overdraw <overdraw>         <f64> pattern copies overlapping more than arg% are removed. [default: 100%]
     -Q, --one-pass                    <boolean> whether we should not reflow the path after culling during overdraw
                                       (faster but worse).
     -C, --no-center-pattern           <boolean> supply if you wish to center the pattern
