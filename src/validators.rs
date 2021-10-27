@@ -1,10 +1,35 @@
-fn arg_validator_positive_f64_impl(v: String, zero_ok: bool) -> Result<(), String> {
+#[derive(Debug)]
+enum ValidatorRange {
+    All,
+    PositiveNotZero,
+    Positive,
+}
+
+fn arg_validator_f64_impl(v: String, range: ValidatorRange) -> Result<(), String> {
     match v.parse::<f64>() {
         Ok(i) => {
-            if i < 0.0 + (if zero_ok { 0.0 } else { f64::EPSILON }) {
-                Err(String::from("Value too small"))
-            } else {
-                Ok(())
+            let err = || {
+                Err(String::from(&format!(
+                    "Value outside allowed range ({:?})",
+                    range
+                )))
+            };
+            match range {
+                ValidatorRange::All => Ok(()),
+                ValidatorRange::PositiveNotZero => {
+                    if i >= 0.0 {
+                        Ok(())
+                    } else {
+                        err()
+                    }
+                }
+                ValidatorRange::Positive => {
+                    if i > 0.0 {
+                        Ok(())
+                    } else {
+                        err()
+                    }
+                }
             }
         }
         Err(_) => Err(String::from("Value must be a float")),
@@ -12,11 +37,15 @@ fn arg_validator_positive_f64_impl(v: String, zero_ok: bool) -> Result<(), Strin
 }
 
 pub fn arg_validator_positive_f64(v: String) -> Result<(), String> {
-    arg_validator_positive_f64_impl(v, false)
+    arg_validator_f64_impl(v, ValidatorRange::Positive)
 }
 
 pub fn arg_validator_positive_or_zero_f64(v: String) -> Result<(), String> {
-    arg_validator_positive_f64_impl(v, true)
+    arg_validator_f64_impl(v, ValidatorRange::PositiveNotZero)
+}
+
+pub fn arg_validator_f64(v: String) -> Result<(), String> {
+    arg_validator_f64_impl(v, ValidatorRange::All)
 }
 
 pub fn arg_validator_isize(v: String) -> Result<(), String> {
@@ -30,5 +59,17 @@ pub fn arg_validator_usize(v: String) -> Result<(), String> {
     match v.parse::<isize>() {
         Ok(_) => Ok(()),
         Err(_) => Err(String::from("Value must be a positive integer")),
+    }
+}
+
+pub fn arg_validator_suffix(
+    f: &impl Fn(String) -> Result<(), String>,
+    suffix: char,
+) -> impl Fn(String) -> Result<(), String> + '_ {
+    move |mut v| {
+        while v.ends_with(suffix) {
+            assert_eq!(v.pop().unwrap(), suffix);
+        }
+        f(v)
     }
 }

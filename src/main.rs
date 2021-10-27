@@ -14,10 +14,11 @@ mod variable_width_stroke;
 fn main() {
     #[allow(unused_mut)] // we actually use it if cfg(feature=fontforge)
     let mut argparser = App::new("MFEKstroke")
-        .setting(AppSettings::ArgRequiredElseHelp)
-        .version("0.1.0")
+        .setting(AppSettings::SubcommandRequired)
+        .setting(AppSettings::DisableVersion)
+        .setting(AppSettings::DisableHelpSubcommand)
         .author("Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens⊙ph>; MFEK Authors")
-        .about("A utility for applying stroking techniques to UFO contours.")
+        .about("A utility for applying stroking techniques to contours (in UFO .glif format).")
         .subcommand(pattern_along_path::clap_app())
         .subcommand(variable_width_stroke::clap_app())
         .subcommand(constant_width_stroke::clap_app());
@@ -35,6 +36,8 @@ fn main() {
         Some("CWS") => constant_width_stroke::cws_cli(&matches.subcommand_matches("CWS").unwrap()),
         #[cfg(feature = "fontforge")]
         Some("NIB") => nib_stroke::nib_cli(&matches.subcommand_matches("NIB").unwrap()),
-        _ => {}
+        _ => {
+            unreachable!()
+        }
     }
 }

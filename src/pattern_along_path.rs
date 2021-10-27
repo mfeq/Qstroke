@@ -8,49 +8,49 @@ use MFEKmath::vector::Vector;
 use MFEKmath::EvalScale;
 use MFEKmath::Piecewise;
 
-use clap::{App, Arg};
+use clap::{App, AppSettings, Arg};
 
 pub fn clap_app() -> clap::App<'static, 'static> {
     App::new("PAP")
+            .setting(AppSettings::DeriveDisplayOrder)
+            .setting(AppSettings::UnifiedHelpMessage)
+            .setting(AppSettings::AllowNegativeNumbers)
             .alias("patterned")
             .alias("pap")
             .alias("PaP")
             .about("Maps a pattern glyph along a path glyph.")
-            .version("0.2")
+            .version("0.2.1")
             .author("Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK Authors")
             .arg(Arg::with_name("pattern")
-                .display_order(1)
                 .long("pattern")
                 .short("p")
                 .takes_value(true)
                 .required_unless_one(&["dot-pattern", "dash-pattern"])
+                .conflicts_with_all(&["dot-pattern", "dash-pattern"])
                 .help("The path to the input pattern file. You may also provide either --dot-pattern or --dash-pattern to use built-in patterns."))
+            .arg(Arg::with_name("dash-pattern")
+                .long("dash-pattern")
+                .short("=")
+                .conflicts_with("dot-pattern")
+                .help("Use a simple dash pattern"))
+            .arg(Arg::with_name("dot-pattern")
+                .long("dot-pattern")
+                .short(".")
+                .conflicts_with("dash-pattern")
+                .help("Use a simple dot pattern"))
             .arg(Arg::with_name("path")
-                .display_order(2)
                 .long("path")
                 .short("P")
                 .takes_value(true)
                 .help("The path to the input path file.")
                 .required(true))
             .arg(Arg::with_name("output")
-                .display_order(3)
                 .long("output")
                 .alias("out")
                 .short("o")
                 .takes_value(true)
-                .help("The path where the output will be saved. If omitted, or `-`, stdout."))
-            .arg(Arg::with_name("dash-pattern")
-                .long("dash_pattern")
-                .conflicts_with("dot-pattern")
-                .hidden(true)
-                .help("Use a standardized dash pattern"))
-            .arg(Arg::with_name("dot-pattern")
-                .long("dot_pattern")
-                .conflicts_with("dash-pattern")
-                .hidden(true)
-                .help("Use a standardized dot pattern"))
+                .help("The path where the output will be saved. If omitted, or `-`, stdout.\n\n\n"))
             .arg(Arg::with_name("contour")
-                .display_order(4)
                 .long("contour")
                 .short("c")
                 .takes_value(true)
@@ -58,7 +58,6 @@ pub fn clap_app() -> clap::App<'static, 'static> {
                 .default_value("-1")
                 .help("<isize> if this is a positive number we stroke only that specific contour in the outline by index."))
             .arg(Arg::with_name("mode")
-                .display_order(4)
                 .short("m")
                 .long("mode")
                 .takes_value(true)
@@ -66,15 +65,14 @@ pub fn clap_app() -> clap::App<'static, 'static> {
                 .possible_values(&["single", "repeated"])
                 .help("Repeat mode."))
             .arg(Arg::with_name("subdivide")
-                .display_order(4)
                 .short("sub")
                 .long("subdivide")
                 .takes_value(true)
                 .default_value("0")
+                .hide_default_value(true)
                 .validator(super::arg_validator_usize)
-                .help("<usize> how many times to subdivide the patterns at their midpoint."))
+                .help("<usize> how many times to subdivide the patterns at their midpoint. [default: 0]\n\n\n"))
             .arg(Arg::with_name("sx")
-                .display_order(4)
                 .long("sx")
                 .short("X")
                 .takes_value(true)
@@ -82,32 +80,30 @@ pub fn clap_app() -> clap::App<'static, 'static> {
                 .validator(super::arg_validator_positive_f64)
                 .help("<f64> how much we scale our input pattern on the x-axis."))
             .arg(Arg::with_name("sy")
-                .display_order(4)
                 .long("sy")
                 .short("Y")
                 .takes_value(true)
                 .default_value("1")
                 .validator(super::arg_validator_positive_f64)
                 .help("<f64> how much we scale our input pattern on the y-axis."))
-            .arg(Arg::with_name("normal_offset")
-                .display_order(5)
+            .arg(Arg::with_name("normal-offset")
                 .long("noffset")
                 .short("n")
                 .takes_value(true)
                 .default_value("0")
-                .validator(super::arg_validator_positive_or_zero_f64)
+                .validator(super::arg_validator_f64)
                 .help("<f64> how much to offset the pattern along the normal of the path."))
-            .arg(Arg::with_name("tangent_offset")
-                .display_order(5)
+            .arg(Arg::with_name("tangent-offset")
                 .long("toffset")
                 .short("t")
                 .takes_value(true)
                 .default_value("0")
-                .validator(super::arg_validator_positive_or_zero_f64)
-                .help("<f64> how much to offset the pattern along the tangent of the path."))
+                .hide_default_value(true)
+                .validator(super::arg_validator_f64)
+                .help("<f64> how much to offset the pattern along the tangent of the path. [default: 0]\n\n\n"))
             .arg(Arg::with_name("spacing")
                 .long("spacing")
-                .short("0")
+                .short("W")
                 .takes_value(true)
                 .default_value("0")
                 .validator(super::arg_validator_positive_or_zero_f64)
@@ -115,7 +111,7 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .arg(Arg::with_name("stretch")
                 .long("stretch")
                 .short("!")
-                .empty_values(true)
+                .takes_value(true)
                 .possible_values(&["spacing"])
                 .help("<stretch> false if not given, true if given, spacing mode if value of spacing given"))
             .arg(Arg::with_name("simplify")
@@ -126,27 +122,26 @@ pub fn clap_app() -> clap::App<'static, 'static> {
                 .long("overdraw")
                 .short("O")
                 .takes_value(true)
-                .default_value("0.15")
-                .validator(super::arg_validator_positive_f64)
-                .help("<f64> any patterns that overlap more than arg * 100 percent are removed."))
+                .default_value("15%")
+                .validator(super::arg_validator_suffix(&super::arg_validator_positive_f64, '%'))
+                .help("<f64> pattern copies overlapping more than arg% are removed."))
             .arg(Arg::with_name("one-pass")
-                .long("onepass")
-                .short("1")
-                .takes_value(true)
-                .empty_values(true)
+                .long("one-pass")
+                .short("Q")
                 .help("<boolean> whether we should not reflow the path after culling during overdraw (faster but worse)."))
             .arg(Arg::with_name("no-center-pattern")
-                .long("no_center_pattern")
+                .long("no-center-pattern")
                 .short("C")
+                .conflicts_with_all(&["sx", "sy"])
                 .help("<boolean> supply if you wish to center the pattern"))
             .arg(Arg::with_name("reverse")
                 .long("reverse")
                 .short("r")
                 .help("<boolean> true will reverse the path."))
             .arg(Arg::with_name("reverse-culling")
-                .long("reverse_culling")
+                .long("reverse-culling")
                 .short("R")
-                .help("<boolean> true will reverse the order we check for overlaps during overlap culling."))
+                .help("<boolean> true will reverse the order we check for overlaps during overlap culling.\n\n\n"))
 }
 
 pub fn pap_cli(matches: &clap::ArgMatches) {
@@ -157,7 +152,7 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     // TODO: Handle errors properly!
     let path: glifparser::Glif<MFEKPointData> =
         glifparser::read(&fs::read_to_string(path_string).expect("Failed to read path file!"))
-            .unwrap();
+            .expect("glifparser couldn't parse input path glif. Invalid glif?");
 
     let pattern: glifparser::Glif<MFEKPointData> = match pattern_string {
         None => {
@@ -182,7 +177,7 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         }
         Some(pattern) => {
             glifparser::read(&fs::read_to_string(pattern).expect("Failed to read pattern file!"))
-                .unwrap()
+                .expect("glifparser couldn't parse input pattern glif. Invalid glif?")
         }
     };
 
@@ -220,26 +215,31 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     }
 
     if let Some(sub_string) = matches.value_of("subdivide") {
-        settings.subdivide = PatternSubdivide::Simple(sub_string.parse::<usize>().unwrap());
+        let n = sub_string.parse::<usize>().unwrap();
+        settings.subdivide = match n {
+            0 => PatternSubdivide::Off,
+            _ => PatternSubdivide::Simple(n),
+        };
     }
 
     if let Some(spacing_string) = matches.value_of("spacing") {
         settings.spacing = spacing_string.parse::<f64>().unwrap();
     }
 
-    if let Some(normal_string) = matches.value_of("normal_offset") {
+    if let Some(normal_string) = matches.value_of("normal-offset") {
         settings.normal_offset = normal_string.parse::<f64>().unwrap();
     }
 
-    if let Some(tangent_string) = matches.value_of("tangent_offset") {
+    if let Some(tangent_string) = matches.value_of("tangent-offset") {
         settings.tangent_offset = tangent_string.parse::<f64>().unwrap();
     }
 
-    settings.center_pattern = matches.is_present("center_pattern");
+    settings.center_pattern = !matches.is_present("no-center-pattern");
     settings.simplify = matches.is_present("simplify");
 
     // We know the string must be "spacing" as that's the only .possible_value to clap::Arg
-    if let Some(_) = matches.value_of("stretch") {
+    if let Some(s) = matches.value_of("stretch") {
+        debug_assert_eq!(s, "spacing");
         settings.stretch = PatternStretch::Spacing;
     } else if matches.is_present("stretch") {
         settings.stretch = PatternStretch::On;
@@ -247,10 +247,12 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         settings.stretch = PatternStretch::Off;
     }
 
-    settings.two_pass_culling = !matches.is_present("one-pass");
-
     if let Some(overdraw_string) = matches.value_of("overdraw") {
-        settings.cull_overlap = overdraw_string.parse::<f64>().unwrap();
+        settings.cull_overlap = overdraw_string
+            .trim_end_matches('%')
+            .parse::<f64>()
+            .unwrap();
+        settings.cull_overlap /= 100.0;
     }
 
     let mut target_contour = None;
@@ -273,11 +275,12 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     settings.reverse_culling = matches.is_present("reverse-culling");
 
     let output = pattern_along_glif(&path, &pattern, &settings, target_contour);
-    let glifstring = glifparser::write(&output).unwrap(); // TODO: Proper error handling.
+    let glifstring =
+        glifparser::write(&output).expect("glifparser failed to understand output of PaP?"); // TODO: Proper error handling.
     if let Some(output_file) = output_string {
         if output_file != "-" {
             // common stand-in for stdout on *nix
-            fs::write(output_file, &glifstring).expect("Unable to write file");
+            fs::write(output_file, &glifstring).expect("Unable to write output file");
             return;
         }
     }

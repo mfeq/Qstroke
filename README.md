@@ -1,6 +1,6 @@
 # MFEKstroke
 
-(c) 2021 Matthew Blanchard, Fredrick R. Brennan & MFEK authors
+(c) 2021 Matthew Blanchard, Fredrick R. Brennan & MFEK Authors
 
 A set of utilities for stroking paths in font glyphs written in Rust.
 
@@ -63,40 +63,48 @@ cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Reg
 ## `MFEKstroke --help`
 ### Pattern Along Path
 ```
-MFEKstroke-PAP 0.2
+MFEKstroke-PAP 0.2.1
 Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK Authors
 Maps a pattern glyph along a path glyph.
 
 USAGE:
-    MFEKstroke PAP [FLAGS] [OPTIONS] --path <path> --pattern <pattern>
-
-FLAGS:
-    -h, --help                 Prints help information
-    -C, --no_center_pattern    <boolean> supply if you wish to center the pattern
-    -r, --reverse              <boolean> true will reverse the path.
-    -R, --reverse_culling      <boolean> true will reverse the order we check for overlaps during overlap culling.
-    -S, --simplify             <boolean> if we should run the result through a simplify routine.
-    -!, --stretch              <stretch> false if not given, true if given, spacing mode if value of spacing given
-    -V, --version              Prints version information
+    MFEKstroke PAP [OPTIONS] --path <path> --pattern <pattern>
 
 OPTIONS:
     -p, --pattern <pattern>           The path to the input pattern file. You may also provide either --dot-pattern or
                                       --dash-pattern to use built-in patterns.
+    -=, --dash-pattern                Use a simple dash pattern
+    -., --dot-pattern                 Use a simple dot pattern
     -P, --path <path>                 The path to the input path file.
     -o, --output <output>             The path where the output will be saved. If omitted, or `-`, stdout.
+                                      
+                                      
     -c, --contour <contour>           <isize> if this is a positive number we stroke only that specific contour in the
                                       outline by index. [default: -1]
     -m, --mode <mode>                 Repeat mode. [default: single]  [possible values: single, repeated]
     -s, --subdivide <subdivide>       <usize> how many times to subdivide the patterns at their midpoint. [default: 0]
+                                      
+                                      
     -X, --sx <sx>                     <f64> how much we scale our input pattern on the x-axis. [default: 1]
     -Y, --sy <sy>                     <f64> how much we scale our input pattern on the y-axis. [default: 1]
-    -n, --noffset <normal_offset>     <f64> how much to offset the pattern along the normal of the path. [default: 0]
-    -t, --toffset <tangent_offset>    <f64> how much to offset the pattern along the tangent of the path. [default: 0]
-    -1, --onepass <one-pass>          <boolean> whether we should not reflow the path after culling during overdraw
+    -n, --noffset <normal-offset>     <f64> how much to offset the pattern along the normal of the path. [default: 0]
+    -t, --toffset <tangent-offset>    <f64> how much to offset the pattern along the tangent of the path. [default: 0]
+                                      
+                                      
+    -W, --spacing <spacing>           <f64> how much padding to trail each copy with. [default: 0]
+    -!, --stretch <stretch>           <stretch> false if not given, true if given, spacing mode if value of spacing
+                                      given [possible values: spacing]
+    -S, --simplify                    <boolean> if we should run the result through a simplify routine.
+    -O, --overdraw <overdraw>         <f64> pattern copies overlapping more than arg% are removed. [default: 15%]
+    -Q, --one-pass                    <boolean> whether we should not reflow the path after culling during overdraw
                                       (faster but worse).
-    -O, --overdraw <overdraw>         <f64> any patterns that overlap more than arg * 100 percent are removed. [default:
-                                      0.15]
-    -0, --spacing <spacing>           <f64> how much padding to trail each copy with. [default: 0]
+    -C, --no-center-pattern           <boolean> supply if you wish to center the pattern
+    -r, --reverse                     <boolean> true will reverse the path.
+    -R, --reverse-culling             <boolean> true will reverse the order we check for overlaps during overlap
+                                      culling.
+                                      
+    -h, --help                        Prints help information
+    -V, --version                     Prints version information
 ```
 ### Variable Width Stroking
 (Note: In VWS mode, it is expected that you are using MFEKglif to generate the input files. Therefore, not many helpful command line options are provided. If you wish to use VWS programatically, play with MFEKglif's VWS tool, get some output, and study it; then generate conformant XML.)
