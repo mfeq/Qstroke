@@ -13,6 +13,8 @@ clap = "2.33.3"
 # parses .glif files 
 glifparser = { git = "https://github.com/MFEK/glifparser.rlib", branch = "master", features=["mfek"] }
 MFEKmath = { git = "https://github.com/MFEK/math.rlib", branch = "main"}
+#glifparser = { path = "../glifparser.rlib", features=["mfek"] } # for development
+#MFEKmath = { path = "../math.rlib" } # for development
 
 # For reading and writing glifs
 xmltree = "0.10.1"

@@ -81,6 +81,11 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .short("E")
             .takes_value(false)
             .help(r#"Remove external contour"#))
+        .arg(Arg::with_name("segmentwise")
+            .long("segmentwise")
+            .short("S")
+            .takes_value(false)
+            .help(r#"Join all segments with caps (stroke all Bézier segments one by one)"#))
 }
 
 #[derive(Debug)]
@@ -93,6 +98,7 @@ struct CWSSettings {
     endcap: CapType,
     remove_internal: bool,
     remove_external: bool,
+    segmentwise: bool,
 }
 
 fn constant_width_stroke(
@@ -136,9 +142,18 @@ fn constant_width_stroke(
     for (i, pwpath_contour) in iter {
         let vws_contour = &vws_contours[i];
 
-        let results = variable_width_stroke(&pwpath_contour, &vws_contour, &settings.vws_settings);
-        for result_contour in results.segs {
-            output_outline.push(result_contour.to_contour());
+        let results = if settings.segmentwise {
+            pwpath_contour.segs.iter().map(
+                |p| variable_width_stroke(&Piecewise::new(vec![p.clone()], None), &vws_contour, &settings.vws_settings)
+            ).collect()
+        } else {
+            vec![variable_width_stroke(&pwpath_contour, &vws_contour, &settings.vws_settings)]
+        };
+
+        for result_outline in results {
+            for result_contour in result_outline.segs.iter() {
+                output_outline.push(result_contour.to_contour());
+            }
         }
     }
     output_outline
@@ -149,23 +164,6 @@ fn constant_width_stroke(
 //
 // Some of this was copied from MFEK/math.rlib file src/variable_width_stroking.rs fn variable_width_stroke_glif
 pub fn cws_cli(matches: &clap::ArgMatches) {
-    fn str_to_jointype(s: &str) -> JoinType {
-        match s {
-            "bevel" => JoinType::Bevel,
-            "miter" => JoinType::Miter,
-            "round" => JoinType::Round,
-            _ => unimplemented!(),
-        }
-    }
-
-    fn str_to_cap(s: &str) -> CapType {
-        match s {
-            "round" => CapType::Round,
-            "square" => CapType::Square,
-            _ => CapType::Custom,
-        }
-    }
-
     fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<MFEKPointData>> {
         if ct == CapType::Custom {
             let path: glifparser::Glif<MFEKPointData> =
@@ -179,11 +177,12 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
 
     let input_file = matches.value_of("input").unwrap();
     let output_file = matches.value_of("output").unwrap();
-    let startcap = str_to_cap(matches.value_of("startcap").unwrap());
-    let endcap = str_to_cap(matches.value_of("endcap").unwrap());
-    let jointype = str_to_jointype(matches.value_of("jointype").unwrap());
+    let startcap: CapType = (matches.value_of("startcap").unwrap()).parse().expect("Invalid cap/join");
+    let endcap: CapType = (matches.value_of("endcap").unwrap()).parse().expect("Invalid cap/join");
+    let jointype: JoinType = (matches.value_of("jointype").unwrap()).parse().expect("Invalid cap/join");
     let remove_internal = matches.is_present("remove-internal");
     let remove_external = matches.is_present("remove-external");
+    let segmentwise = matches.is_present("segmentwise");
     let left: f64;
     let right: f64;
 
@@ -206,14 +205,7 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     };
 
     let cws_settings = CWSSettings {
-        vws_settings: vws_settings,
-        left: left,
-        right: right,
-        startcap: startcap,
-        endcap: endcap,
-        jointype: jointype,
-        remove_internal: remove_internal,
-        remove_external: remove_external,
+        vws_settings, left, right, startcap, endcap, jointype, remove_internal, remove_external, segmentwise
     };
 
     let output_outline = path
