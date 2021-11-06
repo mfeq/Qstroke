@@ -7,10 +7,11 @@ use MFEKmath::{variable_width_stroke, Piecewise, VWSSettings};
 
 use glifparser::{Glif, Outline};
 
-use clap::{App, Arg};
+use clap::{App, AppSettings, Arg};
 
 pub fn clap_app() -> clap::App<'static, 'static> {
     App::new("CWS")
+        .setting(AppSettings::DeriveDisplayOrder)
         .alias("constant")
         .alias("cws")
         .about("Takes a .glif file and strokes it at a constant width.")
@@ -46,7 +47,8 @@ pub fn clap_app() -> clap::App<'static, 'static> {
             .long("jointype")
             .short("j")
             .takes_value(true)
-            .help(r#"Either of the constant strings "round", "miter", or "bevel"."#)
+            .possible_values(&["round", "circle", "miter", "bevel"])
+            .help("How to join discontinuous splines")
             .default_value("round"))
         .arg(Arg::with_name("width")
             .long("width")

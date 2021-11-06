@@ -137,20 +137,24 @@ USAGE:
     MFEKstroke CWS [FLAGS] [OPTIONS] --input <input> --output <output> --width <width>
 
 FLAGS:
-    -h, --help               Prints help information
-    -E, --remove-external    Remove external contour
     -I, --remove-internal    Remove internal contour
+    -E, --remove-external    Remove external contour
+    -S, --segmentwise        Join all segments with caps (stroke all Bézier segments one by one)
+    -h, --help               Prints help information
     -V, --version            Prints version information
 
 OPTIONS:
     -i, --input <input>          The path to the input file.
     -o, --output <output>        The path where the output will be saved.
-    -e, --endcap <endcap>        Either the constant strings "round" or "square", or a .glif file. [default: round]
-    -j, --jointype <jointype>    Either of the constant strings "round", "miter", or "bevel". [default: round]
+    -s, --startcap <startcap>    Either the constant strings "circle", "round" or "square", or a .glif file. [default:
+                                 circle]
+    -e, --endcap <endcap>        Either the constant strings "circle", "round" or "square", or a .glif file. [default:
+                                 circle]
+    -j, --jointype <jointype>    How to join discontinuous splines [default: round]  [possible values: round, circle,
+                                 miter, bevel]
+    -w, --width <width>          <f64> Constant stroke width.
     -l, --left <left>            <f64> Constant stroke width (left).
     -r, --right <right>          <f64> Constant stroke width (right).
-    -s, --startcap <startcap>    Either the constant strings "round" or "square", or a .glif file. [default: round]
-    -w, --width <width>          <f64> Constant stroke width.
 ```
 
 ### Nib Stroking
