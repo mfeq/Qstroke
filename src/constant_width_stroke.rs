@@ -223,15 +223,12 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         width: path.width,
         unicode: path.unicode,
         name: path.name,
-        format: 2,
         lib: None,
         components: path.components,
         guidelines: path.guidelines,
         images: path.images,
         note: path.note,
         filename: path.filename,
-        private_lib: path.private_lib,
-        private_lib_root: path.private_lib_root,
     };
 
     let glifstring = glifparser::write(&out).unwrap(); // TODO: Proper error handling!

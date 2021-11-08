@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "MFEKmath"
 version = "0.1.0"
-source = "git+https://github.com/MFEK/math.rlib?branch=main#cf9e4423ff2430140136d2afb11efd981f5bc18a"
+source = "git+https://github.com/MFEK/math.rlib?branch=main#0cde4ce07c446ec912e9f52f88b0ac5dbf512ddf"
 dependencies = [
  "flo_curves",
  "glifparser 1.1.0 (git+https://github.com/MFEK/glifparser.rlib?branch=master)",
@@ -268,8 +268,8 @@ dependencies = [
 
 [[package]]
 name = "flo_curves"
-version = "0.5.3"
-source = "git+https://github.com/MFEK/flo_curves?branch=new_master#4024a4b705c6a706355b1e83ea6230c31a1d07d8"
+version = "0.6.0"
+source = "git+https://github.com/Logicalshift/flo_curves?branch=v0.6#fdf2190af9a5574d1d8391f3ce687ad3865e35ec"
 dependencies = [
  "itertools",
  "roots",
@@ -303,7 +303,7 @@ checksum = "fed34cd105917e91daa4da6b3728c47b068749d6a62c59811f06ed2ac71d9da7"
 [[package]]
 name = "glifparser"
 version = "1.1.0"
-source = "git+https://github.com/MFEK/glifparser.rlib?branch=master#a33af77f7b5be45f2919c9c43a998c69d9a545c1"
+source = "git+https://github.com/MFEK/glifparser.rlib?branch=master#460e71b980d69cfa8aa5eca41b5aa8026ddcde29"
 dependencies = [
  "image",
  "integer_or_float",
@@ -311,7 +311,6 @@ dependencies = [
  "log",
  "plist",
  "serde",
- "serde_json",
  "skia-safe",
  "trees",
  "xmltree",
@@ -320,7 +319,7 @@ dependencies = [
 [[package]]
 name = "glifparser"
 version = "1.1.0"
-source = "git+https://github.com/MFEK/glifparser.rlib#a33af77f7b5be45f2919c9c43a998c69d9a545c1"
+source = "git+https://github.com/MFEK/glifparser.rlib#460e71b980d69cfa8aa5eca41b5aa8026ddcde29"
 dependencies = [
  "image",
  "integer_or_float",
@@ -328,7 +327,6 @@ dependencies = [
  "log",
  "plist",
  "serde",
- "serde_json",
  "trees",
  "xmltree",
 ]
@@ -407,8 +405,8 @@ dependencies = [
 
 [[package]]
 name = "integer_or_float"
-version = "0.1.0"
-source = "git+https://github.com/MFEK/integer_or_float.rlib?branch=main#d9461928836901f6a6bfe91de16a997e8ebc7136"
+version = "0.1.1"
+source = "git+https://github.com/MFEK/integer_or_float.rlib?branch=main#df82d3066b3bb57b49f40db0434bd3cc297fbd08"
 dependencies = [
  "serde",
 ]
@@ -461,9 +459,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.106"
+version = "0.2.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a60553f9a9e039a333b4e9b20573b9e9b9c0bb3a11e201ccc48ef4283456d673"
+checksum = "fbe5e23404da5b4f555ef85ebed98fb4083e55a00c317800bc2a50ede9f3d219"
 
 [[package]]
 name = "libloading"
@@ -753,9 +751,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f690853975602e1bfe1ccbf50504d67174e3bcf340f23b5ea9992e0587a52d8"
+checksum = "e466864e431129c7e0d3476b92f20458e5879919a0596c6472738d9fa2d342f8"
 dependencies = [
  "itoa",
  "ryu",
