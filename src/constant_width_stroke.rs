@@ -145,11 +145,23 @@ fn constant_width_stroke(
         let vws_contour = &vws_contours[i];
 
         let results = if settings.segmentwise {
-            pwpath_contour.segs.iter().map(
-                |p| variable_width_stroke(&Piecewise::new(vec![p.clone()], None), &vws_contour, &settings.vws_settings)
-            ).collect()
+            pwpath_contour
+                .segs
+                .iter()
+                .map(|p| {
+                    variable_width_stroke(
+                        &Piecewise::new(vec![p.clone()], None),
+                        &vws_contour,
+                        &settings.vws_settings,
+                    )
+                })
+                .collect()
         } else {
-            vec![variable_width_stroke(&pwpath_contour, &vws_contour, &settings.vws_settings)]
+            vec![variable_width_stroke(
+                &pwpath_contour,
+                &vws_contour,
+                &settings.vws_settings,
+            )]
         };
 
         for result_outline in results {
@@ -179,9 +191,15 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
 
     let input_file = matches.value_of("input").unwrap();
     let output_file = matches.value_of("output").unwrap();
-    let startcap: CapType = (matches.value_of("startcap").unwrap()).parse().expect("Invalid cap/join");
-    let endcap: CapType = (matches.value_of("endcap").unwrap()).parse().expect("Invalid cap/join");
-    let jointype: JoinType = (matches.value_of("jointype").unwrap()).parse().expect("Invalid cap/join");
+    let startcap: CapType = (matches.value_of("startcap").unwrap())
+        .parse()
+        .expect("Invalid cap/join");
+    let endcap: CapType = (matches.value_of("endcap").unwrap())
+        .parse()
+        .expect("Invalid cap/join");
+    let jointype: JoinType = (matches.value_of("jointype").unwrap())
+        .parse()
+        .expect("Invalid cap/join");
     let remove_internal = matches.is_present("remove-internal");
     let remove_external = matches.is_present("remove-external");
     let segmentwise = matches.is_present("segmentwise");
@@ -207,7 +225,15 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     };
 
     let cws_settings = CWSSettings {
-        vws_settings, left, right, startcap, endcap, jointype, remove_internal, remove_external, segmentwise
+        vws_settings,
+        left,
+        right,
+        startcap,
+        endcap,
+        jointype,
+        remove_internal,
+        remove_external,
+        segmentwise,
     };
 
     let output_outline = path
