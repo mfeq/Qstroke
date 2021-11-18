@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 # parse command line arguments
-clap = "2.33.3"
+clap = { git = "https://github.com/MFEK/clap.rlib" }
 
 # parses .glif files 
 glifparser = { git = "https://github.com/MFEK/glifparser.rlib", branch = "master", features=["mfek"] }

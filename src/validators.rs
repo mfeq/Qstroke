@@ -5,7 +5,7 @@ enum ValidatorRange {
     Positive,
 }
 
-fn arg_validator_f64_impl(v: String, range: ValidatorRange) -> Result<(), String> {
+fn arg_validator_f64_impl(v: &str, range: ValidatorRange) -> Result<(), String> {
     match v.parse::<f64>() {
         Ok(i) => {
             let err = || {
@@ -36,26 +36,26 @@ fn arg_validator_f64_impl(v: String, range: ValidatorRange) -> Result<(), String
     }
 }
 
-pub fn arg_validator_positive_f64(v: String) -> Result<(), String> {
+pub fn arg_validator_positive_f64(v: &str) -> Result<(), String> {
     arg_validator_f64_impl(v, ValidatorRange::Positive)
 }
 
-pub fn arg_validator_positive_or_zero_f64(v: String) -> Result<(), String> {
+pub fn arg_validator_positive_or_zero_f64(v: &str) -> Result<(), String> {
     arg_validator_f64_impl(v, ValidatorRange::PositiveNotZero)
 }
 
-pub fn arg_validator_f64(v: String) -> Result<(), String> {
+pub fn arg_validator_f64(v: &str) -> Result<(), String> {
     arg_validator_f64_impl(v, ValidatorRange::All)
 }
 
-pub fn arg_validator_isize(v: String) -> Result<(), String> {
+pub fn arg_validator_isize(v: &str) -> Result<(), String> {
     match v.parse::<isize>() {
         Ok(_) => Ok(()),
         Err(_) => Err(String::from("Value must be an integer")),
     }
 }
 
-pub fn arg_validator_usize(v: String) -> Result<(), String> {
+pub fn arg_validator_usize(v: &str) -> Result<(), String> {
     match v.parse::<isize>() {
         Ok(_) => Ok(()),
         Err(_) => Err(String::from("Value must be a positive integer")),
@@ -63,13 +63,16 @@ pub fn arg_validator_usize(v: String) -> Result<(), String> {
 }
 
 pub fn arg_validator_suffix(
-    f: &impl Fn(String) -> Result<(), String>,
+    f: &impl Fn(&str) -> Result<(), String>,
     suffix: char,
-) -> impl Fn(String) -> Result<(), String> + '_ {
-    move |mut v| {
-        while v.ends_with(suffix) {
-            assert_eq!(v.pop().unwrap(), suffix);
-        }
-        f(v)
+) -> impl Fn(&str) -> Result<(), String> + '_ {
+    move |v| {
+        let len = if v.ends_with(suffix) {
+            1
+        } else {
+            0
+        };
+        let vlen = v.len();
+        f(&v[0..vlen - len - 1])
     }
 }

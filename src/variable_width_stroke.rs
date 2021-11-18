@@ -4,7 +4,7 @@ use clap::{App, Arg};
 use glifparser::glif::MFEKPointData;
 use MFEKmath::{variable_width_stroke_glif, VWSSettings};
 
-pub fn clap_app() -> clap::App<'static, 'static> {
+pub fn clap_app() -> clap::App<'static> {
     App::new("VWS")
         .alias("variable")
         .alias("vws")
@@ -12,17 +12,17 @@ pub fn clap_app() -> clap::App<'static, 'static> {
         .version("0.1")
         .author("Matthew Blanchard <matthewrblanchard@gmail.com>")
         .arg(
-            Arg::with_name("input")
-                .short("in")
+            Arg::new("input")
+                .short('i')
                 .takes_value(true)
-                .help("The path to the input file.")
+                .about("The path to the input file.")
                 .required(true),
         )
         .arg(
-            Arg::with_name("output")
-                .short("out")
+            Arg::new("output")
+                .short('o')
                 .takes_value(true)
-                .help("The path where the output will be saved.")
+                .about("The path where the output will be saved.")
                 .required(true),
         )
 }
