@@ -67,11 +67,7 @@ pub fn arg_validator_suffix(
     suffix: char,
 ) -> impl Fn(&str) -> Result<(), String> + '_ {
     move |v| {
-        let len = if v.ends_with(suffix) {
-            1
-        } else {
-            0
-        };
+        let len = if v.ends_with(suffix) { 1 } else { 0 };
         let vlen = v.len();
         f(&v[0..vlen - len - 1])
     }

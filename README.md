@@ -8,11 +8,12 @@ This program is part of the [MFEK project](https://github.com/MFEK/).
 
 MFEKstroke takes UFO `.glif` files and applies path stroking algorithms to them.
 
-Four stroking algorithms are provided:
+Five stroking algorithms are provided:
 
 * PAP (**P**attern-**A**long-**P**ath)
 * VWS (**V**ariable **W**idth **S**troking)
 * CWS (**C**onstant **W**idth **S**troking)
+* DASH (Dashes and dots along paths)
 * Nib (requires FontForge be installed, uses `libfontforge.(so|dll)`)
 
 This makes MFEKstroke more complete in this department than Glyphsapp, FontForge or Runebender.
@@ -59,6 +60,9 @@ cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Reg
 
 ## Variable Width Stroke
 ![Besley Small Caps Q](https://raw.githubusercontent.com/MFEK/stroke/main/docs/blob/MFEKstroke%20VWS%20Q.png)
+
+## Dash Stroke
+![](https://raw.githubusercontent.com/MFEK/stroke/master/docs/blob/MFEKstroke%20DASH.png)
 
 ## `MFEKstroke --help`
 ### Pattern Along Path
@@ -155,6 +159,35 @@ OPTIONS:
     -w, --width <width>          <f64> Constant stroke width.
     -l, --left <left>            <f64> Constant stroke width (left).
     -r, --right <right>          <f64> Constant stroke width (right).
+```
+
+### Dash Stroking
+```
+MFEKstroke-DASH 0.1.0
+
+Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK Authors; Skia/kurbo.rs authors
+
+Applies a dash to a glyph.
+
+USAGE:
+    MFEKstroke DASH [OPTIONS] --input <input> --output <output>
+
+OPTIONS:
+    -i, --input <input>                 The path to the input glif file.
+    -o, --output <output>               The path to the output glif file.
+    -d, --dash-description <desc>...    Dash description [default: 30 30]
+    -c, --cull                          Attempt to cull earlier dashes when later dashes cover them
+    -w, --width <width>                 Stroke width (to leave an open contour, use 0) [default: 30]
+    -W, --cull-width <cull-width>       Cull width [default: 40]
+    -C, --cull-cutoff <cull-cutoff>     Paths with either a height or width below this number are
+                                        culled. Do not set if unsure.
+    -l, --write-last-path               Write last path
+    -j, --jointype <jointype>           How to join discontinuous splines [default: round] [possible
+                                        values: round, miter, bevel]
+    -A, --captype <captype>             How to cap splines [default: round] [possible values: round,
+                                        butt, square]
+    -h, --help                          Print help information
+    -V, --version                       Print version information
 ```
 
 ### Nib Stroking

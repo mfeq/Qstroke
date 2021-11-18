@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 # parse command line arguments
-clap = { git = "https://github.com/MFEK/clap.rlib" }
+clap = { git = "https://github.com/MFEK/clap.rlib", branch = "validator_all" }
 
 # parses .glif files 
 glifparser = { git = "https://github.com/MFEK/glifparser.rlib", branch = "master", features=["mfek"] }
@@ -19,6 +19,7 @@ MFEKmath = { git = "https://github.com/MFEK/math.rlib", branch = "main"}
 # For reading and writing glifs
 xmltree = "0.10.1"
 log = "0.4.11"
+env_logger = "0.9"
 xmlwriter = "0.1.0"
 
 # Can link FontForge as a dylib, if you have it installed. For nib stroking

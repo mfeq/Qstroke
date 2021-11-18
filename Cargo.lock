@@ -22,6 +22,7 @@ version = "0.0.0"
 dependencies = [
  "MFEKmath",
  "clap 3.0.0-beta.5",
+ "env_logger 0.9.0",
  "fontforge-sys",
  "glifparser 1.1.0 (git+https://github.com/MFEK/glifparser.rlib?branch=master)",
  "log",
@@ -98,7 +99,7 @@ dependencies = [
  "cexpr",
  "clang-sys",
  "clap 2.33.3",
- "env_logger",
+ "env_logger 0.8.4",
  "lazy_static",
  "lazycell",
  "log",
@@ -203,7 +204,7 @@ dependencies = [
 [[package]]
 name = "clap"
 version = "3.0.0-beta.5"
-source = "git+https://github.com/MFEK/clap.rlib#5e913473d7f80db2658c3b12031a5f6cde6e364e"
+source = "git+https://github.com/MFEK/clap.rlib?branch=validator_all#39c704c9723f923000fdbb033aa2d53f5f1462b9"
 dependencies = [
  "atty",
  "bitflags",
@@ -220,7 +221,7 @@ dependencies = [
 [[package]]
 name = "clap_derive"
 version = "3.0.0-beta.5"
-source = "git+https://github.com/MFEK/clap.rlib#5e913473d7f80db2658c3b12031a5f6cde6e364e"
+source = "git+https://github.com/MFEK/clap.rlib?branch=validator_all#39c704c9723f923000fdbb033aa2d53f5f1462b9"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -265,6 +266,19 @@ name = "env_logger"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a19187fea3ac7e84da7dacf48de0c45d63c6a76f9490dae389aead16c243fce3"
+dependencies = [
+ "atty",
+ "humantime",
+ "log",
+ "regex",
+ "termcolor",
+]
+
+[[package]]
+name = "env_logger"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b2cf0344971ee6c64c31be0d530793fba457d322dfec2810c453d0ef228f9c3"
 dependencies = [
  "atty",
  "humantime",
