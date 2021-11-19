@@ -1,4 +1,3 @@
-export RUSTFLAGS :=
 export RUST_LOG := debug
 export RUST_BACKTRACE := 1
 
@@ -8,7 +7,7 @@ FONTFORGE := $(if $(FONTFORGE),"fontforge","")
 
 .PHONY: all
 all:
-	cargo build $(DEBUGARGS) --features $(FONTFORGE)
+	RUSTFLAGS="${RUSTFLAGS}" cargo build $(DEBUGARGS) --features $(FONTFORGE)
 
 .PHONY: fmt
 fmt:

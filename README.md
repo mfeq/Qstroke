@@ -32,10 +32,33 @@ make
 
 Which runs ``cargo build``.
 
-You can provide the environment variables `FONTFORGE` and `DEBUG` to `make`. Without `DEBUG`, the binary goes in `target/release`; otherwise `target/debug`. `FONTFORGE` will compile the nib stroking mode; it will only work if `libfontforge.so` (`.dll` on Windows) is locatable by `cargo`.
+You can provide the environment variables `FONTFORGE` and `DEBUG` to `make`. Without `DEBUG`, the binary goes in `target/release`; otherwise `target/debug`.
+
+## Linking to `libfontforge`
+
+`FONTFORGE` will compile the nib stroking mode; it will only work if `libfontforge.so` (`.dll` on Windows) is locatable by `cargo`.
 
 ```bash
 DEBUG=y FONTFORGE=y make
+```
+
+You can pass `RUSTFLAGS` to either `cargo` or `make` to help them find `libfontforge`, where `/opt/lib` is the location of your `libfontforge.so` file:
+
+```bash
+RUSTFLAGS='-L /opt/lib' FONTFORGE=y make
+```
+
+If you get an error like:
+```
+$ MFEKstroke
+MFEKstroke: error while loading shared libraries: libfontforge.so.4: cannot open shared object file: No such file or directory
+```
+
+You can remedy that by running as:
+```
+$ LD_LIBRARY_PATH=/opt/lib MFEKstroke NIB -h
+MFEKstroke-NIB 0.1.0
+…
 ```
 
 ## Pattern Along Path

@@ -2,7 +2,6 @@ use fontforge_sys as fontforge;
 use glifparser;
 use std::ffi;
 use std::fs;
-use std::ops::Fn;
 use std::os::raw;
 use std::ptr;
 
@@ -135,7 +134,7 @@ fn make_spline(
 
 type RustSplineSet = Vec<Vec<fontforge::SplinePoint>>;
 
-fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (Vec<fontforge::SplineSet>, RustSplineSet) {
+fn glif_to_ffsplineset<PD: glifparser::PointData>(glif: glifparser::Glif<PD>) -> (Vec<fontforge::SplineSet>, RustSplineSet) {
     let mut ffsps = vec![];
     for c in glif.outline.unwrap().iter() {
         let mut cffsps = vec![];
@@ -165,14 +164,15 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (Vec<fontforge::SplineSe
             spbf.noprevcp = noprevcp as u32;
             spbf.pointtype = fontforge::pointtype_pt_corner;
 
-            let bf = Fn::call(&fontforge::splinepoint::new_bitfield_1, spbf.to_bitfield());
+            let bf = spbf.to_bitfield();
+            let ffbf = fontforge::splinepoint::new_bitfield_1(bf.0, bf.1, bf.2, bf.3, bf.4, bf.5, bf.6, bf.7, bf.8, bf.9, bf.10, bf.11, bf.12, bf.13, bf.14, bf.15);
 
             let sp = fontforge::SplinePoint {
                 me: bp0_1,
                 prevcp: bp0_3,
                 nextcp: bp0_2,
                 _bitfield_align_1: [],
-                _bitfield_1: bf,
+                _bitfield_1: ffbf,
                 ptindex: idx as u16,
                 // These are for TrueType fonts and don't matter to us.
                 ttfindex: 0,
@@ -186,8 +186,8 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (Vec<fontforge::SplineSe
         }
         // Calculating the len here prevents immutable borrows inside mutable borrows
         let cffsps_len = cffsps.len();
+
         // First, we treat all SplinePoint's as if they form a loop.
-        #[rustfmt::skip]
         for idx in 0..cffsps_len {
             if idx == 0 {
                 cffsps[idx].prev = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[cffsps_len - 1] as *mut _, false);
@@ -201,6 +201,7 @@ fn glif_to_ffsplineset<T>(glif: glifparser::Glif<T>) -> (Vec<fontforge::SplineSe
             }
             //eprintln!("{} {:?} {:?}", idx, cffsps[idx].prev, cffsps[idx].next);
         }
+
         // Then, if we know that the contour this SplineSet will refer to is open, we null the
         // appropriate point fields.
         if c[0].ptype == glifparser::PointType::Move {
@@ -251,18 +252,18 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
     if !settings.quiet {
         eprintln!("Reading nib...");
     }
-    let nibglif: glifparser::Glif<()> = glifparser::read_ufo_glif(
+    let nibglif: glifparser::Glif<()> = glifparser::read(
         &fs::read_to_string(&settings.nib).expect("Nib .glif inaccessible"),
-    );
+    ).unwrap();
     if !settings.quiet {
         eprintln!("Reading path...");
     }
-    let ssglif: glifparser::Glif<()> = glifparser::read_ufo_glif(
+    let ssglif: glifparser::Glif<()> = glifparser::read(
         &fs::read_to_string(&settings.path).expect("Path to stroke .glif inaccessible"),
-    );
+    ).unwrap();
 
     if ssglif.outline.is_none() {
-        return Some(glifparser::write_ufo_glif(&ssglif));
+        return Some(glifparser::write(&ssglif).unwrap());
     }
 
     let mut outglif = ssglif.clone();
@@ -312,5 +313,5 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
         outline.extend(o);
     }
     outglif.outline = Some(outline);
-    Some(glifparser::write_ufo_glif(&outglif))
+    Some(glifparser::write(&outglif).unwrap())
 }
