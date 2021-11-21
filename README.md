@@ -198,16 +198,18 @@ USAGE:
 OPTIONS:
     -i, --input <input>                 The path to the input glif file.
     -o, --output <output>               The path to the output glif file.
-    -d, --dash-description <desc>...    Dash description [default: 30 30]
+    -d, --dash-description <dash>...    Dash description [default: 30 30]
     -c, --cull                          Attempt to cull earlier dashes when later dashes cover them
     -w, --width <width>                 Stroke width (to leave an open contour, use 0) [default: 30]
     -W, --cull-width <cull-width>       Cull width [default: 40]
-    -C, --cull-cutoff <cull-cutoff>     Paths with either a height or width below this number are
+    -a, --min-area <area>               Paths with either a height or width below this number are
                                         culled. Do not set if unsure.
-    -l, --write-last-path               Write last path
-    -j, --jointype <jointype>           How to join discontinuous splines [default: round] [possible
+    -l, --write-last                    Write last path
+                                        
+                                        
+    -j, --join <join-type>              How to join discontinuous splines [default: round] [possible
                                         values: round, miter, bevel]
-    -A, --captype <captype>             How to cap splines [default: round] [possible values: round,
+    -J, --cap <cap-type>                How to cap splines [default: round] [possible values: round,
                                         butt, square]
     -h, --help                          Print help information
     -V, --version                       Print version information

@@ -17,7 +17,6 @@ fn main() {
     #[allow(unused_mut)] // we actually use it if cfg(feature=fontforge)
     let mut argparser = App::new("MFEKstroke")
         .setting(AppSettings::SubcommandRequired)
-        .setting(AppSettings::DisableVersionFlag)
         .setting(AppSettings::DisableHelpSubcommand)
         .author("Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens⊙ph>; MFEK Authors")
         .about("A utility for applying stroking techniques to contours (in UFO .glif format).")

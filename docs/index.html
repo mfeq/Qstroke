@@ -1,0 +1,575 @@
+<!-- Creator     : groff version 1.22.4 -->
+<!-- CreationDate: Sun Nov 21 22:45:47 2021 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>MFEKstroke</title>
+
+</head>
+<body>
+
+<h1 align="center">MFEKstroke</h1>
+
+<a href="#NAME">NAME</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#USAGE">USAGE</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#SUBCOMMANDS">SUBCOMMANDS</a><br>
+
+<hr>
+
+
+<h2>NAME
+<a name="NAME"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MFEKstroke
+&minus; manual page for MFEKstroke git-rev-3a65ce1</p>
+
+<h2>DESCRIPTION
+<a name="DESCRIPTION"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MFEKstroke</p>
+
+<p style="margin-left:11%; margin-top: 1em">Matthew
+Blanchard &lt;matthewrblanchard@gmail.com&gt;; Fredrick R.
+Brennan &lt;copypaste???kittens???ph&gt;; MFEK Authors</p>
+
+<p style="margin-left:11%; margin-top: 1em">A utility for
+applying stroking techniques to contours (in UFO .glif
+format).</p>
+
+<h2>USAGE
+<a name="USAGE"></a>
+</h2>
+
+
+<p style="margin-left:22%; margin-top: 1em">MFEKstroke
+&lt;SUBCOMMAND&gt;</p>
+
+<h2>OPTIONS
+<a name="OPTIONS"></a>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>&minus;h</b>,
+<b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">Print help information</p>
+
+<h2>SUBCOMMANDS
+<a name="SUBCOMMANDS"></a>
+</h2>
+
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em">CWS</p></td>
+<td width="5%"></td>
+<td width="78%">
+
+
+<p style="margin-top: 1em">Takes a .glif file and strokes
+it at a constant width.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p>DASH</p></td>
+<td width="5%"></td>
+<td width="78%">
+
+
+<p>Applies a dash to a glyph.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p>NIB</p></td>
+<td width="5%"></td>
+<td width="78%">
+
+
+<p>Takes a nib and a path, both in .glif format, and
+emulates a pen, with the chosen nib, stroking the path.</p></td></tr>
+</table>
+
+<p style="margin-left:22%; margin-top: 1em">Important note:
+FontForge is used for this, so it may be more unstable than
+other modes as FontForge is implemented in C and not memory
+safe. To prevent bugs, we turn off simplification and
+overlap removal. Use MFEK for that.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p style="margin-top: 1em">PAP</p></td>
+<td width="7%"></td>
+<td width="78%">
+
+
+<p style="margin-top: 1em">Maps a pattern glyph along a
+path glyph.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p>VWS</p></td>
+<td width="7%"></td>
+<td width="78%">
+
+
+<p>Takes a .glif file and strokes it with variable
+width.</p> </td></tr>
+</table>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MFEKstroke-CWS</b>
+<br>
+MFEKstroke&minus;CWS 0.1</p>
+
+<p style="margin-left:11%; margin-top: 1em">Fredrick R.
+Brennan &lt;copypaste???kittens???ph&gt;; Matthew Blanchard
+&lt;matthewrblanchard@gmail.com&gt;</p>
+
+<p style="margin-left:11%; margin-top: 1em">Takes a .glif
+file and strokes it at a constant width.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>USAGE</b></p>
+
+<p style="margin-left:22%;">MFEKstroke CWS [OPTIONS]
+<b>&minus;&minus;input</b> &lt;input&gt;
+<b>&minus;&minus;output</b> &lt;output&gt;</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>OPTIONS <br>
+&minus;s</b>, <b>&minus;&minus;startcap</b>
+&lt;startcap&gt;</p>
+
+<p style="margin-left:22%;">Either the constant strings
+&quot;circle&quot;, &quot;round&quot; or &quot;square&quot;,
+or a .glif file. [default: circle]</p>
+
+<p style="margin-left:11%;"><b>&minus;e</b>,
+<b>&minus;&minus;endcap</b> &lt;endcap&gt;</p>
+
+<p style="margin-left:22%;">Either the constant strings
+&quot;circle&quot;, &quot;round&quot; or &quot;square&quot;,
+or a .glif file. [default: circle]</p>
+
+<p style="margin-left:11%;"><b>&minus;i</b>,
+<b>&minus;&minus;input</b> &lt;input&gt;</p>
+
+<p style="margin-left:22%;">The path to the input file.</p>
+
+<p style="margin-left:11%;"><b>&minus;j</b>,
+<b>&minus;&minus;jointype</b> &lt;jointype&gt;</p>
+
+<p style="margin-left:22%;">How to join discontinuous
+splines [default: round] [possible values: round, circle,
+miter, bevel]</p>
+
+<p style="margin-left:11%;"><b>&minus;o</b>,
+<b>&minus;&minus;output</b> &lt;output&gt;</p>
+
+<p style="margin-left:22%;">The path where the output will
+be saved.</p>
+
+<p style="margin-left:11%;"><b>&minus;w</b>,
+<b>&minus;&minus;width</b> &lt;width&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; Constant stroke
+width.</p>
+
+<p style="margin-left:11%;"><b>&minus;l</b>,
+<b>&minus;&minus;left</b> &lt;left&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; Constant stroke
+width (left).</p>
+
+<p style="margin-left:11%;"><b>&minus;r</b>,
+<b>&minus;&minus;right</b> &lt;right&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; Constant stroke
+width (right).</p>
+
+<p style="margin-left:11%;"><b>&minus;I</b>,
+<b>&minus;&minus;remove&minus;internal</b></p>
+
+<p style="margin-left:22%;">Remove internal contour</p>
+
+<p style="margin-left:11%;"><b>&minus;E</b>,
+<b>&minus;&minus;remove&minus;external</b></p>
+
+<p style="margin-left:22%;">Remove external contour</p>
+
+<p style="margin-left:11%;"><b>&minus;S</b>,
+<b>&minus;&minus;segmentwise</b></p>
+
+<p style="margin-left:22%;">Join all segments with caps
+(stroke all B??zier segments one by one)</p>
+
+<p style="margin-left:11%;"><b>&minus;h</b>,
+<b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">Print help information</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MFEKstroke-DASH</b>
+<br>
+MFEKstroke&minus;DASH 0.1.0</p>
+
+<p style="margin-left:11%; margin-top: 1em">Fredrick R.
+Brennan &lt;copypaste???kittens.ph&gt;; MFEK Authors;
+Skia/kurbo.rs authors</p>
+
+<p style="margin-left:11%; margin-top: 1em">Applies a dash
+to a glyph.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>USAGE</b></p>
+
+<p style="margin-left:22%;">MFEKstroke DASH [OPTIONS]
+<b>&minus;&minus;input</b> &lt;input&gt;
+<b>&minus;&minus;output</b> &lt;output&gt;</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>OPTIONS <br>
+&minus;i</b>, <b>&minus;&minus;input</b> &lt;input&gt;</p>
+
+<p style="margin-left:22%;">The path to the input glif
+file.</p>
+
+<p style="margin-left:11%;"><b>&minus;o</b>,
+<b>&minus;&minus;output</b> &lt;output&gt;</p>
+
+<p style="margin-left:22%;">The path to the output glif
+file.</p>
+
+<p style="margin-left:11%;"><b>&minus;d</b>,
+<b>&minus;&minus;dash&minus;description</b>
+&lt;dash&gt;...</p>
+
+<p style="margin-left:22%;">Dash description [default: 30
+30]</p>
+
+<p style="margin-left:11%;"><b>&minus;c</b>,
+<b>&minus;&minus;cull</b></p>
+
+<p style="margin-left:22%;">Attempt to cull earlier dashes
+when later dashes cover them</p>
+
+<p style="margin-left:11%;"><b>&minus;w</b>,
+<b>&minus;&minus;width</b> &lt;width&gt;</p>
+
+<p style="margin-left:22%;">Stroke width (to leave an open
+contour, use 0) [default: 30]</p>
+
+<p style="margin-left:11%;"><b>&minus;W</b>,
+<b>&minus;&minus;cull&minus;width</b>
+&lt;cull&minus;width&gt;</p>
+
+<p style="margin-left:22%;">Cull width [default: 40]</p>
+
+<p style="margin-left:11%;"><b>&minus;a</b>,
+<b>&minus;&minus;min&minus;area</b> &lt;area&gt;</p>
+
+<p style="margin-left:22%;">Paths with either a height or
+width below this number are culled. Do not set if
+unsure.</p>
+
+<p style="margin-left:11%;"><b>&minus;l</b>,
+<b>&minus;&minus;write&minus;last</b></p>
+
+<p style="margin-left:22%;">Write last path</p>
+
+<p style="margin-left:11%;"><b>&minus;j</b>,
+<b>&minus;&minus;join</b> &lt;join&minus;type&gt;</p>
+
+<p style="margin-left:22%;">How to join discontinuous
+splines [default: round] [possible values: round, miter,
+bevel]</p>
+
+<p style="margin-left:11%;"><b>&minus;J</b>,
+<b>&minus;&minus;cap</b> &lt;cap&minus;type&gt;</p>
+
+<p style="margin-left:22%;">How to cap splines [default:
+round] [possible values: round, butt, square]</p>
+
+<p style="margin-left:11%;"><b>&minus;h</b>,
+<b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">Print help information</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MFEKstroke-NIB</b>
+<br>
+MFEKstroke&minus;NIB 0.1.0</p>
+
+<p style="margin-left:11%; margin-top: 1em">Fredrick R.
+Brennan &lt;copypaste???kittens???ph&gt;; Skef Iterum
+(FontForge)</p>
+
+<p style="margin-left:11%; margin-top: 1em">Takes a nib and
+a path, both in .glif format, and emulates a pen, with the
+chosen nib, stroking the path.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Important note:
+FontForge is used for this, so it may be more unstable than
+other modes as FontForge is implemented in C and not memory
+safe. To prevent bugs, we turn off simplification and
+overlap removal. Use MFEK for that.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>USAGE</b></p>
+
+<p style="margin-left:22%;">MFEKstroke NIB [OPTIONS]
+<b>&minus;&minus;nib</b> &lt;nib&gt;
+<b>&minus;&minus;input</b> &lt;input&gt;
+<b>&minus;&minus;output</b> &lt;output&gt;</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>OPTIONS <br>
+&minus;n</b>, <b>&minus;&minus;nib</b> &lt;nib&gt;</p>
+
+<p style="margin-left:22%;">The path to the nib file.
+FontForge is quite strict about these. The .glif must
+contain a single closed spline, running clockwise, which
+represents a convex shape.</p>
+
+<p style="margin-left:11%;"><b>&minus;i</b>,
+<b>&minus;&minus;input</b> &lt;input&gt;</p>
+
+<p style="margin-left:22%;">The path to the input path
+file.</p>
+
+<p style="margin-left:11%;"><b>&minus;o</b>,
+<b>&minus;&minus;output</b> &lt;output&gt;</p>
+
+<p style="margin-left:22%;">The path where the output .glif
+will be saved.</p>
+
+<p style="margin-left:11%;"><b>&minus;a</b>,
+<b>&minus;&minus;accuracy</b> &lt;accuracy&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; Accuracy target
+[default: 0.25]</p>
+
+<p style="margin-left:11%;"><b>&minus;h</b>,
+<b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">Print help information</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MFEKstroke-PAP</b>
+<br>
+MFEKstroke&minus;PAP 0.2.1</p>
+
+<p style="margin-left:11%; margin-top: 1em">Matthew
+Blanchard &lt;matthewrblanchard@gmail.com&gt;; Fredrick R.
+Brennan &lt;copypaste???kittens.ph&gt;; MFEK Authors</p>
+
+<p style="margin-left:11%; margin-top: 1em">Maps a pattern
+glyph along a path glyph.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>USAGE</b></p>
+
+<p style="margin-left:22%;">MFEKstroke PAP [OPTIONS]
+<b>&minus;&minus;path</b> &lt;path&gt;</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>OPTIONS <br>
+&minus;p</b>, <b>&minus;&minus;pattern</b>
+&lt;pattern&gt;</p>
+
+<p style="margin-left:22%;">The path to the input pattern
+file. You may also provide either
+<b>&minus;&minus;dot&minus;pattern</b> or
+<b>&minus;&minus;dash&minus;pattern</b> to use
+built&minus;in patterns.</p>
+
+<p style="margin-left:11%;"><b>&minus;=</b>,
+<b>&minus;&minus;dash&minus;pattern</b></p>
+
+<p style="margin-left:22%;">Use a simple dash pattern</p>
+
+<p style="margin-left:11%;">&minus;.,
+<b>&minus;&minus;dot&minus;pattern</b></p>
+
+<p style="margin-left:22%;">Use a simple dot pattern</p>
+
+<p style="margin-left:11%;"><b>&minus;P</b>,
+<b>&minus;&minus;path</b> &lt;path&gt;</p>
+
+<p style="margin-left:22%;">The path to the input path
+file.</p>
+
+<p style="margin-left:11%;"><b>&minus;o</b>,
+<b>&minus;&minus;output</b> &lt;output&gt;</p>
+
+<p style="margin-left:22%;">The path where the output will
+be saved. If omitted, or &lsquo;&minus;&lsquo;, stdout.</p>
+
+<p style="margin-left:11%;"><b>&minus;c</b>,
+<b>&minus;&minus;contour</b> &lt;contour&gt;</p>
+
+<p style="margin-left:22%;">&lt;isize&gt; if this is a
+positive number we stroke only that specific contour in the
+outline by index. [default: -1]</p>
+
+<p style="margin-left:11%;"><b>&minus;m</b>,
+<b>&minus;&minus;mode</b> &lt;mode&gt;</p>
+
+<p style="margin-left:22%;">Repeat mode. [default: single]
+[possible values: single, repeated]</p>
+
+<p style="margin-left:11%;"><b>&minus;s</b>,
+<b>&minus;&minus;subdivide</b> &lt;subdivide&gt;</p>
+
+<p style="margin-left:22%;">&lt;usize&gt; how many times to
+subdivide the patterns at their midpoint. [default: 0]</p>
+
+<p style="margin-left:11%;"><b>&minus;X</b>,
+<b>&minus;&minus;sx</b> &lt;sx&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; how much we scale
+our input pattern on the x&minus;axis. [default: 1]</p>
+
+<p style="margin-left:11%;"><b>&minus;Y</b>,
+<b>&minus;&minus;sy</b> &lt;sy&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; how much we scale
+our input pattern on the y&minus;axis. [default: 1]</p>
+
+<p style="margin-left:11%;"><b>&minus;n</b>,
+<b>&minus;&minus;noffset</b> &lt;normal&minus;offset&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; how much to offset
+the pattern along the normal of the path. [default: 0]</p>
+
+<p style="margin-left:11%;"><b>&minus;t</b>,
+<b>&minus;&minus;toffset</b>
+&lt;tangent&minus;offset&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; how much to offset
+the pattern along the tangent of the path. [default: 0]</p>
+
+<p style="margin-left:11%;"><b>&minus;W</b>,
+<b>&minus;&minus;spacing</b> &lt;spacing&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; how much padding to
+trail each copy with. [default: 0]</p>
+
+<p style="margin-left:11%;">&minus;!,
+<b>&minus;&minus;stretch</b> &lt;stretch&gt;</p>
+
+<p style="margin-left:22%;">&lt;stretch&gt; false if not
+given, true if given, spacing mode if value of spacing given
+[possible values: spacing]</p>
+
+<p style="margin-left:11%;"><b>&minus;S</b>,
+<b>&minus;&minus;simplify</b></p>
+
+<p style="margin-left:22%;">&lt;boolean&gt; if we should
+run the result through Skia&rsquo;s (buggy) simplify
+routine.</p>
+
+<p style="margin-left:11%;"><b>&minus;O</b>,
+<b>&minus;&minus;overdraw</b> &lt;overdraw&gt;</p>
+
+<p style="margin-left:22%;">&lt;f64&gt; pattern copies
+overlapping more than arg% are removed. [default: 100%]</p>
+
+<p style="margin-left:11%;"><b>&minus;Q</b>,
+<b>&minus;&minus;one&minus;pass</b></p>
+
+<p style="margin-left:22%;">&lt;boolean&gt; whether we
+should not reflow the path after culling during overdraw
+(faster but worse).</p>
+
+<p style="margin-left:11%;"><b>&minus;C</b>,
+<b>&minus;&minus;no&minus;center&minus;pattern</b></p>
+
+<p style="margin-left:22%;">&lt;boolean&gt; supply if you
+wish to center the pattern</p>
+
+<p style="margin-left:11%;"><b>&minus;r</b>,
+<b>&minus;&minus;reverse</b></p>
+
+<p style="margin-left:22%;">&lt;boolean&gt; true will
+reverse the path.</p>
+
+<p style="margin-left:11%;"><b>&minus;R</b>,
+<b>&minus;&minus;reverse&minus;culling</b></p>
+
+<p style="margin-left:22%;">&lt;boolean&gt; true will
+reverse the order we check for overlaps during overlap
+culling.</p>
+
+<p style="margin-left:11%;"><b>&minus;h</b>,
+<b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">Print help information</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MFEKstroke-VWS</b>
+<br>
+MFEKstroke&minus;VWS 0.1</p>
+
+<p style="margin-left:11%; margin-top: 1em">Matthew
+Blanchard &lt;matthewrblanchard@gmail.com&gt;</p>
+
+<p style="margin-left:11%; margin-top: 1em">Takes a .glif
+file and strokes it with variable width.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>USAGE</b></p>
+
+<p style="margin-left:22%;">MFEKstroke VWS <b>&minus;i</b>
+&lt;input&gt; <b>&minus;o</b> &lt;output&gt;</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>OPTIONS <br>
+&minus;h</b>, <b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">Print help information</p>
+
+<p style="margin-left:11%;"><b>&minus;i</b>
+&lt;input&gt;</p>
+
+<p style="margin-left:22%;">The path to the input file.</p>
+
+<p style="margin-left:11%;"><b>&minus;o</b>
+&lt;output&gt;</p>
+
+<p style="margin-left:22%;">The path where the output will
+be saved.</p>
+
+<p style="margin-left:11%;"><b>&minus;V</b>,
+<b>&minus;&minus;version</b></p>
+<hr>
+</body>
+</html>

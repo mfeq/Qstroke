@@ -23,7 +23,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .required(true)
                 .takes_value(true)
                 .about("The path to the output glif file."))
-            .arg(Arg::new("desc")
+            .arg(Arg::new("dash")
                 .long("dash-description")
                 .short('d')
                 .multiple_values(true)
@@ -49,29 +49,40 @@ pub fn clap_app() -> clap::App<'static> {
                 .takes_value(true)
                 .validator(super::validators::arg_validator_positive_or_zero_f64)
                 .default_value("40")
+                .requires("cull")
                 .about("Cull width"))
-            .arg(Arg::new("cull-cutoff")
-                .short('C')
-                .long("cull-cutoff")
+            .arg(Arg::new("area")
+                .short('a')
+                .short_alias('C')
+                .long("min-area")
+                .aliases(&["area-cutoff", "cull-cutoff"])
                 .takes_value(true)
                 .required(false)
                 .validator(super::validators::arg_validator_positive_or_zero_f64)
+                .requires("cull")
                 .about("Paths with either a height or width below this number are culled. Do not set if unsure."))
             .arg(Arg::new("write-last-path")
                 .short('l')
-                .long("write-last-path")
-                .about("Write last path"))
-            .arg(Arg::new("jointype")
-                .long("jointype")
+                .long("write-last")
+                .alias("write-last-path")
+                .requires("cull")
+                .about("Write last path\n\n\n"))
+            .arg(Arg::new("join-type")
+                .long("join")
+                .alias("jointype")
                 .short('j')
                 .takes_value(true)
+                .case_insensitive(true)
                 .possible_values(&["round", "miter", "bevel"])
                 .about("How to join discontinuous splines")
                 .default_value("round"))
-            .arg(Arg::new("captype")
-                .long("captype")
-                .short('A')
+            .arg(Arg::new("cap-type")
+                .long("cap")
+                .alias("captype")
+                .short('J')
+                .short_alias('A')
                 .takes_value(true)
+                .case_insensitive(true)
                 .possible_values(&["round", "butt", "square"])
                 .about("How to cap splines")
                 .default_value("round"))
@@ -88,22 +99,32 @@ pub fn dash_cli(matches: &ArgMatches) {
         .parse::<f32>()
         .unwrap();
     let cull_cutoff = matches
-        .value_of("cull-cutoff")
+        .value_of("area")
         .map(|v| v.parse::<f32>().unwrap())
         .unwrap_or((stroke_width * stroke_width) / 2.);
     let dash_desc = matches
-        .values_of("desc")
+        .values_of("dash")
         .unwrap()
         .map(|s| s.parse::<f32>().unwrap())
         .collect::<Vec<_>>();
     let include_last_path = matches.is_present("write-last-path");
-    let paint_join = match matches.value_of("jointype").unwrap() {
+    let paint_join = match matches
+        .value_of("join-type")
+        .unwrap()
+        .to_ascii_lowercase()
+        .as_str()
+    {
         "round" => PaintJoin::Round,
         "bevel" => PaintJoin::Bevel,
         "miter" => PaintJoin::Miter,
         _ => unreachable!(),
     };
-    let paint_cap = match matches.value_of("captype").unwrap() {
+    let paint_cap = match matches
+        .value_of("cap-type")
+        .unwrap()
+        .to_ascii_lowercase()
+        .as_str()
+    {
         "round" => PaintCap::Round,
         "butt" => PaintCap::Butt,
         "square" => PaintCap::Square,

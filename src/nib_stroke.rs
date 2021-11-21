@@ -1,3 +1,4 @@
+#[rustfmt::skip]
 mod fontforge;
 
 use std::fs;
