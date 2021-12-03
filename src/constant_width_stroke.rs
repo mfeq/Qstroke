@@ -1,11 +1,11 @@
 use std::fs;
 
 use glifparser::glif::{
-    CapType, InterpolationType, JoinType, MFEKPointData, VWSContour, VWSHandle,
+    CapType, InterpolationType, JoinType, VWSContour, VWSHandle,
 };
 use MFEKmath::{variable_width_stroke, Piecewise, VWSSettings};
 
-use glifparser::{Glif, Outline};
+use glifparser::{Glif, Outline, PointData};
 
 use clap::{App, AppSettings, Arg};
 
@@ -91,8 +91,8 @@ pub fn clap_app() -> clap::App<'static> {
 }
 
 #[derive(Debug)]
-struct CWSSettings {
-    vws_settings: VWSSettings,
+struct CWSSettings<PD: PointData> {
+    vws_settings: VWSSettings<PD>,
     left: f64,
     right: f64,
     jointype: JoinType,
@@ -104,9 +104,9 @@ struct CWSSettings {
 }
 
 fn constant_width_stroke(
-    path: &glifparser::Glif<MFEKPointData>,
-    settings: &CWSSettings,
-) -> Outline<MFEKPointData> {
+    path: &glifparser::Glif<()>,
+    settings: &CWSSettings<()>,
+) -> Outline<()> {
     let vws_contour = VWSContour {
         join_type: settings.jointype,
         cap_start_type: settings.startcap,
@@ -118,7 +118,7 @@ fn constant_width_stroke(
 
     // convert our path and pattern to piecewise collections of beziers
     let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
-    let mut output_outline: Outline<MFEKPointData> = Vec::new();
+    let mut output_outline: Outline<()> = Vec::new();
 
     let mut vws_contours = vec![vws_contour; path.outline.as_ref().unwrap().len()];
 
@@ -178,9 +178,9 @@ fn constant_width_stroke(
 //
 // Some of this was copied from MFEK/math.rlib file src/variable_width_stroking.rs fn variable_width_stroke_glif
 pub fn cws_cli(matches: &clap::ArgMatches) {
-    fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<MFEKPointData>> {
+    fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<()>> {
         if ct == CapType::Custom {
-            let path: glifparser::Glif<MFEKPointData> =
+            let path: glifparser::Glif<()> =
                 glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!"))
                     .unwrap(); // TODO: Proper error handling!
             Some(path)
@@ -216,7 +216,7 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     }
 
     // TODO: Proper error handling!
-    let path: glifparser::Glif<MFEKPointData> =
+    let path: glifparser::Glif<()> =
         glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!")).unwrap();
 
     let vws_settings = VWSSettings {

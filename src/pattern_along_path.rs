@@ -1,6 +1,6 @@
 use std::fs;
 
-use glifparser::glif::{MFEKPointData, PatternCopies, PatternStretch, PatternSubdivide};
+use glifparser::glif::{PatternCopies, PatternStretch, PatternSubdivide};
 use MFEKmath::pattern_along_path::pattern_along_glif;
 use MFEKmath::pattern_along_path::*;
 use MFEKmath::vec2;
@@ -149,11 +149,11 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     let output_string = matches.value_of("output");
 
     // TODO: Handle errors properly!
-    let path: glifparser::Glif<MFEKPointData> =
+    let path: glifparser::Glif<()> =
         glifparser::read(&fs::read_to_string(path_string).expect("Failed to read path file!"))
             .expect("glifparser couldn't parse input path glif. Invalid glif?");
 
-    let pattern: glifparser::Glif<MFEKPointData> = match pattern_string {
+    let pattern: glifparser::Glif<()> = match pattern_string {
         None => {
             if matches.is_present("dot-pattern") {
                 let mut dot = glifparser::read(include_str!("../assets/dot.glif")).unwrap();

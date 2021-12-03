@@ -30,7 +30,14 @@ fn main() {
         argparser = argparser.subcommand(nib_stroke::clap_app());
     }
 
-    let matches = argparser.get_matches();
+    let matches = argparser.try_get_matches();
+    let matches = match matches {
+        Ok(m) => m,
+        Err(e) => {
+            mfek_ipc::display_header("stroke");
+            e.exit();
+        }
+    };
 
     match matches.subcommand_name() {
         Some("PAP") => pattern_along_path::pap_cli(&matches.subcommand_matches("PAP").unwrap()),
