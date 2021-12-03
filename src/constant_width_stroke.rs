@@ -1,8 +1,6 @@
 use std::fs;
 
-use glifparser::glif::{
-    CapType, InterpolationType, JoinType, VWSContour, VWSHandle,
-};
+use glifparser::glif::{CapType, InterpolationType, JoinType, VWSContour, VWSHandle};
 use MFEKmath::{variable_width_stroke, Piecewise, VWSSettings};
 
 use glifparser::{Glif, Outline, PointData};
@@ -103,10 +101,7 @@ struct CWSSettings<PD: PointData> {
     segmentwise: bool,
 }
 
-fn constant_width_stroke(
-    path: &glifparser::Glif<()>,
-    settings: &CWSSettings<()>,
-) -> Outline<()> {
+fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>) -> Outline<()> {
     let vws_contour = VWSContour {
         join_type: settings.jointype,
         cap_start_type: settings.startcap,
