@@ -74,8 +74,7 @@ jobs:
           override: true
           components: rustfmt
       - name: Run rustfmt
-        run: |
-          git ls-files '*.rs' | xargs rustfmt --check
+        run: cargo fmt -- --check
 
   cargo_bloat:
     if: false
