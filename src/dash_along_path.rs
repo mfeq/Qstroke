@@ -34,6 +34,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .about("Dash description"))
             .arg(Arg::new("cull")
                 .short('c')
+                .required(false)
                 .long("cull")
                 .about("Attempt to cull earlier dashes when later dashes cover them"))
             .arg(Arg::new("width")
