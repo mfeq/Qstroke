@@ -1,9 +1,12 @@
+use std::ffi;
 use std::fs;
+use std::path::PathBuf as FsPathBuf;
 
 use glifparser::glif::{CapType, InterpolationType, JoinType, VWSContour, VWSHandle};
 use MFEKmath::{variable_width_stroke, Piecewise, VWSSettings};
 
 use glifparser::{Glif, Outline, PointData};
+use glifparser::glif::mfek::{ContourOperations, MFEKGlif};
 
 use clap::{App, AppSettings, Arg};
 
@@ -101,7 +104,7 @@ struct CWSSettings<PD: PointData> {
     segmentwise: bool,
 }
 
-fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>) -> Outline<()> {
+fn make_vws_contours(path: &Glif<()>, settings: &CWSSettings<()>) -> Vec<VWSContour> {
     let vws_contour = VWSContour {
         join_type: settings.jointype,
         cap_start_type: settings.startcap,
@@ -110,10 +113,6 @@ fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>
         remove_internal: settings.remove_internal,
         remove_external: settings.remove_external,
     };
-
-    // convert our path and pattern to piecewise collections of beziers
-    let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
-    let mut output_outline: Outline<()> = Vec::new();
 
     let mut vws_contours = vec![vws_contour; path.outline.as_ref().unwrap().len()];
 
@@ -134,6 +133,24 @@ fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>
             vws_contours[cidx].handles.push(vws_handle);
         }
     }
+
+    vws_contours
+}
+
+fn constant_width_stroke_glifjson(path: Glif<()>, settings: &CWSSettings<()>) -> MFEKGlif<()> {
+    let vws_contours = make_vws_contours(&path, settings);
+    let mut ret: MFEKGlif<()> = path.into();
+    for (i, contour) in ret.layers[0].outline.iter_mut().enumerate() {
+        contour.operation = Some(ContourOperations::VariableWidthStroke { data: vws_contours[i].clone() });
+    }
+    ret
+}
+
+fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>) -> Outline<()> {
+    // convert our path and pattern to piecewise collections of beziers
+    let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
+    let mut output_outline: Outline<()> = Vec::new();
+    let vws_contours = make_vws_contours(path, settings);
 
     let iter = piece_path.segs.iter().enumerate();
     for (i, pwpath_contour) in iter {
@@ -184,8 +201,8 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         }
     }
 
-    let input_file = matches.value_of("input").unwrap();
-    let output_file = matches.value_of("output").unwrap();
+    let input_file = matches.value_of_os("input").unwrap();
+    let output_file = matches.value_of_os("output").unwrap();
     let startcap: CapType = (matches.value_of("startcap").unwrap())
         .parse()
         .expect("Invalid cap/join");
@@ -231,27 +248,39 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
         segmentwise,
     };
 
-    let output_outline = path
-        .outline
-        .as_ref()
-        .map(|_| Some(constant_width_stroke(&path, &cws_settings)))
-        .unwrap_or_else(|| None);
-
-    let out = Glif {
-        outline: output_outline,
-        order: path.order,
-        anchors: path.anchors.clone(),
-        width: path.width,
-        unicode: path.unicode,
-        name: path.name,
-        lib: None,
-        components: path.components,
-        guidelines: path.guidelines,
-        images: path.images,
-        note: path.note,
-        filename: path.filename,
+    let oss = match FsPathBuf::from(output_file).extension() {
+        Some(oss) => {
+            oss.to_ascii_lowercase()
+        },
+        None => ffi::OsString::from("glif")
     };
+        
+    if &oss == &ffi::OsString::from("glifjson") {
+        let out = constant_width_stroke_glifjson(path, &cws_settings);
+        fs::write(output_file, serde_json::to_vec_pretty(&out).unwrap()).expect("Write failed");
+    } else if &oss == &ffi::OsString::from("glif") {
+        let output_outline = path
+            .outline
+            .as_ref()
+            .map(|_| Some(constant_width_stroke(&path, &cws_settings)))
+            .unwrap_or_else(|| None);
 
-    let glifstring = glifparser::write(&out).unwrap(); // TODO: Proper error handling!
-    fs::write(output_file, glifstring).expect("Unable to write file");
+        let out = Glif {
+            outline: output_outline,
+            order: path.order,
+            anchors: path.anchors.clone(),
+            width: path.width,
+            unicode: path.unicode,
+            name: path.name,
+            lib: None,
+            components: path.components,
+            guidelines: path.guidelines,
+            images: path.images,
+            note: path.note,
+            filename: path.filename,
+        };
+
+        let glifstring = glifparser::write(&out).unwrap(); // TODO: Proper error handling!
+        fs::write(output_file, glifstring).expect("Unable to write file");
+    }
 }
