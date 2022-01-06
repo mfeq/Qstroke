@@ -14,14 +14,14 @@ pub fn clap_app() -> clap::App<'static> {
             Arg::new("input")
                 .short('i')
                 .takes_value(true)
-                .about("The path to the input file.")
+                .help("The path to the input file.")
                 .required(true),
         )
         .arg(
             Arg::new("output")
                 .short('o')
                 .takes_value(true)
-                .about("The path where the output will be saved.")
+                .help("The path where the output will be saved.")
                 .required(true),
         )
 }

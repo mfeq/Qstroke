@@ -32,5 +32,5 @@ fontforge = ["fontforge-sys"]
 
 [profile.release]
 opt-level = 'z'
-lto = true
+#lto = true
 codegen-units = 1
