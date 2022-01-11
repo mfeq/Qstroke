@@ -3,6 +3,7 @@ use glifparser;
 use std::ffi;
 use std::fs;
 use std::os::raw;
+use std::path::PathBuf;
 use std::ptr;
 
 #[derive(Default, Debug, PartialEq)]
@@ -242,8 +243,8 @@ fn glif_to_ffsplineset<PD: glifparser::PointData>(glif: glifparser::Glif<PD>) ->
 
 #[derive(Clone, Debug)]
 pub struct NibSettings {
-    pub nib: String,
-    pub path: String,
+    pub nib: PathBuf,
+    pub path: PathBuf,
     pub accuracy: f64,
     pub quiet: bool,
 }
