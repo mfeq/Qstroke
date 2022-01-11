@@ -272,7 +272,7 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
             width: path.width,
             unicode: path.unicode,
             name: path.name,
-            lib: None,
+            lib: path.lib,
             components: path.components,
             guidelines: path.guidelines,
             images: path.images,

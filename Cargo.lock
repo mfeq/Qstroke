@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "MFEKmath"
 version = "0.1.0"
-source = "git+https://github.com/MFEK/math.rlib?branch=main#a575e35a9076431d9c6e4b56824acd8e3b9e9520"
+source = "git+https://github.com/MFEK/math.rlib?branch=main#f3687b23cd0eec0fb454d82d2b51076bf50ab687"
 dependencies = [
  "flo_curves",
  "glifparser 1.2.0 (git+https://github.com/MFEK/glifparser.rlib?branch=master)",
@@ -21,7 +21,7 @@ name = "MFEKstroke"
 version = "0.0.0"
 dependencies = [
  "MFEKmath",
- "clap 3.0.1",
+ "clap 3.0.5",
  "env_logger",
  "fontforge-sys",
  "glifparser 1.2.0 (git+https://github.com/MFEK/glifparser.rlib?branch=master)",
@@ -121,9 +121,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bumpalo"
-version = "3.9.0"
+version = "3.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe438c9d2f2b0fb88a112154ed81e30b0a491c29322afe1db3b6eec5811f5ba0"
+checksum = "a4a45a46ab1f2412e53d3a0ade76ffad2025804294569aae387231a0cd6e0899"
 
 [[package]]
 name = "bytemuck"
@@ -198,8 +198,8 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.0.1"
-source = "git+https://github.com/MFEK/clap.rlib?branch=validator_all#f48280c187f7b2307917ee0d9d6fb8379daaff82"
+version = "3.0.5"
+source = "git+https://github.com/MFEK/clap.rlib?branch=master#c29cebf4b9bd7fb5ef8dc5a542a547778db43377"
 dependencies = [
  "atty",
  "bitflags",
@@ -362,10 +362,11 @@ checksum = "3dcaa9ae7725d12cdb85b3ad99a434db70b468c09ded17e012d86b5c1010f7a7"
 [[package]]
 name = "glifparser"
 version = "1.2.0"
-source = "git+https://github.com/MFEK/glifparser.rlib?branch=master#6aaf88012709fce8fd21ccf0b61d1074a95307a3"
+source = "git+https://github.com/MFEK/glifparser.rlib?branch=master#d9aa702df074094f1509f071e15e11cc696a4ca3"
 dependencies = [
  "image",
  "integer_or_float",
+ "itertools",
  "kurbo",
  "log",
  "plist",
@@ -378,10 +379,11 @@ dependencies = [
 [[package]]
 name = "glifparser"
 version = "1.2.0"
-source = "git+https://github.com/MFEK/glifparser.rlib#6aaf88012709fce8fd21ccf0b61d1074a95307a3"
+source = "git+https://github.com/MFEK/glifparser.rlib#d9aa702df074094f1509f071e15e11cc696a4ca3"
 dependencies = [
  "image",
  "integer_or_float",
+ "itertools",
  "kurbo",
  "log",
  "plist",
@@ -454,9 +456,9 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "1.7.0"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc633605454125dec4b66843673f01c7df2b89479b32e0ed634e43a91cff62a5"
+checksum = "282a6247722caba404c065016bbfa522806e51714c34f5dfc3e4a3a46fcb4223"
 dependencies = [
  "autocfg",
  "hashbrown",
