@@ -1,5 +1,6 @@
 use clap::{App, AppSettings, Arg, ArgMatches};
 use glifparser::glif::{DashContour, DashCull};
+use glifparser::outline::RefigurePointTypes as _;
 use MFEKmath::skia_safe::{PaintCap, PaintJoin};
 
 use std::fs;
@@ -155,7 +156,7 @@ pub fn dash_cli(matches: &ArgMatches) {
         glifparser::read(&fs::read_to_string(path_string).expect("Failed to read path file!"))
             .expect("glifparser couldn't parse input path glif. Invalid glif?");
     let mut out = MFEKmath::dash_along_glif(&path, &dash_settings);
-    out.outline.as_mut().unwrap().retain(|c|c.len() > 1);
+    out.outline.as_mut().map(|o|{ o.retain(|c|c.len() > 1); o.refigure_point_types() });
     path = out;
     glifparser::write_to_filename(&path, out_string).unwrap();
 }
