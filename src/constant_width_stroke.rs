@@ -114,7 +114,7 @@ fn make_vws_contours(path: &Glif<()>, settings: &CWSSettings<()>) -> Vec<VWSCont
         remove_external: settings.remove_external,
     };
 
-    let mut vws_contours = vec![vws_contour; path.outline.as_ref().unwrap().len()];
+    let mut vws_contours = vec![vws_contour; path.outline.as_ref().map(|o|o.len()).unwrap_or(0)];
 
     let vws_handle = VWSHandle {
         left_offset: settings.left,
@@ -147,6 +147,9 @@ fn constant_width_stroke_glifjson(path: Glif<()>, settings: &CWSSettings<()>) ->
 }
 
 fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>) -> Outline<()> {
+    if path.outline.as_ref().map(|o|o.len() == 0).unwrap_or(true) {
+        return Outline::new()
+    }
     // convert our path and pattern to piecewise collections of beziers
     let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
     let mut output_outline: Outline<()> = Vec::new();
