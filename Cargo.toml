@@ -1,6 +1,6 @@
 [package]
 name = "MFEKstroke"
-version = "0.1.0-beta1"
+version = "1.0.0"
 authors = ["Matthew Blanchard <matthewrblanchard@gmail.com>", "Fredrick R. Brennan <copypaste@kittens.ph>", "MFEK Authors"]
 edition = "2021"
 license = "Apache-2.0"

@@ -18,7 +18,7 @@ dependencies = [
 
 [[package]]
 name = "MFEKstroke"
-version = "0.1.0-beta1"
+version = "1.0.0"
 dependencies = [
  "MFEKmath",
  "clap 3.0.5",
@@ -435,7 +435,7 @@ checksum = "3dcaa9ae7725d12cdb85b3ad99a434db70b468c09ded17e012d86b5c1010f7a7"
 [[package]]
 name = "glifparser"
 version = "1.2.0"
-source = "git+https://github.com/MFEK/glifparser.rlib?branch=master#2c884abab26974487078527206d41006e90e4aff"
+source = "git+https://github.com/MFEK/glifparser.rlib?branch=master#98ab5c6a30c85e159a79350b72f4b625a95a5820"
 dependencies = [
  "derivative",
  "derive_more",
@@ -455,7 +455,7 @@ dependencies = [
 [[package]]
 name = "glifparser"
 version = "1.2.0"
-source = "git+https://github.com/MFEK/glifparser.rlib#2c884abab26974487078527206d41006e90e4aff"
+source = "git+https://github.com/MFEK/glifparser.rlib#98ab5c6a30c85e159a79350b72f4b625a95a5820"
 dependencies = [
  "derivative",
  "derive_more",
@@ -651,9 +651,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.114"
+version = "0.2.116"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0005d08a8f7b65fb8073cb697aa0b12b631ed251ce73d862ce50eeb52ce3b50"
+checksum = "565dbd88872dbe4cc8a46e527f26483c1d1f7afa6b884a3bd6cd893d4f98da74"
 
 [[package]]
 name = "libloading"
@@ -908,7 +908,7 @@ dependencies = [
  "indexmap",
  "line-wrap",
  "serde",
- "time 0.3.6",
+ "time 0.3.7",
  "xml-rs",
 ]
 
@@ -1209,9 +1209,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.6"
+version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8d54b9298e05179c335de2b9645d061255bcd5155f843b3e328d2cfe0a5b413"
+checksum = "004cbc98f30fa233c61a38bc77e96a9106e65c88f2d3bef182ae952027e5753d"
 dependencies = [
  "itoa",
  "libc",

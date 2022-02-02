@@ -6,6 +6,8 @@ A set of utilities for stroking paths in font glyphs written in Rust.
 
 This program is part of the [MFEK project](https://github.com/MFEK/).
 
+**Notice 2 February 2022: MFEKstroke v1.0 is released! The CLI API should be considered stable.**
+
 MFEKstroke takes UFO `.glif` files and applies path stroking algorithms to them.
 
 Five stroking algorithms are provided:
