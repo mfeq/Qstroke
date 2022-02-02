@@ -8,12 +8,7 @@ enum ValidatorRange {
 fn arg_validator_f64_impl(v: &str, range: ValidatorRange) -> Result<(), String> {
     match v.parse::<f64>() {
         Ok(i) => {
-            let err = || {
-                Err(String::from(&format!(
-                    "Value outside allowed range ({:?})",
-                    range
-                )))
-            };
+            let err = || Err(String::from(&format!("Value outside allowed range ({:?})", range)));
             match range {
                 ValidatorRange::All => Ok(()),
                 ValidatorRange::PositiveNotZero => {
@@ -62,10 +57,7 @@ pub fn arg_validator_usize(v: &str) -> Result<(), String> {
     }
 }
 
-pub fn arg_validator_suffix(
-    f: &impl Fn(&str) -> Result<(), String>,
-    suffix: char,
-) -> impl Fn(&str) -> Result<(), String> + '_ {
+pub fn arg_validator_suffix(f: &impl Fn(&str) -> Result<(), String>, suffix: char) -> impl Fn(&str) -> Result<(), String> + '_ {
     move |v| {
         let len = if v.ends_with(suffix) { 1 } else { 0 };
         let vlen = v.len();

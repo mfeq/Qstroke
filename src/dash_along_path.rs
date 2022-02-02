@@ -7,54 +7,71 @@ use std::fs;
 
 pub fn clap_app() -> clap::App<'static> {
     App::new("DASH")
-            .setting(AppSettings::DeriveDisplayOrder)
-            .setting(AppSettings::AllowNegativeNumbers)
-            .about("Applies a dash to a glyph.")
-            .version("0.1.0")
-            .author("Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK Authors; Skia/kurbo.rs authors")
-            .arg(Arg::new("input")
+        .setting(AppSettings::DeriveDisplayOrder)
+        .setting(AppSettings::AllowNegativeNumbers)
+        .about("Applies a dash to a glyph.")
+        .version("0.1.0")
+        .author("Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK Authors; Skia/kurbo.rs authors")
+        .arg(
+            Arg::new("input")
                 .long("input")
                 .short('i')
                 .takes_value(true)
                 .required(true)
-                .help("The path to the input glif file."))
-            .arg(Arg::new("output")
+                .help("The path to the input glif file."),
+        )
+        .arg(
+            Arg::new("output")
                 .long("output")
                 .short('o')
                 .required(true)
                 .takes_value(true)
-                .help("The path to the output glif file."))
-            .arg(Arg::new("dash")
+                .help("The path to the output glif file."),
+        )
+        .arg(
+            Arg::new("dash")
                 .long("dash-description")
                 .short('d')
                 .multiple_values(true)
                 .min_values(2)
                 .validator(super::validators::arg_validator_positive_or_zero_f64)
-                .validator_all(|vals| (vals.len() % 2 == 0).then(||Ok(())).unwrap_or_else(||Err("dash lengths not divisible by 2!")))
+                .validator_all(|vals| {
+                    (vals.len() % 2 == 0)
+                        .then(|| Ok(()))
+                        .unwrap_or_else(|| Err("dash lengths not divisible by 2!"))
+                })
                 .default_values(&["30", "30"])
-                .help("Dash description"))
-            .arg(Arg::new("cull")
+                .help("Dash description"),
+        )
+        .arg(
+            Arg::new("cull")
                 .short('c')
                 .long("cull")
                 .required(false)
                 .takes_value(false)
-                .help("Attempt to cull earlier dashes when later dashes cover them"))
-            .arg(Arg::new("width")
+                .help("Attempt to cull earlier dashes when later dashes cover them"),
+        )
+        .arg(
+            Arg::new("width")
                 .short('w')
                 .long("width")
                 .takes_value(true)
                 .validator(super::validators::arg_validator_positive_or_zero_f64)
                 .default_value("30")
-                .help("Stroke width (to leave an open contour, use 0)"))
-            .arg(Arg::new("cull-width")
+                .help("Stroke width (to leave an open contour, use 0)"),
+        )
+        .arg(
+            Arg::new("cull-width")
                 .short('W')
                 .long("cull-width")
                 .takes_value(true)
                 .validator(super::validators::arg_validator_positive_or_zero_f64)
                 .required(false)
                 .requires("cull")
-                .help("Cull width"))
-            .arg(Arg::new("area")
+                .help("Cull width"),
+        )
+        .arg(
+            Arg::new("area")
                 .short('a')
                 .short_alias('C')
                 .long("min-area")
@@ -63,14 +80,18 @@ pub fn clap_app() -> clap::App<'static> {
                 .validator(super::validators::arg_validator_positive_or_zero_f64)
                 .required(false)
                 .requires("cull")
-                .help("Paths with either a height or width below this number are culled. Do not set if unsure."))
-            .arg(Arg::new("write-last-path")
+                .help("Paths with either a height or width below this number are culled. Do not set if unsure."),
+        )
+        .arg(
+            Arg::new("write-last-path")
                 .short('l')
                 .long("write-last")
                 .alias("write-last-path")
                 .required(false)
-                .help("Write last path\n\n\n"))
-            .arg(Arg::new("join-type")
+                .help("Write last path\n\n\n"),
+        )
+        .arg(
+            Arg::new("join-type")
                 .long("join")
                 .alias("jointype")
                 .short('j')
@@ -79,8 +100,10 @@ pub fn clap_app() -> clap::App<'static> {
                 .required(false)
                 .possible_values(&["round", "miter", "bevel"])
                 .help("How to join discontinuous splines")
-                .default_value("round"))
-            .arg(Arg::new("cap-type")
+                .default_value("round"),
+        )
+        .arg(
+            Arg::new("cap-type")
                 .long("cap")
                 .alias("captype")
                 .short('J')
@@ -90,7 +113,8 @@ pub fn clap_app() -> clap::App<'static> {
                 .required(false)
                 .possible_values(&["round", "butt", "square"])
                 .help("How to cap splines")
-                .default_value("round"))
+                .default_value("round"),
+        )
 }
 
 pub fn dash_cli(matches: &ArgMatches) {
@@ -100,7 +124,7 @@ pub fn dash_cli(matches: &ArgMatches) {
     let cull = matches.is_present("cull");
     let cull_width = matches
         .value_of("cull-width")
-        .map(|w|w.parse::<f32>().unwrap())
+        .map(|w| w.parse::<f32>().unwrap())
         .unwrap_or(stroke_width);
     let cull_cutoff = matches
         .value_of("area")
@@ -112,23 +136,13 @@ pub fn dash_cli(matches: &ArgMatches) {
         .map(|s| s.parse::<f32>().unwrap())
         .collect::<Vec<_>>();
     let include_last_path = matches.is_present("write-last-path");
-    let paint_join = match matches
-        .value_of("join-type")
-        .unwrap()
-        .to_ascii_lowercase()
-        .as_str()
-    {
+    let paint_join = match matches.value_of("join-type").unwrap().to_ascii_lowercase().as_str() {
         "round" => PaintJoin::Round,
         "bevel" => PaintJoin::Bevel,
         "miter" => PaintJoin::Miter,
         _ => unreachable!(),
     };
-    let paint_cap = match matches
-        .value_of("cap-type")
-        .unwrap()
-        .to_ascii_lowercase()
-        .as_str()
-    {
+    let paint_cap = match matches.value_of("cap-type").unwrap().to_ascii_lowercase().as_str() {
         "round" => PaintCap::Round,
         "butt" => PaintCap::Butt,
         "square" => PaintCap::Square,
@@ -152,11 +166,13 @@ pub fn dash_cli(matches: &ArgMatches) {
     };
 
     // TODO: Handle errors properly!
-    let mut path: glifparser::Glif<()> =
-        glifparser::read(&fs::read_to_string(path_string).expect("Failed to read path file!"))
-            .expect("glifparser couldn't parse input path glif. Invalid glif?");
+    let mut path: glifparser::Glif<()> = glifparser::read(&fs::read_to_string(path_string).expect("Failed to read path file!"))
+        .expect("glifparser couldn't parse input path glif. Invalid glif?");
     let mut out = MFEKmath::dash_along_glif(&path, &dash_settings);
-    out.outline.as_mut().map(|o|{ o.retain(|c|c.len() > 1); o.refigure_point_types() });
+    out.outline.as_mut().map(|o| {
+        o.retain(|c| c.len() > 1);
+        o.refigure_point_types()
+    });
     path = out;
     glifparser::write_to_filename(&path, out_string).unwrap();
 }

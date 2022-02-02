@@ -30,9 +30,7 @@ pub fn vws_cli(matches: &clap::ArgMatches) {
     let input_string = matches.value_of("input").unwrap();
     let output_string = matches.value_of("output").unwrap();
 
-    let input: glifparser::Glif<()> =
-        glifparser::read(&fs::read_to_string(input_string).expect("Failed to read path file!"))
-            .unwrap(); // TODO: Proper error handling!
+    let input: glifparser::Glif<()> = glifparser::read(&fs::read_to_string(input_string).expect("Failed to read path file!")).unwrap(); // TODO: Proper error handling!
 
     // TODO: Copy logic from CWS here
     let settings = VWSSettings::<()> {

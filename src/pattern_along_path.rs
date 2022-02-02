@@ -149,9 +149,8 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     let output_string = matches.value_of("output");
 
     // TODO: Handle errors properly!
-    let path: glifparser::Glif<()> =
-        glifparser::read(&fs::read_to_string(path_string).expect("Failed to read path file!"))
-            .expect("glifparser couldn't parse input path glif. Invalid glif?");
+    let path: glifparser::Glif<()> = glifparser::read(&fs::read_to_string(path_string).expect("Failed to read path file!"))
+        .expect("glifparser couldn't parse input path glif. Invalid glif?");
 
     let pattern: glifparser::Glif<()> = match pattern_string {
         None => {
@@ -174,10 +173,8 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
                 unreachable!()
             }
         }
-        Some(pattern) => {
-            glifparser::read(&fs::read_to_string(pattern).expect("Failed to read pattern file!"))
-                .expect("glifparser couldn't parse input pattern glif. Invalid glif?")
-        }
+        Some(pattern) => glifparser::read(&fs::read_to_string(pattern).expect("Failed to read pattern file!"))
+            .expect("glifparser couldn't parse input pattern glif. Invalid glif?"),
     };
 
     let mut settings = PatternSettings {
@@ -247,10 +244,7 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     }
 
     if let Some(overdraw_string) = matches.value_of("overdraw") {
-        settings.cull_overlap = overdraw_string
-            .trim_end_matches('%')
-            .parse::<f64>()
-            .unwrap();
+        settings.cull_overlap = overdraw_string.trim_end_matches('%').parse::<f64>().unwrap();
         settings.cull_overlap /= 100.0;
     }
 
@@ -258,11 +252,7 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     if let Some(contour) = matches.value_of("contour") {
         let idx = contour.parse::<isize>().unwrap();
 
-        match (
-            idx,
-            path.outline.as_ref().map(|o| o.len() as isize >= idx),
-            idx == -1,
-        ) {
+        match (idx, path.outline.as_ref().map(|o| o.len() as isize >= idx), idx == -1) {
             (n, Some(false), false) => target_contour = Some(n as usize),
             (_, _, true) => {} // -1 ⇒ do nothing, target_contour already None
             _ => eprintln!("Invalid contour argument. Falling back to default. (-1)"),
@@ -274,8 +264,7 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     settings.reverse_culling = matches.is_present("reverse-culling");
 
     let output = pattern_along_glif(&path, &pattern, &settings, target_contour);
-    let glifstring =
-        glifparser::write(&output).expect("glifparser failed to understand output of PaP?"); // TODO: Proper error handling.
+    let glifstring = glifparser::write(&output).expect("glifparser failed to understand output of PaP?"); // TODO: Proper error handling.
     if let Some(output_file) = output_string {
         if output_file != "-" {
             // common stand-in for stdout on *nix

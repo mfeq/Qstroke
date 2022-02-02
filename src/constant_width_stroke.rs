@@ -5,8 +5,8 @@ use std::path::PathBuf as FsPathBuf;
 use glifparser::glif::{CapType, InterpolationType, JoinType, VWSContour, VWSHandle};
 use MFEKmath::{variable_width_stroke, Piecewise, VWSSettings};
 
-use glifparser::{Glif, Outline, PointData};
 use glifparser::glif::mfek::{ContourOperations, MFEKGlif};
+use glifparser::{Glif, Outline, PointData};
 
 use clap::{App, AppSettings, Arg};
 
@@ -18,77 +18,99 @@ pub fn clap_app() -> clap::App<'static> {
         .about("Takes a .glif file and strokes it at a constant width.")
         .version("0.1")
         .author("Fredrick R. Brennan <copypasteⒶkittens⊙ph>; Matthew Blanchard <matthewrblanchard@gmail.com>")
-        .arg(Arg::new("input")
-            .display_order(1)
-            .short('i')
-            .long("input")
-            .takes_value(true)
-            .help("The path to the input file.")
-            .required(true))
-        .arg(Arg::new("output")
-            .display_order(2)
-            .short('o')
-            .long("output")
-            .takes_value(true)
-            .help("The path where the output will be saved.")
-            .required(true))
-        .arg(Arg::new("startcap")
-            .long("startcap")
-            .short('s')
-            .takes_value(true)
-            .help(r#"Either the constant strings "circle", "round" or "square", or a .glif file."#)
-            .default_value("circle"))
-        .arg(Arg::new("endcap")
-            .long("endcap")
-            .short('e')
-            .takes_value(true)
-            .help(r#"Either the constant strings "circle", "round" or "square", or a .glif file."#)
-            .default_value("circle"))
-        .arg(Arg::new("jointype")
-            .long("jointype")
-            .short('j')
-            .takes_value(true)
-            .possible_values(&["round", "circle", "miter", "bevel"])
-            .help("How to join discontinuous splines")
-            .default_value("round"))
-        .arg(Arg::new("width")
-            .long("width")
-            .short('w')
-            .takes_value(true)
-            .help(r#"<f64> Constant stroke width."#)
-            .validator(super::arg_validator_positive_f64)
-            .conflicts_with("left")
-            .conflicts_with("right")
-            .required_unless_present_all(&["left", "right"]))
-        .arg(Arg::new("left")
-            .long("left")
-            .short('l')
-            .takes_value(true)
-            .help(r#"<f64> Constant stroke width (left)."#)
-            .validator(super::arg_validator_positive_f64)
-            .requires("right"))
-        .arg(Arg::new("right")
-            .long("right")
-            .short('r')
-            .takes_value(true)
-            .help(r#"<f64> Constant stroke width (right)."#)
-            .validator(super::arg_validator_positive_f64)
-            .requires("left"))
-        .arg(Arg::new("remove-internal")
-            .long("remove-internal")
-            .short('I')
-            .takes_value(false)
-            .help(r#"Remove internal contour"#))
-        .arg(Arg::new("remove-external")
-            .long("remove-external")
-            .short('E')
-            .takes_value(false)
-            .help(r#"Remove external contour"#))
-        .arg(Arg::new("segmentwise")
-            .long("segmentwise")
-            .short('S')
-            .takes_value(false)
-            .help(r#"Join all segments with caps (stroke all Bézier segments one by one)"#))
+        .arg(
+            Arg::new("input")
+                .display_order(1)
+                .short('i')
+                .long("input")
+                .takes_value(true)
+                .help("The path to the input file.")
+                .required(true),
+        )
+        .arg(
+            Arg::new("output")
+                .display_order(2)
+                .short('o')
+                .long("output")
+                .takes_value(true)
+                .help("The path where the output will be saved.")
+                .required(true),
+        )
+        .arg(
+            Arg::new("startcap")
+                .long("startcap")
+                .short('s')
+                .takes_value(true)
+                .help(r#"Either the constant strings "circle", "round" or "square", or a .glif file."#)
+                .default_value("circle"),
+        )
+        .arg(
+            Arg::new("endcap")
+                .long("endcap")
+                .short('e')
+                .takes_value(true)
+                .help(r#"Either the constant strings "circle", "round" or "square", or a .glif file."#)
+                .default_value("circle"),
+        )
+        .arg(
+            Arg::new("jointype")
+                .long("jointype")
+                .short('j')
+                .takes_value(true)
+                .possible_values(&["round", "circle", "miter", "bevel"])
+                .help("How to join discontinuous splines")
+                .default_value("round"),
+        )
+        .arg(
+            Arg::new("width")
+                .long("width")
+                .short('w')
+                .takes_value(true)
+                .help(r#"<f64> Constant stroke width."#)
+                .validator(super::arg_validator_positive_f64)
+                .conflicts_with("left")
+                .conflicts_with("right")
+                .required_unless_present_all(&["left", "right"]),
+        )
+        .arg(
+            Arg::new("left")
+                .long("left")
+                .short('l')
+                .takes_value(true)
+                .help(r#"<f64> Constant stroke width (left)."#)
+                .validator(super::arg_validator_positive_f64)
+                .requires("right"),
+        )
+        .arg(
+            Arg::new("right")
+                .long("right")
+                .short('r')
+                .takes_value(true)
+                .help(r#"<f64> Constant stroke width (right)."#)
+                .validator(super::arg_validator_positive_f64)
+                .requires("left"),
+        )
+        .arg(
+            Arg::new("remove-internal")
+                .long("remove-internal")
+                .short('I')
+                .takes_value(false)
+                .help(r#"Remove internal contour"#),
+        )
+        .arg(
+            Arg::new("remove-external")
+                .long("remove-external")
+                .short('E')
+                .takes_value(false)
+                .help(r#"Remove external contour"#),
+        )
+        .arg(
+            Arg::new("segmentwise")
+                .long("segmentwise")
+                .short('S')
+                .takes_value(false)
+                .help(r#"Join all segments with caps (stroke all Bézier segments one by one)"#),
+        )
 }
 
 #[derive(Debug)]
@@ -114,7 +136,7 @@ fn make_vws_contours(path: &Glif<()>, settings: &CWSSettings<()>) -> Vec<VWSCont
         remove_external: settings.remove_external,
     };
 
-    let mut vws_contours = vec![vws_contour; path.outline.as_ref().map(|o|o.len()).unwrap_or(0)];
+    let mut vws_contours = vec![vws_contour; path.outline.as_ref().map(|o| o.len()).unwrap_or(0)];
 
     let vws_handle = VWSHandle {
         left_offset: settings.left,
@@ -141,14 +163,16 @@ fn constant_width_stroke_glifjson(path: Glif<()>, settings: &CWSSettings<()>) ->
     let vws_contours = make_vws_contours(&path, settings);
     let mut ret: MFEKGlif<()> = path.into();
     for (i, contour) in ret.layers[0].outline.iter_mut().enumerate() {
-        contour.operation = Some(ContourOperations::VariableWidthStroke { data: vws_contours[i].clone() });
+        contour.operation = Some(ContourOperations::VariableWidthStroke {
+            data: vws_contours[i].clone(),
+        });
     }
     ret
 }
 
 fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>) -> Outline<()> {
-    if path.outline.as_ref().map(|o|o.len() == 0).unwrap_or(true) {
-        return Outline::new()
+    if path.outline.as_ref().map(|o| o.len() == 0).unwrap_or(true) {
+        return Outline::new();
     }
     // convert our path and pattern to piecewise collections of beziers
     let piece_path = Piecewise::from(path.outline.as_ref().unwrap());
@@ -163,20 +187,10 @@ fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>
             pwpath_contour
                 .segs
                 .iter()
-                .map(|p| {
-                    variable_width_stroke(
-                        &Piecewise::new(vec![p.clone()], None),
-                        &vws_contour,
-                        &settings.vws_settings,
-                    )
-                })
+                .map(|p| variable_width_stroke(&Piecewise::new(vec![p.clone()], None), &vws_contour, &settings.vws_settings))
                 .collect()
         } else {
-            vec![variable_width_stroke(
-                &pwpath_contour,
-                &vws_contour,
-                &settings.vws_settings,
-            )]
+            vec![variable_width_stroke(&pwpath_contour, &vws_contour, &settings.vws_settings)]
         };
 
         for result_outline in results {
@@ -195,9 +209,7 @@ fn constant_width_stroke(path: &glifparser::Glif<()>, settings: &CWSSettings<()>
 pub fn cws_cli(matches: &clap::ArgMatches) {
     fn custom_cap_if_requested(ct: CapType, input_file: &str) -> Option<Glif<()>> {
         if ct == CapType::Custom {
-            let path: glifparser::Glif<()> =
-                glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!"))
-                    .unwrap(); // TODO: Proper error handling!
+            let path: glifparser::Glif<()> = glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!")).unwrap(); // TODO: Proper error handling!
             Some(path)
         } else {
             None
@@ -206,15 +218,9 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
 
     let input_file = matches.value_of_os("input").unwrap();
     let output_file = matches.value_of_os("output").unwrap();
-    let startcap: CapType = (matches.value_of("startcap").unwrap())
-        .parse()
-        .expect("Invalid cap/join");
-    let endcap: CapType = (matches.value_of("endcap").unwrap())
-        .parse()
-        .expect("Invalid cap/join");
-    let jointype: JoinType = (matches.value_of("jointype").unwrap())
-        .parse()
-        .expect("Invalid cap/join");
+    let startcap: CapType = (matches.value_of("startcap").unwrap()).parse().expect("Invalid cap/join");
+    let endcap: CapType = (matches.value_of("endcap").unwrap()).parse().expect("Invalid cap/join");
+    let jointype: JoinType = (matches.value_of("jointype").unwrap()).parse().expect("Invalid cap/join");
     let remove_internal = matches.is_present("remove-internal");
     let remove_external = matches.is_present("remove-external");
     let segmentwise = matches.is_present("segmentwise");
@@ -231,8 +237,7 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     }
 
     // TODO: Proper error handling!
-    let path: glifparser::Glif<()> =
-        glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!")).unwrap();
+    let path: glifparser::Glif<()> = glifparser::read(&fs::read_to_string(input_file).expect("Failed to read file!")).unwrap();
 
     let vws_settings = VWSSettings {
         cap_custom_end: custom_cap_if_requested(endcap, matches.value_of("endcap").unwrap()),
@@ -252,12 +257,10 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
     };
 
     let oss = match FsPathBuf::from(output_file).extension() {
-        Some(oss) => {
-            oss.to_ascii_lowercase()
-        },
-        None => ffi::OsString::from("glif")
+        Some(oss) => oss.to_ascii_lowercase(),
+        None => ffi::OsString::from("glif"),
     };
-        
+
     if &oss == &ffi::OsString::from("glifjson") {
         let out = constant_width_stroke_glifjson(path, &cws_settings);
         fs::write(output_file, serde_json::to_vec_pretty(&out).unwrap()).expect("Write failed");

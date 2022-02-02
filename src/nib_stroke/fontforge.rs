@@ -96,16 +96,8 @@ fn ffsplineset_to_outline(ss_in: fontforge::SplineSet) -> glifparser::Outline<()
             while pt.next != ptr::null_mut() {
                 // `noprevcp`/`nonextcp` is a method because it's a bitfield in fontforge. It's a
                 // bindgen artifact due to the fact Rust has no native support for bitfields.
-                let prevcp = if pt.noprevcp() != 0 {
-                    None
-                } else {
-                    Some(pt.prevcp)
-                };
-                let nextcp = if pt.nonextcp() != 0 {
-                    None
-                } else {
-                    Some(pt.nextcp)
-                };
+                let prevcp = if pt.noprevcp() != 0 { None } else { Some(pt.prevcp) };
+                let nextcp = if pt.nonextcp() != 0 { None } else { Some(pt.nextcp) };
                 let should_move = pt.prev == ptr::null_mut() && i == 0;
                 contour.push(ffbasepoint_to_point(pt.me, prevcp, nextcp, should_move));
                 if (*pt.next).to == first {
@@ -122,11 +114,7 @@ fn ffsplineset_to_outline(ss_in: fontforge::SplineSet) -> glifparser::Outline<()
 
 // The FontForge `Spline` type shouldn't be made by us.
 // Cf. (GitHub) fontforge/fontforge#4676, fontforge/fontforge#4673.
-fn make_spline(
-    from: *mut fontforge::SplinePoint,
-    to: *mut fontforge::SplinePoint,
-    order2: bool,
-) -> *mut fontforge::Spline {
+fn make_spline(from: *mut fontforge::SplinePoint, to: *mut fontforge::SplinePoint, order2: bool) -> *mut fontforge::Spline {
     unsafe {
         let s = fontforge::SplineMake(from, to, order2 as raw::c_int);
         s
@@ -154,9 +142,7 @@ fn glif_to_ffsplineset<PD: glifparser::PointData>(glif: glifparser::Glif<PD>) ->
                 x: bx as f64,
                 y: by as f64,
             };
-            let mut spbf = SplinePointBitField {
-                ..Default::default()
-            };
+            let mut spbf = SplinePointBitField { ..Default::default() };
 
             let nonextcp = p.a == glifparser::Handle::Colocated;
             let noprevcp = p.b == glifparser::Handle::Colocated;
@@ -166,7 +152,9 @@ fn glif_to_ffsplineset<PD: glifparser::PointData>(glif: glifparser::Glif<PD>) ->
             spbf.pointtype = fontforge::pointtype_pt_corner;
 
             let bf = spbf.to_bitfield();
-            let ffbf = fontforge::splinepoint::new_bitfield_1(bf.0, bf.1, bf.2, bf.3, bf.4, bf.5, bf.6, bf.7, bf.8, bf.9, bf.10, bf.11, bf.12, bf.13, bf.14, bf.15);
+            let ffbf = fontforge::splinepoint::new_bitfield_1(
+                bf.0, bf.1, bf.2, bf.3, bf.4, bf.5, bf.6, bf.7, bf.8, bf.9, bf.10, bf.11, bf.12, bf.13, bf.14, bf.15,
+            );
 
             let sp = fontforge::SplinePoint {
                 me: bp0_1,
@@ -189,6 +177,7 @@ fn glif_to_ffsplineset<PD: glifparser::PointData>(glif: glifparser::Glif<PD>) ->
         let cffsps_len = cffsps.len();
 
         // First, we treat all SplinePoint's as if they form a loop.
+        #[rustfmt::skip]
         for idx in 0..cffsps_len {
             if idx == 0 {
                 cffsps[idx].prev = make_spline(&mut cffsps[idx] as *mut _, &mut cffsps[cffsps_len - 1] as *mut _, false);
@@ -253,15 +242,12 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
     if !settings.quiet {
         eprintln!("Reading nib...");
     }
-    let nibglif: glifparser::Glif<()> = glifparser::read(
-        &fs::read_to_string(&settings.nib).expect("Nib .glif inaccessible"),
-    ).unwrap();
+    let nibglif: glifparser::Glif<()> = glifparser::read(&fs::read_to_string(&settings.nib).expect("Nib .glif inaccessible")).unwrap();
     if !settings.quiet {
         eprintln!("Reading path...");
     }
-    let ssglif: glifparser::Glif<()> = glifparser::read(
-        &fs::read_to_string(&settings.path).expect("Path to stroke .glif inaccessible"),
-    ).unwrap();
+    let ssglif: glifparser::Glif<()> =
+        glifparser::read(&fs::read_to_string(&settings.path).expect("Path to stroke .glif inaccessible")).unwrap();
 
     if ssglif.outline.is_none() {
         return Some(glifparser::write(&ssglif).unwrap());
@@ -281,10 +267,7 @@ pub fn convert_glif(settings: &NibSettings) -> Option<String> {
         let shape = fontforge::NibIsValid(nibss);
         if shape != 0 {
             let shapetype = fontforge::NibShapeTypeMsg(shape);
-            eprintln!(
-                "Shape: {}\nCannot stroke!",
-                ffi::CStr::from_ptr(shapetype).to_str().unwrap()
-            );
+            eprintln!("Shape: {}\nCannot stroke!", ffi::CStr::from_ptr(shapetype).to_str().unwrap());
             return None;
         }
         let si = fontforge::InitializeStrokeInfo(ptr::null_mut());
