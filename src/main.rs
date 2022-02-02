@@ -20,6 +20,7 @@ fn main() {
         .setting(AppSettings::DisableHelpSubcommand)
         .author("Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens⊙ph>; MFEK Authors")
         .about("A utility for applying stroking techniques to contours (in UFO .glif format).")
+        .version(env!("CARGO_PKG_VERSION"))
         .subcommand(pattern_along_path::clap_app())
         .subcommand(variable_width_stroke::clap_app())
         .subcommand(constant_width_stroke::clap_app())

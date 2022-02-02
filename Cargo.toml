@@ -1,8 +1,9 @@
 [package]
 name = "MFEKstroke"
-version = "0.0.0"
-authors = ["Matthew Blanchard <matthewrblanchard@gmail.com>", "MFEK authors"]
-edition = "2018"
+version = "0.1.0-beta1"
+authors = ["Matthew Blanchard <matthewrblanchard@gmail.com>", "Fredrick R. Brennan <copypaste@kittens.ph>", "MFEK Authors"]
+edition = "2021"
+license = "Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
