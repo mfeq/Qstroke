@@ -24,6 +24,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .short('i')
                 .long("input")
                 .takes_value(true)
+                .allow_invalid_utf8(true)
                 .help("The path to the input file.")
                 .required(true),
         )
@@ -33,6 +34,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .short('o')
                 .long("output")
                 .takes_value(true)
+                .allow_invalid_utf8(true)
                 .help("The path where the output will be saved.")
                 .required(true),
         )

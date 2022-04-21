@@ -17,6 +17,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .long("input")
                 .short('i')
                 .takes_value(true)
+                .allow_invalid_utf8(true)
                 .required(true)
                 .help("The path to the input glif file."),
         )
@@ -26,6 +27,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .short('o')
                 .required(true)
                 .takes_value(true)
+                .allow_invalid_utf8(true)
                 .help("The path to the output glif file."),
         )
         .arg(
