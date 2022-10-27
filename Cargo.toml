@@ -14,7 +14,7 @@ clap = { git = "https://github.com/MFEK/clap.rlib", branch = "master" }
 # parses .glif files 
 glifparser = { git = "https://github.com/MFEK/glifparser.rlib", branch = "master", features=["mfek"] }
 #glifparser = { path = "../glifparser.rlib", features=["mfek"] } # for development
-MFEKmath = { git = "https://github.com/MFEK/math.rlib", branch = "main"}
+MFEKmath = { git = "https://github.com/MFEK/math.rlib", branch = "nibstroking" }
 #MFEKmath = { path = "../math.rlib" } # for development
 mfek-ipc = { git = "https://github.com/MFEK/ipc.rlib" }
 #mfek-ipc = { path = "../ipc.rlib" } # for development
@@ -26,10 +26,9 @@ env_logger = "0.9"
 serde_json = "1.0" # for glifjson
 
 # Can link FontForge as a dylib, if you have it installed. For nib stroking
-fontforge-sys = { path = "fontforge-sys", optional = true }
 
 [features]
-fontforge = ["fontforge-sys"]
+fontforge = ["MFEKmath/fontforge"]
 
 [profile.release]
 opt-level = 'z'

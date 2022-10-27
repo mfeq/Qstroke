@@ -5,10 +5,11 @@ version = 3
 [[package]]
 name = "MFEKmath"
 version = "0.1.0"
-source = "git+https://github.com/MFEK/math.rlib?branch=main#bd3ee6bd3b30298a6c7f2b1db6877b24f3c95c37"
+source = "git+https://github.com/MFEK/math.rlib?branch=nibstroking#6dd3fbf316d24a6f3bee988c47f50925fbda9caa"
 dependencies = [
  "flo_curves",
- "glifparser 1.2.0 (git+https://github.com/MFEK/glifparser.rlib?branch=master)",
+ "fontforge-typeconv",
+ "glifparser",
  "kurbo",
  "log",
  "plist",
@@ -23,8 +24,7 @@ dependencies = [
  "MFEKmath",
  "clap 3.0.5",
  "env_logger",
- "fontforge-sys",
- "glifparser 1.2.0 (git+https://github.com/MFEK/glifparser.rlib?branch=master)",
+ "glifparser",
  "log",
  "mfek-ipc",
  "serde_json",
@@ -382,9 +382,18 @@ dependencies = [
 [[package]]
 name = "fontforge-sys"
 version = "0.1.0"
+source = "git+https://github.com/MFEK/fontforge-sys.rlib#52d2b17e6541b8d0ce7db1ca9f9c44df41ff79dd"
 dependencies = [
- "glifparser 1.2.0 (git+https://github.com/MFEK/glifparser.rlib)",
  "libc",
+]
+
+[[package]]
+name = "fontforge-typeconv"
+version = "0.1.0"
+source = "git+https://github.com/MFEK/fontforge-typeconv.rlib?branch=main#f0276288877e42371986d223569e474bcb2d84f2"
+dependencies = [
+ "fontforge-sys",
+ "glifparser",
 ]
 
 [[package]]
@@ -448,25 +457,6 @@ dependencies = [
  "plist",
  "serde",
  "skia-safe",
- "trees",
- "xmltree",
-]
-
-[[package]]
-name = "glifparser"
-version = "1.2.0"
-source = "git+https://github.com/MFEK/glifparser.rlib#98ab5c6a30c85e159a79350b72f4b625a95a5820"
-dependencies = [
- "derivative",
- "derive_more",
- "float-cmp",
- "image",
- "integer_or_float",
- "itertools",
- "kurbo",
- "log",
- "plist",
- "serde",
  "trees",
  "xmltree",
 ]
@@ -706,7 +696,7 @@ dependencies = [
  "chrono_locale",
  "colored",
  "figlet-rs",
- "glifparser 1.2.0 (git+https://github.com/MFEK/glifparser.rlib?branch=master)",
+ "glifparser",
  "log",
  "notify",
  "serde",

@@ -1,9 +1,7 @@
-#[rustfmt::skip]
-mod fontforge;
-
 use std::fs;
 
 use clap::{App, Arg};
+use MFEKmath;
 
 pub fn clap_app() -> clap::App<'static> {
     App::new("NIB")
@@ -52,14 +50,14 @@ pub fn nib_cli(matches: &clap::ArgMatches) {
     let output_file = matches.value_of_os("output").unwrap();
     let accuracy = matches.value_of("accuracy").unwrap();
 
-    let settings = fontforge::NibSettings {
+    let settings = MFEKmath::nib_stroking::NibSettings {
         nib: nib_file.into(),
         path: input_file.into(),
         accuracy: accuracy.parse().unwrap(), //validated by super::arg_validator_positive_f64
         quiet: true,
     };
 
-    let converted = fontforge::convert_glif(&settings);
+    let converted = MFEKmath::nib_stroking::convert_glif(&settings);
     match converted {
         Some(glifstring) => fs::write(&output_file, glifstring).expect("Unable to write file"),
         None => eprintln!("Failed to nib stroke"),
