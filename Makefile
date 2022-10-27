@@ -1,21 +1,22 @@
 SHELL := /bin/bash
+.PHONY: all fmt man
 
 export RUST_LOG := debug
 export RUST_BACKTRACE := 1
 
 DEBUGARGS := $(if $(DEBUG),,"--release")
 
-FONTFORGE := $(if $(FONTFORGE),"fontforge","")
-
-.PHONY: all
+ifdef FONTFORGE
+RUSTFLAGS += -L/opt/lib -L/usr/local/lib
+endif
 all:
-	RUSTFLAGS="${RUSTFLAGS}" cargo build $(DEBUGARGS) --features $(FONTFORGE)
+	set -x; \
+	[ $$FONTFORGE = "y" ] && FONTFORGE_FLAG="--features fontforge" && NIGHTLY_FLAG="+nightly"; \
+	RUSTFLAGS="${RUSTFLAGS}" cargo $$NIGHTLY_FLAG build $(DEBUGARGS) $$FONTFORGE_FLAG
 
-.PHONY: fmt
 fmt:
 	find src -type f -iname '*.rs' | parallel --bar RUST_LOG=error rustfmt {}
 
-.PHONY: man
 man:
 	rm -f /tmp/MFEKstroke*
 	LD_LIBRARY_PATH=/opt/lib help2man -N 'target/debug/MFEKstroke CWS' --no-discard-stderr | tail -n +5 | head -n -3 > /tmp/MFEKstrokeCWS
