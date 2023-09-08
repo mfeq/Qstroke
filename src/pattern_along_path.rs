@@ -1,6 +1,6 @@
 use std::fs;
 
-use glifparser::glif::{PatternCopies, PatternStretch, PatternSubdivide};
+use glifparser::glif::contour_operations::pap::{PatternCopies, PatternStretch, PatternSubdivide};
 use MFEKmath::pattern_along_path::pattern_along_glif;
 use MFEKmath::pattern_along_path::*;
 use MFEKmath::vec2;

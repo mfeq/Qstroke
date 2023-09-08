@@ -1,5 +1,5 @@
 use clap::{App, AppSettings, Arg, ArgMatches};
-use glifparser::glif::{DashContour, DashCull};
+use glifparser::glif::contour_operations::dash::{DashContour, DashCull};
 use glifparser::outline::RefigurePointTypes as _;
 use MFEKmath::skia_safe::{PaintCap, PaintJoin};
 

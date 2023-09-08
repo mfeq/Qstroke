@@ -2,10 +2,12 @@ use std::ffi;
 use std::fs;
 use std::path::PathBuf as FsPathBuf;
 
-use glifparser::glif::{CapType, InterpolationType, JoinType, VWSContour, VWSHandle};
-use MFEKmath::{variable_width_stroke, Piecewise, VWSSettings};
+use glifparser::{CapType, JoinType, VWSContour};
+use glifparser::glif::contour_operations::vws::{InterpolationType, VWSHandle};
+use MFEKmath::{variable_width_stroking::{variable_width_stroke, VWSSettings}, Piecewise};
 
-use glifparser::glif::mfek::{ContourOperations, MFEKGlif};
+use glifparser::glif::mfek::MFEKGlif;
+use glifparser::glif::contour_operations::ContourOperations;
 use glifparser::{Glif, Outline, PointData};
 
 use clap::{App, AppSettings, Arg};
@@ -147,7 +149,7 @@ fn make_vws_contours(path: &Glif<()>, settings: &CWSSettings<()>) -> Vec<VWSCont
         interpolation: InterpolationType::Linear,
     };
 
-    for outline in path.outline.as_ref() {
+    if let Some(outline) = path.outline.as_ref() {
         for (cidx, contour) in outline.iter().enumerate() {
             let pointiter = contour.iter().enumerate();
 
@@ -275,7 +277,6 @@ pub fn cws_cli(matches: &clap::ArgMatches) {
 
         let out = Glif {
             outline: output_outline,
-            order: path.order,
             anchors: path.anchors.clone(),
             width: path.width,
             unicode: path.unicode,
