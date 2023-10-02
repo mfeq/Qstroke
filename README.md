@@ -134,7 +134,7 @@ OPTIONS:
             
             
 
-        --subdivide-angle <subdivide_angle>
+    -°, --subdivide-angle <subdivide_angle>
             <f64> how many degrees of change in direction to subdivide the patterns at. [default: 0]
             
 
@@ -144,7 +144,7 @@ OPTIONS:
     -Y, --sy <sy>
             <f64> how much we scale our input pattern on the y-axis. [default: 1]
 
-        --split-at-discontinuity
+    -|, --split-at-discontinuity
             Handle discontinuities by splitting the path.
 
     -n, --noffset <normal-offset>
@@ -171,10 +171,10 @@ OPTIONS:
     -Z, --erase-overlapping
             Erase the area underneath patterns that would overlap.
 
-        --erase-overlapping-stroke <erase_overlapping_stroke_width>
+    -z, --erase-overlapping-stroke <erase_overlapping_stroke_width>
             <float> how much we should expand the pattern when erasing overlapping patterns.
 
-        --erase-overlapping-area-percent <erase_overlapping_area_percent>
+    -%, --erase-overlapping-area-percent <erase_overlapping_area_percent>
             <float> how much we should expand the pattern when erasing overlapping patterns.
 
     -Q, --one-pass
