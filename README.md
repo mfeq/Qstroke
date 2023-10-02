@@ -93,47 +93,110 @@ cargo run -- --out Untitled2.ufo/glyphs/k.low.glif --path FRBStandardCursive-Reg
 ### Pattern Along Path
 ```
 MFEKstroke-PAP 0.2.1
-Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK Authors
+Matthew Blanchard <matthewrblanchard@gmail.com>; Fredrick R. Brennan <copypasteⒶkittens.ph>; MFEK
+Authors
 Maps a pattern glyph along a path glyph.
 
 USAGE:
-    MFEKstroke PAP [OPTIONS] --path <path> --pattern <pattern>
+    MFEKstroke PAP [OPTIONS] --path <path>
 
 OPTIONS:
-    -p, --pattern <pattern>           The path to the input pattern file. You may also provide either --dot-pattern or
-                                      --dash-pattern to use built-in patterns.
-    -=, --dash-pattern                Use a simple dash pattern
-    -., --dot-pattern                 Use a simple dot pattern
-    -P, --path <path>                 The path to the input path file.
-    -o, --output <output>             The path where the output will be saved. If omitted, or `-`, stdout.
-                                      
-                                      
-    -c, --contour <contour>           <isize> if this is a positive number we stroke only that specific contour in the
-                                      outline by index. [default: -1]
-    -m, --mode <mode>                 Repeat mode. [default: single]  [possible values: single, repeated]
-    -s, --subdivide <subdivide>       <usize> how many times to subdivide the patterns at their midpoint. [default: 0]
-                                      
-                                      
-    -X, --sx <sx>                     <f64> how much we scale our input pattern on the x-axis. [default: 1]
-    -Y, --sy <sy>                     <f64> how much we scale our input pattern on the y-axis. [default: 1]
-    -n, --noffset <normal-offset>     <f64> how much to offset the pattern along the normal of the path. [default: 0]
-    -t, --toffset <tangent-offset>    <f64> how much to offset the pattern along the tangent of the path. [default: 0]
-                                      
-                                      
-    -W, --spacing <spacing>           <f64> how much padding to trail each copy with. [default: 0]
-    -!, --stretch <stretch>           <stretch> false if not given, true if given, spacing mode if value of spacing
-                                      given [possible values: spacing]
-    -S, --simplify                    <boolean> if we should run the result through Skia's (buggy) simplify routine.
-    -O, --overdraw <overdraw>         <f64> pattern copies overlapping more than arg% are removed. [default: 100%]
-    -Q, --one-pass                    <boolean> whether we should not reflow the path after culling during overdraw
-                                      (faster but worse).
-    -C, --no-center-pattern           <boolean> supply if you wish to center the pattern
-    -r, --reverse                     <boolean> true will reverse the path.
-    -R, --reverse-culling             <boolean> true will reverse the order we check for overlaps during overlap
-                                      culling.
-                                      
-    -h, --help                        Prints help information
-    -V, --version                     Prints version information
+    -p, --pattern <pattern>
+            The path to the input pattern file. You may also provide either --dot-pattern or --dash-
+            pattern to use built-in patterns.
+
+    -=, --dash-pattern
+            Use a simple dash pattern
+
+    -w, --warp
+            Warp the pattern to fit the path.
+
+    -., --dot-pattern
+            Use a simple dot pattern
+
+    -P, --path <path>
+            The path to the input path file.
+
+    -o, --output <output>
+            The path where the output will be saved. If omitted, or `-`, stdout.
+            
+            
+
+    -c, --contour <contour>
+            <isize> if this is a positive number we stroke only that specific contour in the outline
+            by index. [default: -1]
+
+    -m, --mode <mode>
+            Repeat mode. [default: single] [possible values: single, repeated]
+
+    -s, --subdivide <subdivide>
+            <usize> how many times to subdivide the patterns at their midpoint. [default: 0]
+            
+            
+
+        --subdivide-angle <subdivide_angle>
+            <f64> how many degrees of change in direction to subdivide the patterns at. [default: 0]
+            
+
+    -X, --sx <sx>
+            <f64> how much we scale our input pattern on the x-axis. [default: 1]
+
+    -Y, --sy <sy>
+            <f64> how much we scale our input pattern on the y-axis. [default: 1]
+
+        --split-at-discontinuity
+            Handle discontinuities by splitting the path.
+
+    -n, --noffset <normal-offset>
+            <f64> how much to offset the pattern along the normal of the path. [default: 0]
+
+    -t, --toffset <tangent-offset>
+            <f64> how much to offset the pattern along the tangent of the path. [default: 0]
+            
+            
+
+    -W, --spacing <spacing>
+            <f64> how much padding to trail each copy with. [default: 0]
+
+    -!, --stretch <stretch>
+            <stretch> false if not given, true if given, spacing mode if value of spacing given
+            [possible values: spacing]
+
+    -S, --simplify
+            <boolean> if we should run the result through Skia's (buggy) simplify routine.
+
+    -O, --remove-overlapping
+            Remove patterns that would overlap.
+
+    -Z, --erase-overlapping
+            Erase the area underneath patterns that would overlap.
+
+        --erase-overlapping-stroke <erase_overlapping_stroke_width>
+            <float> how much we should expand the pattern when erasing overlapping patterns.
+
+        --erase-overlapping-area-percent <erase_overlapping_area_percent>
+            <float> how much we should expand the pattern when erasing overlapping patterns.
+
+    -Q, --one-pass
+            <boolean> whether we should not reflow the path after culling during overdraw (faster
+            but worse).
+
+    -C, --no-center-pattern
+            <boolean> supply if you wish to center the pattern
+
+    -r, --reverse
+            <boolean> true will reverse the path.
+
+    -R, --reverse-culling
+            <boolean> true will reverse the order we check for overlaps during overlap culling.
+            
+            
+
+    -h, --help
+            Print help information
+
+    -V, --version
+            Print version information
 ```
 ### Variable Width Stroking
 (Note: In VWS mode, it is expected that you are using MFEKglif to generate the input files. Therefore, not many helpful command line options are provided. If you wish to use VWS programatically, play with MFEKglif's VWS tool, get some output, and study it; then generate conformant XML.)
