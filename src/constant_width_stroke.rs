@@ -10,6 +10,7 @@ use glifparser::glif::contour_operations::vws::{InterpolationType, VWSHandle};
 
 use glifparser::glif::mfek::{MFEKGlif};
 use MFEKmath::variable_width_stroking::VWSSettings;
+
 use glifparser::{Glif, Outline, PointData};
 
 use clap::{App, AppSettings, Arg};
@@ -151,7 +152,7 @@ fn make_vws_contours(path: &Glif<()>, settings: &CWSSettings<()>) -> Vec<VWSCont
         interpolation: InterpolationType::Linear,
     };
 
-    for outline in path.outline.as_ref() {
+    if let Some(outline) = path.outline.as_ref() {
         for (cidx, contour) in outline.iter().enumerate() {
             let pointiter = contour.iter().enumerate();
 

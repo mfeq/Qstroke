@@ -12,23 +12,24 @@ license = "Apache-2.0"
 clap = { git = "https://github.com/MFEK/clap.rlib", branch = "master" }
 
 # parses .glif files 
-#glifparser = { git = "https://github.com/MFEK/glifparser.rlib", branch = "master", features=["mfek"] }
-glifparser = { path = "../glifparser.rlib", features=["mfek"] } # for development
-#MFEKmath = { git = "https://github.com/MFEK/math.rlib", branch = "nibstroking" }
-MFEKmath = { path = "../math.rlib", features = ["skia"]} # for development
-#mfek-ipc = { git = "https://github.com/MFEK/ipc.rlib" }
-mfek-ipc = { path = "../ipc.rlib" } # for development
+glifparser = { git = "https://github.com/MFEK/glifparser.rlib", branch = "master", features=["mfek"] }
+#glifparser = { path = "../glifparser.rlib", features=["mfek"] } # for development
+MFEKmath = { git = "https://github.com/MFEK/math.rlib", features=["skia"], branch = "main" }
+#MFEKmath = { path = "../math.rlib" } # for development
+mfek-ipc = { git = "https://github.com/MFEK/ipc.rlib" }
+#mfek-ipc = { path = "../ipc.rlib" } # for development
 
 # For reading and writing glifs
 xmltree = "0.10"
 log = "0.4.11"
 env_logger = "0.9"
 serde_json = "1.0" # for glifjson
+float-cmp = { version = "0.9.0", features = ["std"] }
 
 # Can link FontForge as a dylib, if you have it installed. For nib stroking
 
-#[features]
-#fontforge = ["MFEKmath/fontforge"]
+[features]
+fontforge = ["MFEKmath/fontforge"]
 
 [profile.release]
 opt-level = 'z'

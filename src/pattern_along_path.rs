@@ -1,5 +1,7 @@
 use std::fs;
 
+use float_cmp::ApproxEq as _;
+use float_cmp::F64Margin;
 use MFEKmath::pattern_along_glif;
 use glifparser::glif::contour_operations::pap::{PatternCopies, PatternStretch, PatternSubdivide};
 use MFEKmath::vec2;
@@ -79,6 +81,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .validator(super::arg_validator_usize)
                 .help("<usize> how many times to subdivide the patterns at their midpoint. [default: 0]\n\n\n"))
             .arg(Arg::new("subdivide_angle")
+                .short('°')
                 .long("subdivide-angle")
                 .takes_value(true)
                 .default_value("1")
@@ -100,6 +103,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .validator(super::arg_validator_positive_f64)
                 .help("<f64> how much we scale our input pattern on the y-axis."))
             .arg(Arg::new("split_at_discontinuity")
+                .short('|')
                 .long("split-at-discontinuity")
                 .help("Handle discontinuities by splitting the path.")
             )
@@ -146,12 +150,14 @@ pub fn clap_app() -> clap::App<'static> {
                 .help("Erase the area underneath patterns that would overlap."))   
             .arg(Arg::new("erase_overlapping_stroke_width")
                 .long("erase-overlapping-stroke")
+                .short('z')
                 .takes_value(true)
                 .default_value("5")
                 .hide_default_value(true)
                 .validator(super::arg_validator_f64) 
                 .help("<float> how much we should expand the pattern when erasing overlapping patterns."))   
             .arg(Arg::new("erase_overlapping_area_percent")
+                .short('%')
                 .long("erase-overlapping-area-percent")
                 .takes_value(true)
                 .default_value("5")
@@ -256,10 +262,11 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
 
     if let Some(sub_angle_string) = matches.value_of("subdivide_angle") {
         let n = sub_angle_string.parse::<f64>().unwrap();
-        settings.subdivide = match n {
-            0. => PatternSubdivide::Off,
-            _ => PatternSubdivide::Angle(n),
-        };
+        if 0.0f64.approx_eq(n, F64Margin { ulps: 2, epsilon: 0.01 }) {
+            settings.subdivide = PatternSubdivide::Off;
+        } else {
+            settings.subdivide = PatternSubdivide::Angle(n);
+        }
     }
 
     if let Some(spacing_string) = matches.value_of("spacing") {
@@ -278,7 +285,7 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
     settings.center_pattern = !matches.is_present("no-center-pattern");
     settings.simplify = matches.is_present("simplify");
 
-    if let Some(s) = matches.value_of("remove_overlapping") {
+    if matches.value_of("remove_overlapping").is_some() {
         settings.cull_overlap = glifparser::glif::contour_operations::pap::PatternCulling::RemoveOverlapping;
     }
 

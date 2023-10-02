@@ -1,7 +1,7 @@
 use std::fs;
 
 use clap::{App, Arg};
-use MFEKmath::{variable_width_stroke_glif, VWSSettings};
+use MFEKmath::{variable_width_stroking::{variable_width_stroke_glif, VWSSettings}};
 
 pub fn clap_app() -> clap::App<'static> {
     App::new("VWS")
