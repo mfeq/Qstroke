@@ -2,12 +2,15 @@ use std::ffi;
 use std::fs;
 use std::path::PathBuf as FsPathBuf;
 
+use MFEKmath::Piecewise;
+use MFEKmath::variable_width_stroking::variable_width_stroke;
+use glifparser::glif::contour_operations::ContourOperations;
 use glifparser::{CapType, JoinType, VWSContour};
 use glifparser::glif::contour_operations::vws::{InterpolationType, VWSHandle};
-use MFEKmath::{variable_width_stroking::{variable_width_stroke, VWSSettings}, Piecewise};
 
-use glifparser::glif::mfek::MFEKGlif;
-use glifparser::glif::contour_operations::ContourOperations;
+use glifparser::glif::mfek::{MFEKGlif};
+use MFEKmath::variable_width_stroking::VWSSettings;
+
 use glifparser::{Glif, Outline, PointData};
 
 use clap::{App, AppSettings, Arg};
@@ -167,9 +170,9 @@ fn constant_width_stroke_glifjson(path: Glif<()>, settings: &CWSSettings<()>) ->
     let vws_contours = make_vws_contours(&path, settings);
     let mut ret: MFEKGlif<()> = path.into();
     for (i, contour) in ret.layers[0].outline.iter_mut().enumerate() {
-        contour.operation = Some(ContourOperations::VariableWidthStroke {
+        contour.set_operation(Some(ContourOperations::VariableWidthStroke {
             data: vws_contours[i].clone(),
-        });
+        }));
     }
     ret
 }

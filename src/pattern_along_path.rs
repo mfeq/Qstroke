@@ -1,12 +1,14 @@
 use std::fs;
 
+use float_cmp::ApproxEq as _;
+use float_cmp::F64Margin;
+use MFEKmath::pattern_along_glif;
 use glifparser::glif::contour_operations::pap::{PatternCopies, PatternStretch, PatternSubdivide};
-use MFEKmath::pattern_along_path::pattern_along_glif;
-use MFEKmath::pattern_along_path::*;
 use MFEKmath::vec2;
 use MFEKmath::vector::Vector;
 use MFEKmath::EvalScale;
 use MFEKmath::Piecewise;
+use MFEKmath::PatternSettings;
 
 use clap::{App, AppSettings, Arg};
 
@@ -24,7 +26,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .long("pattern")
                 .short('p')
                 .takes_value(true)
-                .allow_invalid_utf8(true)
+                //.allow_invalid_utf8(true)
                 .required_unless_present_any(&["dot-pattern", "dash-pattern"])
                 .conflicts_with_all(&["dot-pattern", "dash-pattern"])
                 .help("The path to the input pattern file. You may also provide either --dot-pattern or --dash-pattern to use built-in patterns."))
@@ -33,6 +35,10 @@ pub fn clap_app() -> clap::App<'static> {
                 .short('=')
                 .conflicts_with("dot-pattern")
                 .help("Use a simple dash pattern"))
+            .arg(Arg::new("warp")
+                .long("warp")
+                .short('w')
+                .help("Warp the pattern to fit the path."))
             .arg(Arg::new("dot-pattern")
                 .long("dot-pattern")
                 .short('.')
@@ -42,7 +48,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .long("path")
                 .short('P')
                 .takes_value(true)
-                .allow_invalid_utf8(true)
+                //.allow_invalid_utf8(true)
                 .help("The path to the input path file.")
                 .required(true))
             .arg(Arg::new("output")
@@ -50,7 +56,7 @@ pub fn clap_app() -> clap::App<'static> {
                 .alias("out")
                 .short('o')
                 .takes_value(true)
-                .allow_invalid_utf8(true)
+                //.allow_invalid_utf8(true)
                 .help("The path where the output will be saved. If omitted, or `-`, stdout.\n\n\n"))
             .arg(Arg::new("contour")
                 .long("contour")
@@ -74,6 +80,13 @@ pub fn clap_app() -> clap::App<'static> {
                 .hide_default_value(true)
                 .validator(super::arg_validator_usize)
                 .help("<usize> how many times to subdivide the patterns at their midpoint. [default: 0]\n\n\n"))
+            .arg(Arg::new("subdivide_angle")
+                .long("subdivide-angle")
+                .takes_value(true)
+                .default_value("1")
+                .hide_default_value(true)
+                .validator(super::arg_validator_positive_f64)
+                .help("<f64> how many degrees of change in direction to subdivide the patterns at. [default: 0]\n\n\n"))
             .arg(Arg::new("sx")
                 .long("sx")
                 .short('X')
@@ -88,6 +101,10 @@ pub fn clap_app() -> clap::App<'static> {
                 .default_value("1")
                 .validator(super::arg_validator_positive_f64)
                 .help("<f64> how much we scale our input pattern on the y-axis."))
+            .arg(Arg::new("split_at_discontinuity")
+                .long("split-at-discontinuity")
+                .help("Handle discontinuities by splitting the path.")
+            )
             .arg(Arg::new("normal-offset")
                 .long("noffset")
                 .short('n')
@@ -120,13 +137,29 @@ pub fn clap_app() -> clap::App<'static> {
                 .short('S')
                 .long("simplify")
                 .help("<boolean> if we should run the result through Skia's (buggy) simplify routine."))
-            .arg(Arg::new("overdraw")
-                .long("overdraw")
+            .arg(Arg::new("remove_overlapping")
+                .long("remove-overlapping")
                 .short('O')
+                .conflicts_with_all(&["erase_overlapping_stroke_width", "erase_overlapping", "erase_overlapping_area_percent"])
+                .help("Remove patterns that would overlap."))
+            .arg(Arg::new("erase_overlapping")
+                .long("erase-overlapping")
+                .short('Z')
+                .help("Erase the area underneath patterns that would overlap."))   
+            .arg(Arg::new("erase_overlapping_stroke_width")
+                .long("erase-overlapping-stroke")
                 .takes_value(true)
-                .default_value("100%")
-                .validator(super::arg_validator_suffix(&super::arg_validator_positive_f64, '%'))
-                .help("<f64> pattern copies overlapping more than arg% are removed."))
+                .default_value("5")
+                .hide_default_value(true)
+                .validator(super::arg_validator_f64) 
+                .help("<float> how much we should expand the pattern when erasing overlapping patterns."))   
+            .arg(Arg::new("erase_overlapping_area_percent")
+                .long("erase-overlapping-area-percent")
+                .takes_value(true)
+                .default_value("5")
+                .hide_default_value(true)
+                .validator(super::arg_validator_f64) 
+                .help("<float> how much we should expand the pattern when erasing overlapping patterns."))              
             .arg(Arg::new("one-pass")
                 .long("one-pass")
                 .short('Q')
@@ -191,10 +224,12 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         spacing: 0.,
         stretch: PatternStretch::Spacing,
         simplify: false,
-        cull_overlap: 1.,
+        cull_overlap: glifparser::glif::contour_operations::pap::PatternCulling::Off,
         two_pass_culling: false,
         reverse_path: false,
         reverse_culling: false,
+        split_path: false,
+        warp_pattern: false,
     };
 
     if let Some(copies) = matches.value_of("mode") {
@@ -221,6 +256,15 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         };
     }
 
+    if let Some(sub_angle_string) = matches.value_of("subdivide_angle") {
+        let n = sub_angle_string.parse::<f64>().unwrap();
+        if 0.0f64.approx_eq(n, F64Margin { ulps: 2, epsilon: 0.01 }) {
+            settings.subdivide = PatternSubdivide::Off;
+        } else {
+            settings.subdivide = PatternSubdivide::Angle(n);
+        }
+    }
+
     if let Some(spacing_string) = matches.value_of("spacing") {
         settings.spacing = spacing_string.parse::<f64>().unwrap();
     }
@@ -233,8 +277,30 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         settings.tangent_offset = tangent_string.parse::<f64>().unwrap();
     }
 
+    settings.warp_pattern = matches.is_present("warp");
     settings.center_pattern = !matches.is_present("no-center-pattern");
     settings.simplify = matches.is_present("simplify");
+
+    if matches.value_of("remove_overlapping").is_some() {
+        settings.cull_overlap = glifparser::glif::contour_operations::pap::PatternCulling::RemoveOverlapping;
+    }
+
+    if matches.is_present("erase_overlapping") {
+        settings.cull_overlap = glifparser::glif::contour_operations::pap::PatternCulling::EraseOverlapping(
+            matches
+                .value_of("erase_overlapping_stroke_width")
+                .unwrap_or("5")
+                .parse::<f64>()
+                .unwrap(),
+            matches
+                .value_of("erase_overlapping_area_percent")
+                .unwrap_or("25")
+                .parse::<f64>()
+                .unwrap(),
+        );
+    }
+
+    settings.split_path = matches.is_present("split_at_discontinuity");
 
     // We know the string must be "spacing" as that's the only .possible_value to clap::Arg
     if let Some(s) = matches.value_of("stretch") {
@@ -244,11 +310,6 @@ pub fn pap_cli(matches: &clap::ArgMatches) {
         settings.stretch = PatternStretch::On;
     } else {
         settings.stretch = PatternStretch::Off;
-    }
-
-    if let Some(overdraw_string) = matches.value_of("overdraw") {
-        settings.cull_overlap = overdraw_string.trim_end_matches('%').parse::<f64>().unwrap();
-        settings.cull_overlap /= 100.0;
     }
 
     let mut target_contour = None;

@@ -56,11 +56,3 @@ pub fn arg_validator_usize(v: &str) -> Result<(), String> {
         Err(_) => Err(String::from("Value must be a positive integer")),
     }
 }
-
-pub fn arg_validator_suffix(f: &impl Fn(&str) -> Result<(), String>, suffix: char) -> impl Fn(&str) -> Result<(), String> + '_ {
-    move |v| {
-        let len = if v.ends_with(suffix) { 1 } else { 0 };
-        let vlen = v.len();
-        f(&v[0..vlen - len - 1])
-    }
-}
